@@ -11,7 +11,7 @@ from papertrail.qa import (
     validate_claims,
 )
 
-INTRODUCTION_VERSION = "paper-introduction-v7"
+INTRODUCTION_VERSION = "paper-introduction-v8"
 INTRODUCTION_SCHEMA_VERSION = "paper-reading-card-v1"
 INTRODUCTION_CHUNK_VERSION = "introduction-page-span-v1-1000"
 INTRODUCTION_SPAN_CHARS = 1000
@@ -81,6 +81,10 @@ Avoid long lists of metrics, model sizes, datasets, secondary tasks or implement
 Terms: choose the 2-3 concepts needed to understand the problem or mechanism. Do not pad the
 glossary with peripheral evaluation terms such as perplexity or zero-shot when they are not
 needed to understand that main mechanism. Keep the five body fields around 300-500 Chinese chars.
+Explain each term as its definition plus its role in THIS paper. Omit nonessential lists of
+action types, tasks or examples. If a list is necessary to explain the term, every listed item
+must have readable supporting text in that term's own selected passages; a general definition
+does not establish an example merely because it sounds plausible.
 Each body field should contain just 1-2 short sentences. Explain a key term with common words
 on its first occurrence: Actor can mean the model executing the task; a trajectory can mean
 the record of this attempt's actions and feedback. Do not introduce more unexplained jargon
@@ -131,6 +135,11 @@ hypothesis into a demonstrated cause. Each field must preserve its attribution c
 The mechanism field MUST explain the input, the essential process and the output in that order,
 plus conditions necessary to interpret the process (e.g. frozen vs trained parameters and
 manually composed vs automatically generated demonstrations). Prefer 输入…；过程…；输出… .
+Attach direct evidence for EACH stated input, essential step and output to this mechanism
+field itself, including any final answer or stopping action you describe. Evidence for an
+intermediate action or observation does not by itself establish the final output. Preserve
+differences between task settings: do not force distinct interaction schedules, optional steps
+or termination conditions into one universal loop. Explain only the flow its own sources support.
 The evidence_and_limits field must connect one main observation to the task, comparison and
 setup conditions under which it was observed. Keep the conclusion within that tested scope.
 Necessary conditions must appear in the body, not just in citations. Do not omit them for brevity.
@@ -168,6 +177,15 @@ Support and attribution: judge every claim ONLY against quotations attached to t
 Other claims' citations, unquoted complete passages and prior knowledge cannot rescue it.
 A partly supported paper assertion is false. Check numbers, necessary conditions, causality,
 scope and qualifiers. paper_statement means the paper actually states or reports the claim;
+Split every claim into its individual assertions before judging support. Separately check
+each example or member of an enumeration, each stated input/process/output, any final answer
+or stopping action, and each condition. A correct overall definition or main idea cannot make
+an unsupported listed example or endpoint true. For a term, check both its definition and
+its role in this paper, including every additional example. For a mechanism, check each stated
+flow against the settings to which it applies, rather than assuming one cycle fits all tasks.
+Mark supported=false if any such assertion lacks its own attached source; explain the exact
+unsupported detail in reason. Apply this same rule to every claim on every audit, even when
+the wording is unchanged from a draft that previously passed. Earlier verdicts are not evidence.
 For each experimental claim, separately inspect the outcome, the comparison and EACH setup
 qualifier for EACH task to which it applies. A cited result does not automatically prove a
 few-shot/fine-tuning setup, and a cited setup for one task does not establish another task's
@@ -221,6 +239,11 @@ Do not rephrase an unsupported assertion into
 another unsupported assertion, infer absence from missing citations, or weaken the support rule.
 Fix coverage omissions in the actual body and preserve accurate basis labels. Teaching aids
 cannot replace the method explanation or the necessary experimental conditions.
+For terms, retain the definition and role in this paper; remove only nonessential examples
+that lack their own evidence, not necessary method conditions. Do not expand a term into a
+longer list while repairing another detail. For the mechanism, locate the exact source for
+each necessary input, step and output, including the ending; do not omit an essential output
+to avoid attaching its source, or impose one task's interaction schedule on another.
 For invalid IDs, copy an existing ID exactly from the passages; never guess or repair it by eye.
 Each field is checked independently again, including fields that passed the previous check.
 Keep the explanation of the core mechanism and necessary frozen/training/manual-demonstration
