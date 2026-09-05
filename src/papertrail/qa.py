@@ -8,9 +8,15 @@ from collections.abc import Callable
 
 from papertrail.coverage import checked_coverage, requirements_from_query
 from papertrail.model import ModelClient, ModelConfig, ModelError
-from papertrail.retrieval import CHUNK_VERSION, RETRIEVAL_VERSION, build_chunks, retrieve
+from papertrail.retrieval import (
+    CHUNK_VERSION,
+    RETRIEVAL_VERSION,
+    build_chunks,
+    retrieve,
+    retrieve_for_queries,
+)
 
-PROMPT_VERSION = "evidence-qa-v6-relevance-boundary"
+PROMPT_VERSION = "evidence-qa-v7-query-term-coverage"
 PIPELINE_TIMEOUT = 180
 INSUFFICIENT = "在当前已检索证据中未找到足够支持。请尝试更具体的问题，或直接查看原文核对。"
 QUERY_PROMPT = """You prepare search queries for a single academic paper. Return JSON only:
@@ -320,11 +326,12 @@ def answer_question(
         trace["requirements"] = requirements
         stage("retrieving")
         chunks = build_chunks(str(paper["id"]), paper["sha256"], pages)
-        retrieved = retrieve(chunks, " ".join([question, *queries]))
+        retrieval = retrieve_for_queries(chunks, question, queries)
+        retrieved = retrieval["selected"]
         trace["retrieval"] = {
             "queries": queries,
             "chunk_count": len(chunks),
-            "selected": retrieved,
+            **retrieval,
             "baseline_selected": retrieve(chunks, question),
             "top_k": 12,
             "max_chars": 20_000,

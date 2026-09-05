@@ -95,6 +95,12 @@ def test_complete_fixed_pipeline_resolves_page_and_records_separate_checks():
     assert trace["usage"] == {"prompt_tokens": 300, "completion_tokens": 120, "complete": True}
     assert trace["retrieval"]["baseline_selected"] == []
     assert trace["retrieval"]["selected"][0]["page_index"] == 1
+    assert trace["retrieval"]["merged_selected"] == trace["retrieval"]["selected"]
+    assert trace["retrieval"]["supplementation"]["decisions"] == []
+    assert trace["retrieval"]["supplementation"]["baseline_matched_terms"] == [
+        "benchmarks",
+        "experiments",
+    ]
     assert stages == ["translating", "retrieving", "generating", "validating", "verifying"]
 
 
