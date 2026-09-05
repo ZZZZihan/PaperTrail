@@ -19,10 +19,30 @@ class Budget:
     output_price: Decimal
     currency: str
     scope: str
+    mode: str = "priced"
+    max_calls: int | None = None
 
     @classmethod
     def from_env(cls) -> "Budget | None":
         try:
+            mode = os.getenv("PAPERTRAIL_MODEL_BUDGET_MODE", "priced").strip().lower()
+            if mode not in {"priced", "provider_quota"}:
+                return None
+            currency = os.getenv("PAPERTRAIL_MODEL_CURRENCY", "").strip().upper()
+            if mode == "provider_quota" and not currency:
+                currency = "USD"
+            if not currency or len(currency) > 12:
+                return None
+            # Scope stays independent of model, prices and budget mode.
+            scope = os.getenv("PAPERTRAIL_MODEL_BUDGET_SCOPE", "v01-development")
+            scope_hash = hashlib.sha256(scope.encode()).hexdigest()
+            if mode == "provider_quota":
+                max_calls = int(os.environ["PAPERTRAIL_MODEL_MAX_CALLS"])
+                if not 1 <= max_calls <= 1000:
+                    return None
+                return cls(
+                    Decimal(0), Decimal(0), Decimal(0), currency, scope_hash, mode, max_calls
+                )
             values = [
                 Decimal(os.environ[key])
                 for key in (
@@ -33,12 +53,7 @@ class Budget:
             ]
             if not all(value.is_finite() and value >= 0 for value in values):
                 return None
-            currency = os.environ["PAPERTRAIL_MODEL_CURRENCY"].strip().upper()
-            if not currency or len(currency) > 12:
-                return None
-            # Scope is an explicit allowance name, independent of switching model or prices.
-            scope = os.getenv("PAPERTRAIL_MODEL_BUDGET_SCOPE", "v01-development")
-            return cls(*values, currency, hashlib.sha256(scope.encode()).hexdigest())
+            return cls(*values, currency, scope_hash)
         except (KeyError, ValueError, InvalidOperation):
             return None
 
@@ -63,10 +78,24 @@ class CallLedger:
         if self.budget is None:
             raise ModelError(
                 "budget_not_configured",
-                "请在本地配置中填写获准预算、币种及输入/输出单价，重启后再试。",
+                "请配置获准预算及单价，或明确选择供应商额度模式并设置调用次数上限，然后重启。",
             )
         budget = self.budget
-        reserved = budget.cost(metadata["input_token_upper_bound"], metadata["max_output_tokens"])
+        quota = budget.mode == "provider_quota"
+        reserved = (
+            Decimal(0)
+            if quota
+            else budget.cost(metadata["input_token_upper_bound"], metadata["max_output_tokens"])
+        )
+        reservation = {
+            **metadata,
+            "budget_mode": budget.mode,
+            "reserved_cost_purpose": "call_slot_only_not_monetary"
+            if quota
+            else "conservative_token_cost",
+            "cost_source": "unknown_provider_rates" if quota else "unknown",
+            "estimated_cost": None,
+        }
         with self.repository.connect() as conn:
             conn.execute("SELECT pg_advisory_xact_lock(18091802)")
             task = conn.execute(
@@ -75,7 +104,9 @@ class CallLedger:
             if task is None or task["status"] not in {"pending", "running"}:
                 raise ModelError("interrupted", "问题处理已结束或中断，请刷新历史查看。")
             rows = conn.execute(
-                "SELECT currency, COALESCE(SUM(COALESCE(actual_cost, reserved_cost)), 0) AS used "
+                "SELECT currency, COALESCE(SUM(COALESCE(actual_cost, reserved_cost)), 0) AS used, "
+                "COUNT(*) AS call_count, COUNT(*) FILTER "
+                "(WHERE details->>'budget_mode' = 'provider_quota') AS unpriced_calls "
                 "FROM model_calls WHERE budget_scope = %s GROUP BY currency",
                 (budget.scope,),
             ).fetchall()
@@ -83,8 +114,16 @@ class CallLedger:
                 raise ModelError(
                     "budget_currency_changed", "本轮预算币种与既有记录不同，请恢复配置。"
                 )
+            if quota and sum(row["call_count"] for row in rows) >= budget.max_calls:
+                raise ModelError(
+                    "call_limit_exceeded", "本轮调用次数已达上限，请核对供应商额度和账本后再试。"
+                )
+            if not quota and any(row["unpriced_calls"] for row in rows):
+                raise ModelError(
+                    "budget_mode_conflict", "本轮已有费用未知的额度调用，不能改按金额继续预留。"
+                )
             used = sum((row["used"] for row in rows), Decimal(0))
-            if used + reserved > budget.limit:
+            if not quota and used + reserved > budget.limit:
                 raise ModelError(
                     "budget_exceeded", "本轮剩余预算不足以预留下一次调用，请核对用量和预算后再试。"
                 )
@@ -99,7 +138,7 @@ class CallLedger:
                     budget.currency,
                     metadata["stage"],
                     reserved,
-                    Jsonb(metadata),
+                    Jsonb(reservation),
                 ),
             )
 
@@ -111,7 +150,8 @@ class CallLedger:
         completion_tokens = usage.get("completion_tokens")
         actual = None
         if (
-            isinstance(prompt_tokens, int)
+            self.budget.mode == "priced"
+            and isinstance(prompt_tokens, int)
             and not isinstance(prompt_tokens, bool)
             and isinstance(completion_tokens, int)
             and not isinstance(completion_tokens, bool)
@@ -120,13 +160,23 @@ class CallLedger:
             actual = self.budget.cost(prompt_tokens, completion_tokens)
         augmented = {
             **details,
+            "budget_mode": self.budget.mode,
+            "reserved_cost_purpose": "call_slot_only_not_monetary"
+            if self.budget.mode == "provider_quota"
+            else "conservative_token_cost",
             "estimated_cost": str(actual) if actual is not None else None,
             "currency": self.budget.currency,
-            "cost_source": "configured_token_rates" if actual is not None else "unknown",
+            "cost_source": "unknown_provider_rates"
+            if self.budget.mode == "provider_quota"
+            else "configured_token_rates"
+            if actual is not None
+            else "unknown",
             "price_per_million": {
                 "input": str(self.budget.input_price),
                 "output": str(self.budget.output_price),
-            },
+            }
+            if self.budget.mode == "priced"
+            else None,
         }
         details.update(augmented)
         with self.repository.connect() as conn:
@@ -144,6 +194,9 @@ class CallLedger:
                 "completed_at FROM model_calls WHERE question_id = %s ORDER BY created_at",
                 (self.question_id,),
             ).fetchall()
+        known_costs = [row["actual_cost"] for row in rows if row["actual_cost"] is not None]
+        known_subtotal = sum(known_costs, Decimal(0))
+        unknown_calls = len(rows) - len(known_costs)
         return {
             "calls": [
                 {
@@ -160,12 +213,10 @@ class CallLedger:
                 }
                 for row in rows
             ],
-            "estimated_cost": str(
-                sum(
-                    (row["actual_cost"] for row in rows if row["actual_cost"] is not None),
-                    Decimal(0),
-                )
-            ),
-            "unknown_cost_calls": sum(row["actual_cost"] is None for row in rows),
+            "budget_mode": self.budget.mode if self.budget else None,
+            "estimated_cost": str(known_subtotal) if known_costs or not rows else None,
+            "estimated_cost_scope": "known_calls_only",
+            "known_cost_subtotal": str(known_subtotal),
+            "unknown_cost_calls": unknown_calls,
             "currency": self.budget.currency if self.budget else None,
         }

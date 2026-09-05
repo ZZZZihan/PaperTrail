@@ -277,6 +277,7 @@ def metrics(result: dict) -> dict:
     )
     totals = Counter()
     unknown_usage = 0
+    cost_sources = sorted({call.get("cost_source") or "unknown" for call in calls}) or ["unknown"]
     for call in calls:
         usage = call.get("usage")
         if not isinstance(usage, dict) or not all(
@@ -292,12 +293,17 @@ def metrics(result: dict) -> dict:
         "usage_known_subtotals": dict(totals),
         "unknown_usage_calls": unknown_usage,
         "elapsed_seconds": trace.get("elapsed_seconds"),
-        "estimated_cost_known_subtotal": ledger.get("estimated_cost"),
+        "estimated_cost_known_subtotal": ledger.get(
+            "known_cost_subtotal", ledger.get("estimated_cost")
+        ),
+        "estimated_cost_total": ledger.get("estimated_cost")
+        if ledger.get("unknown_cost_calls", len(calls)) == 0
+        else None,
         "unknown_cost_calls": ledger.get("unknown_cost_calls", len(calls)),
         "currency": ledger.get("currency"),
-        "cost_source": "configured_token_rates; not a provider invoice"
-        if ledger_calls
-        else "unknown",
+        "cost_source": cost_sources[0] if len(cost_sources) == 1 else "mixed",
+        "cost_sources": cost_sources,
+        "cost_note": "Known subtotals exclude unknown charges and are not a provider invoice",
     }
 
 
@@ -411,11 +417,15 @@ def aggregate(records: list[dict]) -> dict:
     unknown_cost = 0
     unknown_usage = 0
     unmeasured = 0
+    cost_sources = set()
     for record in records:
         measured = record.get("metrics")
         if measured is None:
             unmeasured += 1
             continue
+        cost_sources.update(
+            measured.get("cost_sources") or [measured.get("cost_source", "unknown")]
+        )
         calls += measured["calls"]
         tokens.update(measured["usage_known_subtotals"])
         unknown_cost += measured["unknown_cost_calls"]
@@ -441,7 +451,14 @@ def aggregate(records: list[dict]) -> dict:
         "unknown_cost_calls": unknown_cost,
         "unmeasured_questions": unmeasured,
         "estimated_cost_known_subtotals": {key: str(value) for key, value in currencies.items()},
-        "cost_source": "Configured token rates; unknown calls and unmeasured questions excluded",
+        "cost_source": next(iter(cost_sources))
+        if len(cost_sources) == 1
+        else ("mixed" if cost_sources else "unknown"),
+        "cost_sources": sorted(cost_sources) or ["unknown"],
+        "cost_note": "Known subtotals exclude unknown calls and unmeasured questions",
+        "estimated_cost_totals": {key: str(value) for key, value in currencies.items()}
+        if not unknown_cost and not unmeasured
+        else None,
         "ai_semantic_quality_review": "pending",
         "human_review": "pending",
         "warning": "Status agreement and valid citations do not establish answer correctness",

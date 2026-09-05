@@ -249,3 +249,72 @@ def test_unknown_cost_and_usage_are_not_zero_or_provider_invoice():
 def test_app_origin_does_not_accept_remote_or_embedded_credentials(url):
     with pytest.raises(argparse.ArgumentTypeError):
         runner.local_url(url)
+
+
+def test_provider_quota_preserves_unknown_cost_even_with_known_usage():
+    result = {
+        "trace": {
+            "ledger": {
+                "calls": [
+                    {
+                        "details": {
+                            "usage": {
+                                "prompt_tokens": 10,
+                                "completion_tokens": 5,
+                                "total_tokens": 15,
+                            },
+                            "cost_source": "unknown_provider_rates",
+                            "estimated_cost": None,
+                        },
+                        "actual_cost": None,
+                    }
+                ],
+                "estimated_cost": None,
+                "known_cost_subtotal": "0",
+                "unknown_cost_calls": 1,
+                "currency": "USD",
+            }
+        }
+    }
+    metrics = runner.metrics(result)
+    assert metrics["cost_source"] == "unknown_provider_rates"
+    assert metrics["cost_sources"] == ["unknown_provider_rates"]
+    assert metrics["estimated_cost_known_subtotal"] == "0"
+    assert metrics["estimated_cost_total"] is None
+    assert metrics["unknown_cost_calls"] == 1
+    summary = runner.aggregate([{"runner_status": "completed", "metrics": metrics}])
+    assert summary["cost_sources"] == ["unknown_provider_rates"]
+    assert summary["estimated_cost_known_subtotals"] == {"USD": "0"}
+    assert summary["estimated_cost_totals"] is None
+    assert summary["usage_known_subtotals"]["total_tokens"] == 15
+
+
+def test_priced_and_unknown_cost_sources_remain_separate():
+    def result(cost_source, subtotal, unknown):
+        return {
+            "trace": {
+                "ledger": {
+                    "calls": [{"details": {"cost_source": cost_source}}],
+                    "estimated_cost": subtotal,
+                    "unknown_cost_calls": unknown,
+                    "currency": "USD",
+                }
+            }
+        }
+
+    priced = runner.metrics(result("configured_token_rates", "0.0123", 0))
+    unknown = runner.metrics(result("unknown", "0", 1))
+    assert priced["cost_source"] == "configured_token_rates"
+    priced_summary = runner.aggregate([{"runner_status": "completed", "metrics": priced}])
+    assert priced_summary["estimated_cost_totals"] == {"USD": "0.0123"}
+    summary = runner.aggregate(
+        [
+            {"runner_status": "completed", "metrics": priced},
+            {"runner_status": "completed", "metrics": unknown},
+        ]
+    )
+    assert summary["cost_source"] == "mixed"
+    assert summary["cost_sources"] == ["configured_token_rates", "unknown"]
+    assert summary["estimated_cost_known_subtotals"] == {"USD": "0.0123"}
+    assert summary["unknown_cost_calls"] == 1
+    assert summary["estimated_cost_totals"] is None

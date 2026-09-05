@@ -39,7 +39,9 @@ make serve
 | `PAPERTRAIL_MODEL_ALLOW_HTTP_ORIGIN` | 可选，明确允许一个 HTTP 中转入口，例如 `http://192.168.1.2:8080`；默认空，不自动开放其他 HTTP 地址 |
 | `PAPERTRAIL_MODEL_NAME` / `PAPERTRAIL_MODEL_API_KEY` | 获准的模型名称与本地密钥 |
 | `PAPERTRAIL_MODEL_PROFILE` | 显式请求参数方案：默认 `compatible`，或 `openai`；不按模型名称猜测 |
-| `PAPERTRAIL_MODEL_BUDGET` / `PAPERTRAIL_MODEL_CURRENCY` | 本轮获准额度与币种；未配置时拒绝调用 |
+| `PAPERTRAIL_MODEL_BUDGET_MODE` | 默认 `priced`，按金额和单价控制；明确选择 `provider_quota` 表示授权使用已有供应商额度 |
+| `PAPERTRAIL_MODEL_MAX_CALLS` | `provider_quota` 必填，1—1000 的整数；当前 scope 全部已记录调用累计上限 |
+| `PAPERTRAIL_MODEL_BUDGET` / `PAPERTRAIL_MODEL_CURRENCY` | `priced` 必填的获准金额与币种；`provider_quota` 无需金额，币种为空时采用 USD，必须与同 scope 既有记录一致 |
 | `PAPERTRAIL_MODEL_INPUT_PRICE_PER_MILLION` / `PAPERTRAIL_MODEL_OUTPUT_PRICE_PER_MILLION` | 同币种每百万 token 保守输入/输出单价，用于调用前预留及用量后估算 |
 | `PAPERTRAIL_MODEL_BUDGET_SCOPE` | 本轮账本范围，默认 `v01-development`；不要通过换值绕过已经消耗的额度 |
 
@@ -49,7 +51,11 @@ make serve
 
 HTTPS 和 `http://127.0.0.1` / `http://localhost` 沿用默认支持。若用户指定局域网 HTTP 中转站，例如服务根路径为 `http://192.168.1.2:8080/private-route/v1`，则将 `PAPERTRAIL_MODEL_ALLOW_HTTP_ORIGIN` 设为 `http://192.168.1.2:8080`。允许项只接受单个 origin，不含用户信息、查询参数、片段或业务路径（末尾单个 `/` 可省略）；协议、主机和有效端口必须与服务根路径一致，未写 HTTP 端口时按 80 匹配。该设置只允许这个明确入口，不接受地址列表或通配符，也不因地址属于局域网而自动允许。运行追踪仅保存服务 origin 和完整根路径的哈希，不保存业务路径或密钥。
 
-每次调用前在持久账本预留输入保守上界及最大输出费用；成功返回用量后按配置单价估算，网络失败且用量未知则保留预留额。费用是配置单价计算的估算，不是供应商账单；特殊费用、不同计费规则或错误单价可能导致偏差。应使用普通文本 token 计费模型和供应商侧额度限制。服务、价格、额度得到用户授权后再运行真实诊断。
+`priced` 模式每次调用前在持久账本预留输入保守上界及最大输出费用；成功返回用量后按配置单价估算，网络失败且用量未知则保留预留额。费用是配置单价计算的估算，不是供应商账单；特殊费用、不同计费规则或错误单价可能导致偏差。应使用普通文本 token 计费模型和供应商侧额度限制。服务、价格、额度得到用户授权后再运行真实诊断。
+
+当用户明确授权使用已有中转额度、而所选模型费率无法核实时，可显式选择 `provider_quota` 并设置 `PAPERTRAIL_MODEL_MAX_CALLS`；此模式不读取金额或单价，不估造模型费用。它在相同持久账本和事务锁下预留一次调用名额，累计当前 scope 的全部历史行，包含之前的 `priced` 调用、失败调用及未完成预留；重启或换模型、模式不会重置次数。达到上限后拒绝下一次调用，无自动重试或自动更换 scope。供应商余额限制仍由供应商执行，本地调用次数上限不是美元费用上限。
+
+额度模式中的 `reserved_cost: 0` 仅为调用名额占位，绝不表示免费；`actual_cost` 和逐次 `estimated_cost` 始终为 `null`，即使用量 tokens 已知也不估费，来源记录为 `unknown_provider_rates`。快照中的 `known_cost_subtotal` 只累计已知金额；全部调用费用未知时它为 `0`、`estimated_cost` 为 `null`，并逐次计入 `unknown_cost_calls`。同 scope 已有额度模式调用后，不能切回金额模式将这些未知费用当作零继续预留。
 
 固定来源准备（零模型调用）：
 

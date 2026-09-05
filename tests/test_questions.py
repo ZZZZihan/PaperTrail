@@ -313,3 +313,73 @@ def test_missing_budget_refuses_call_before_reservation(client, settings):
     with pytest.raises(ModelError):
         ledger.before_call({})
     assert ledger.snapshot()["calls"] == []
+
+
+@pytest.mark.parametrize("cap", [None, "", "0", "-1", "1001", "1.5", "invalid", "1", "1000"])
+def test_provider_quota_requires_explicit_bounded_call_cap(monkeypatch, cap):
+    for key in (
+        "PAPERTRAIL_MODEL_BUDGET",
+        "PAPERTRAIL_MODEL_INPUT_PRICE_PER_MILLION",
+        "PAPERTRAIL_MODEL_OUTPUT_PRICE_PER_MILLION",
+        "PAPERTRAIL_MODEL_CURRENCY",
+        "PAPERTRAIL_MODEL_MAX_CALLS",
+    ):
+        monkeypatch.delenv(key, raising=False)
+    monkeypatch.setenv("PAPERTRAIL_MODEL_BUDGET_MODE", "provider_quota")
+    if cap is not None:
+        monkeypatch.setenv("PAPERTRAIL_MODEL_MAX_CALLS", cap)
+    budget = Budget.from_env()
+    if cap in {"1", "1000"}:
+        assert budget.mode == "provider_quota"
+        assert budget.max_calls == int(cap)
+        assert budget.currency == "USD"
+    else:
+        assert budget is None
+    monkeypatch.delenv("PAPERTRAIL_MODEL_BUDGET_MODE", raising=False)
+    assert Budget.from_env() is None  # A cap alone never implicitly enables quota mode.
+
+
+def test_quota_counts_existing_priced_calls_and_keeps_known_usage_cost_unknown(client, settings):
+    from papertrail.model import ModelError
+
+    paper = upload(client).json()["paper"]
+    repository = Repository(settings)
+    metadata = {"stage": "query", "input_token_upper_bound": 1000, "max_output_tokens": 1000}
+    first, _ = repository.create_question(UUID(paper["id"]), uuid4(), "原有按价调用")
+    priced = Budget(Decimal("1"), Decimal("1"), Decimal("2"), "USD", "same-scope")
+    ledger = CallLedger(repository, first["id"], priced)
+    ledger.before_call(metadata)
+    ledger.record_call({"usage": {"prompt_tokens": 30, "completion_tokens": 10}})
+    ledger.before_call(metadata)  # An unfinished reservation counts as another call.
+    repository.finish_question(first["id"], {"status": "failed"})
+
+    second, _ = repository.create_question(UUID(paper["id"]), uuid4(), "使用既有中转额度")
+    quota = Budget(Decimal(0), Decimal(0), Decimal(0), "USD", "same-scope", "provider_quota", 2)
+    with pytest.raises(ModelError) as capped:
+        CallLedger(repository, second["id"], quota).before_call(metadata)
+    assert capped.value.code == "call_limit_exceeded"
+
+    quota = replace(quota, max_calls=3)
+    ledger = CallLedger(repository, second["id"], quota)
+    ledger.before_call(metadata)
+    ledger.record_call({"usage": {"prompt_tokens": 500, "completion_tokens": 200}})
+    saved = ledger.snapshot()
+    assert saved["estimated_cost"] is None
+    assert saved["known_cost_subtotal"] == "0"
+    assert saved["estimated_cost_scope"] == "known_calls_only"
+    assert saved["unknown_cost_calls"] == 1
+    call = saved["calls"][0]
+    assert call["reserved_cost"] == "0" and call["actual_cost"] is None
+    assert call["details"]["estimated_cost"] is None
+    assert call["details"]["price_per_million"] is None
+    assert call["details"]["cost_source"] == "unknown_provider_rates"
+    assert call["details"]["reserved_cost_purpose"] == "call_slot_only_not_monetary"
+
+    # A fresh repository and ledger cannot reset this scope's accumulated three calls.
+    with pytest.raises(ModelError) as capped:
+        CallLedger(Repository(settings), second["id"], quota).before_call(metadata)
+    assert capped.value.code == "call_limit_exceeded"
+    assert len(ledger.snapshot()["calls"]) == 1
+    with pytest.raises(ModelError) as unpriced:
+        CallLedger(repository, second["id"], priced).before_call(metadata)
+    assert unpriced.value.code == "budget_mode_conflict"

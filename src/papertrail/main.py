@@ -237,7 +237,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if not configured:
             reason = "请在 .env.local 配置模型服务、模型名称和密钥，再重启应用。"
         elif budget is None:
-            reason = "请在 .env.local 配置获准预算、币种及模型单价，再重启应用。"
+            reason = (
+                "请在 .env.local 配置预算模式及对应额度："
+                "金额与单价，或已获准配额的调用上限，再重启应用。"
+            )
         return {
             "max_upload_bytes": settings.max_upload_bytes,
             "max_pages": settings.max_pages,
