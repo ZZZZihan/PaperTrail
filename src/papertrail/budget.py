@@ -8,6 +8,7 @@ from uuid import UUID, uuid4
 
 from psycopg.types.json import Jsonb
 
+from papertrail.errors import ImportFailure
 from papertrail.repository import Repository
 
 
@@ -55,6 +56,10 @@ class CallLedger:
     def before_call(self, metadata: dict) -> None:
         from papertrail.model import ModelError
 
+        try:
+            self.repository.require_service_guard()
+        except ImportFailure as exc:
+            raise ModelError(exc.code, exc.message) from exc
         if self.budget is None:
             raise ModelError(
                 "budget_not_configured",

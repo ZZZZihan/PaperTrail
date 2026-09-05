@@ -18,6 +18,29 @@ from papertrail.errors import ImportFailure
 class Repository:
     def __init__(self, settings: Settings):
         self.settings = settings
+        self._service_guard = None
+        self._service_guard_lost = False
+
+    def bind_service_guard(self, guard) -> None:
+        """Bind only the session whose exclusive lock was acquired at application startup."""
+        self._service_guard = guard
+        self._service_guard_lost = False
+
+    def require_service_guard(self) -> None:
+        """A lost PostgreSQL session cannot regain permission without an application restart."""
+        if not self.settings.exclusive_service:
+            return
+        if not self._service_guard_lost and self._service_guard is not None:
+            try:
+                self._service_guard.execute("SELECT 1").fetchone()
+                return
+            except psycopg.Error:
+                self._service_guard_lost = True
+        raise ImportFailure(
+            "service_restart_required",
+            "应用的数据库会话已中断。请先停止并重启 PaperTrail，再提交或重试问题。",
+            503,
+        )
 
     def connect(self):
         return psycopg.connect(
@@ -75,6 +98,7 @@ class Repository:
             ).fetchall()
 
     def create_question(self, paper_id: UUID, request_id: UUID, question: str):
+        self.require_service_guard()
         self.expire_questions()
         with self.connect() as conn:
             conn.execute("SELECT pg_advisory_xact_lock(18091801)")

@@ -156,6 +156,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 ).fetchone()["acquired"]
                 if not acquired:
                     raise RuntimeError("PaperTrail 已有服务使用这个数据库，请先停止原服务。")
+                repository.bind_service_guard(guard)
             for name in ("staging", "papers"):
                 (settings.data_dir / name).mkdir(parents=True, exist_ok=True)
             repository.migrate()

@@ -91,6 +91,93 @@ def test_second_server_cannot_interrupt_first_servers_pending_work(settings):
         assert recovered["error_code"] == "interrupted"
 
 
+def test_lost_guard_stops_model_calls_and_new_questions_but_keeps_history_readable(
+    settings, monkeypatch
+):
+    import httpx2 as httpx
+
+    from papertrail.model import ModelClient
+
+    for key, value in {
+        "PAPERTRAIL_MODEL_BASE_URL": "https://provider.test/v1",
+        "PAPERTRAIL_MODEL_API_KEY": "test-guard-key",
+        "PAPERTRAIL_MODEL_NAME": "test-guard-model",
+        "PAPERTRAIL_MODEL_BUDGET": "1",
+        "PAPERTRAIL_MODEL_INPUT_PRICE_PER_MILLION": "1",
+        "PAPERTRAIL_MODEL_OUTPUT_PRICE_PER_MILLION": "1",
+        "PAPERTRAIL_MODEL_CURRENCY": "USD",
+        "PAPERTRAIL_MODEL_BUDGET_SCOPE": "guard-test",
+    }.items():
+        monkeypatch.setenv(key, value)
+    exclusive = replace(settings, exclusive_service=True)
+    with TestClient(create_app(exclusive)) as first:
+        paper = upload(first).json()["paper"]
+        repository = first.app.state.repository
+        requests = []
+
+        def handler(request):
+            requests.append(request)
+            # Drop only this temporary test database's guard session. A DB restart
+            # likewise destroys it, while subsequent repository connections can recover.
+            with repository.connect() as conn:
+                row = conn.execute(
+                    "SELECT pid FROM pg_locks WHERE locktype = 'advisory' "
+                    "AND classid = 0 AND objid = 18091803 AND objsubid = 1 "
+                    "AND database = (SELECT oid FROM pg_database "
+                    "WHERE datname = current_database())"
+                ).fetchone()
+                assert row is not None
+                assert conn.execute(
+                    "SELECT pg_terminate_backend(%s) AS stopped", (row["pid"],)
+                ).fetchone()["stopped"]
+            return httpx.Response(
+                200,
+                json={
+                    "choices": [
+                        {
+                            "finish_reason": "stop",
+                            "message": {
+                                "content": '{"search_queries":["Alpha evidence physical page one"]}'
+                            },
+                        }
+                    ],
+                    "usage": {"prompt_tokens": 30, "completion_tokens": 10},
+                },
+            )
+
+        def local_model(config, **kwargs):
+            return ModelClient(config, transport=httpx.MockTransport(handler), **kwargs)
+
+        monkeypatch.setattr("papertrail.model.ModelClient", local_model)
+        path = f"/api/papers/{paper['id']}/questions"
+        assert (
+            first.post(
+                path, json={"question": "Alpha evidence 是什么？", "request_id": str(uuid4())}
+            ).status_code
+            == 202
+        )
+        history = first.get(path).json()
+        assert history[0]["status"] == "failed"
+        assert history[0]["error_code"] == "service_restart_required"
+        assert len(requests) == len(history[0]["trace"]["ledger"]["calls"]) == 1
+        assert first.get(f"/api/papers/{paper['id']}").status_code == 200
+        assert first.get(f"/api/papers/{paper['id']}/pages/0").status_code == 200
+
+        def assert_original_refuses_new_question():
+            response = first.post(path, json={"question": "再次提问", "request_id": str(uuid4())})
+            assert response.status_code == 503
+            assert response.json()["error"]["code"] == "service_restart_required"
+            assert len(first.get(path).json()) == 1
+
+        assert_original_refuses_new_question()
+        # A fresh application may acquire the released lock. The original remains
+        # unable to regain permission, even after the new application's shutdown.
+        with TestClient(create_app(exclusive)) as restarted:
+            restarted.app.state.repository.require_service_guard()
+            assert_original_refuses_new_question()
+        assert_original_refuses_new_question()
+
+
 def test_invalid_question_and_unknown_paper_never_start(client):
     paper = upload(client).json()["paper"]
     path = f"/api/papers/{paper['id']}/questions"
