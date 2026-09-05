@@ -220,6 +220,8 @@ def answer_question(
             ),
             deadline=deadline,
         )
+        # Diagnostic-only, unvalidated model claims. Never publish these as answer claims.
+        trace["generated_claims"] = generated.get("claims")
         if generated.get("status") == "insufficient_evidence":
             if generated.get("claims") != []:
                 raise ModelError("invalid_output", "证据不足结果含有冲突的事实输出，请重试。")

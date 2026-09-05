@@ -100,6 +100,28 @@ def test_bad_citations_fail_closed_without_support_call(change):
     assert result["claims"] == []
     assert result["trace"]["citation_validation"] == "failed"
     assert result["trace"]["call_count"] == 2
+    assert result["trace"]["generated_claims"]
+    assert "candidate_claims" not in result["trace"]
+
+
+def test_failed_citation_preserves_only_unvalidated_claims_for_diagnosis():
+    captured = []
+
+    def corrupt(result):
+        result["claims"][0]["citations"][0]["quote"] = "A fabricated quotation for diagnosis."
+        captured.append(deepcopy(result["claims"]))
+        result["message"] = "DO-NOT-STORE-THIS-MESSAGE"
+        result["debug"] = {"header": "DO-NOT-STORE-THIS-HEADER"}
+        return result
+
+    result = answer_question(PAPER, PAGES, "实验？", client=pipeline_client(generate=corrupt))
+    assert result["status"] == "failed"
+    assert result["error_code"] == "invalid_citation"
+    assert result["claims"] == []
+    assert result["trace"]["generated_claims"] == captured[0]
+    assert result["trace"]["citation_validation"] == "failed"
+    assert result["trace"]["call_count"] == 2
+    assert "DO-NOT-STORE" not in json.dumps(result, ensure_ascii=False)
 
 
 def test_real_quote_from_wrong_paper_is_rejected_and_whitespace_is_only_normalization():
