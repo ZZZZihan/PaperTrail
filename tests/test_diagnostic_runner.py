@@ -60,12 +60,15 @@ def frozen_fixture(tmp_path, monkeypatch):
     (dataset / "manifest.json").write_text(
         json.dumps(
             {
+                "dataset_id": "papertrail-development-v0.1",
                 "extractor": {"version": runner.version("pypdf")},
                 "papers": papers,
             }
         )
     )
-    (dataset / "questions.json").write_text(json.dumps({"questions": questions}))
+    (dataset / "questions.json").write_text(
+        json.dumps({"dataset_id": "papertrail-development-v0.1", "questions": questions})
+    )
     (dataset / "checksums.sha256").write_text(
         "".join(
             f"{runner.digest((dataset / name).read_bytes())}  {name}\n"
@@ -92,6 +95,225 @@ def test_prepare_rejects_changed_questions_before_calls(tmp_path, monkeypatch):
     dataset = frozen_fixture(tmp_path, monkeypatch)
     (dataset / "questions.json").write_text('{"questions": []}')
     with pytest.raises(runner.DiagnosticError, match="Dataset checksum mismatch: questions.json"):
+        runner.prepare(dataset, tmp_path / "run")
+
+
+def synthetic_holdout(tmp_path, monkeypatch):
+    """No real held-out answer is loaded into test output or used as a tuning fixture."""
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    dataset = tmp_path / "dataset"
+    dataset.mkdir()
+    papers, questions, contexts = [], [], []
+    for number in range(4):
+        paper_id = f"synthetic{number}"
+        text = f"Synthetic frozen source {number}"
+        pdf = pdf_bytes((text,))
+        path = tmp_path / f"{paper_id}.pdf"
+        path.write_bytes(pdf)
+        papers.append(
+            {
+                "id": paper_id,
+                "local_path": path.name,
+                "sha256": runner.digest(pdf),
+                "page_count": 1,
+                "page_text_sha256": [runner.digest(text.encode())],
+            }
+        )
+        evidence = {
+            "id": f"evidence-{number}",
+            "paper_id": paper_id,
+            "page_index": 0,
+            "pdf_page_number": 1,
+            "context_start": 0,
+            "context_end": len(text),
+            "context_sha256": runner.digest(text.encode()),
+            "char_start": 0,
+            "char_end": 9,
+            "quote": "Synthetic",
+            "section": "Synthetic section",
+        }
+        contexts.append(evidence)
+        for category in (
+            "fact",
+            "cross_section_conditions",
+            "false_premise",
+            "insufficient_evidence",
+            "table_footnote_probe",
+        ):
+            question_id = f"{paper_id}-{category}"
+            answer = category != "insufficient_evidence"
+            points = (
+                [
+                    {
+                        "id": f"{question_id}-point",
+                        "text": "Synthetic answer point",
+                        "evidence_ids": [evidence["id"]],
+                    }
+                ]
+                if answer
+                else []
+            )
+            question = {
+                "id": question_id,
+                "paper_id": paper_id,
+                "question": "Synthetic diagnostic question",
+                "category": category,
+                "expected_status": "answered" if answer else "insufficient_evidence",
+                "expected_answer_points": [point["text"] for point in points],
+                "answer_points": points,
+                "required_conditions": [],
+                "human_review": {"status": "pending"},
+                "evidence_ids": [evidence["id"]],
+                "expected_evidence": [
+                    {
+                        key: evidence[key]
+                        for key in (
+                            "id",
+                            "page_index",
+                            "pdf_page_number",
+                            "quote",
+                            "char_start",
+                            "char_end",
+                            "section",
+                        )
+                    }
+                ],
+                "insufficient_reason": None,
+            }
+            if not answer:
+                question.update(
+                    insufficient_reason="Synthetic unsupported premise",
+                    insufficiency_audit={
+                        "boundary": "Only this synthetic page",
+                        "search_page_indices": [0],
+                        "keyword_page_indices": {"Synthetic": [0]},
+                    },
+                )
+            if category == "table_footnote_probe":
+                question["table_probe"] = {
+                    "row_labels": ["Synthetic row"],
+                    "column_labels": ["Synthetic column"],
+                    "note_evidence_ids": [evidence["id"]],
+                    "visual_review_page_indices": [0],
+                }
+            questions.append(question)
+    objects = {
+        "manifest.json": {
+            "dataset_id": "papertrail-candidate-holdout-v0.2",
+            "dataset_status": "candidate_holdout",
+            "tuning_status_at_freeze": "never_used_for_tuning",
+            "model_runs_at_freeze": 0,
+            "extractor": {"version": runner.version("pypdf")},
+            "papers": papers,
+        },
+        "questions.json": {
+            "dataset_id": "papertrail-candidate-holdout-v0.2",
+            "questions": questions,
+        },
+        "evidence.json": {"contexts": contexts},
+        "rubric.json": {
+            "frozen_denominators": {
+                "papers": 4,
+                "questions": 20,
+                "answerable": 16,
+                "insufficient": 4,
+                "answer_points": 16,
+                "required_conditions": 0,
+                "contexts": 4,
+            }
+        },
+    }
+    for name, value in objects.items():
+        (dataset / name).write_text(json.dumps(value))
+    development = tmp_path / "evals/development-v0.1/manifest.json"
+    development.parent.mkdir(parents=True)
+    development.write_text(json.dumps({"papers": [{"sha256": "f" * 64}]}))
+    write_holdout_checksums(dataset)
+    return dataset
+
+
+def write_holdout_checksums(dataset):
+    (dataset / "checksums.sha256").write_text(
+        "".join(
+            f"{runner.digest((dataset / name).read_bytes())}  {name}\n"
+            for name in ("manifest.json", "questions.json", "evidence.json", "rubric.json")
+        )
+    )
+
+
+def test_prepare_holdout_snapshots_all_rules_and_validates_without_app_calls(tmp_path, monkeypatch):
+    dataset = synthetic_holdout(tmp_path, monkeypatch)
+    monkeypatch.setattr(runner, "request_json", lambda *a, **k: pytest.fail("No app call allowed"))
+    run = tmp_path / "run"
+    _, questions, sources = runner.prepare(dataset, run)
+    assert len(questions) == 20 and len(sources) == 4
+    preparation = json.loads((run / "preparation.json").read_text())
+    assert preparation["expected_status_counts"] == {"answered": 16, "insufficient_evidence": 4}
+    assert preparation["holdout_annotation_check"]["questions"] == 20
+    assert preparation["ai_review"]["status"] == preparation["human_review"]["status"] == "pending"
+    for name in (
+        "manifest.json",
+        "questions.json",
+        "evidence.json",
+        "rubric.json",
+        "checksums.sha256",
+    ):
+        assert (run / "dataset" / name).read_bytes() == (dataset / name).read_bytes()
+        assert (run / "dataset" / name).stat().st_mode & 0o222 == 0
+
+
+def test_holdout_wrong_context_is_rejected_even_with_consistent_file_checksums(
+    tmp_path, monkeypatch
+):
+    dataset = synthetic_holdout(tmp_path, monkeypatch)
+    path = dataset / "evidence.json"
+    content = json.loads(path.read_text())
+    content["contexts"][0]["context_sha256"] = "0" * 64
+    path.write_text(json.dumps(content))
+    write_holdout_checksums(dataset)
+    with pytest.raises(runner.DiagnosticError, match="annotation contract validation failed"):
+        runner.prepare(dataset, tmp_path / "run")
+    assert not (tmp_path / "run/dataset").exists()
+
+
+@pytest.mark.parametrize("change", ["changed_bytes", "omitted_file", "source_overlap"])
+def test_holdout_contract_cannot_drop_rules_or_include_development_source(
+    tmp_path, monkeypatch, change
+):
+    dataset = synthetic_holdout(tmp_path, monkeypatch)
+    if change == "changed_bytes":
+        with (dataset / "rubric.json").open("a") as file:
+            file.write(" ")
+        message = "Dataset checksum mismatch: rubric.json"
+    elif change == "omitted_file":
+        path = dataset / "checksums.sha256"
+        path.write_text(
+            "\n".join(line for line in path.read_text().splitlines() if "rubric.json" not in line)
+            + "\n"
+        )
+        message = "complete dataset contract"
+    else:
+        manifest = json.loads((dataset / "manifest.json").read_text())
+        path = tmp_path / "evals/development-v0.1/manifest.json"
+        path.write_text(json.dumps({"papers": [{"sha256": manifest["papers"][0]["sha256"]}]}))
+        message = "overlaps the development corpus"
+    with pytest.raises(runner.DiagnosticError, match=message):
+        runner.prepare(dataset, tmp_path / "run")
+
+
+def test_dataset_identity_and_original_development_counts_remain_strict(tmp_path, monkeypatch):
+    dataset = frozen_fixture(tmp_path, monkeypatch)
+    path = dataset / "questions.json"
+    questions = json.loads(path.read_text())
+    questions["questions"].pop()
+    path.write_text(json.dumps(questions))
+    (dataset / "checksums.sha256").write_text(
+        "".join(
+            f"{runner.digest((dataset / name).read_bytes())}  {name}\n"
+            for name in ("manifest.json", "questions.json")
+        )
+    )
+    with pytest.raises(runner.DiagnosticError, match="count differs"):
         runner.prepare(dataset, tmp_path / "run")
 
 

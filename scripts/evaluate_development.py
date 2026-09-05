@@ -1,4 +1,4 @@
-"""Freeze and diagnose the public development set through the local application only.
+"""Freeze and diagnose supported QA datasets through the local application only.
 
 No provider client, credentials, expected answers, or hidden retry enters the application.
 Every invocation creates a new write-once run; --prepare-only never contacts the app.
@@ -6,6 +6,7 @@ Every invocation creates a new write-once run; --prepare-only never contacts the
 
 import argparse
 import hashlib
+import importlib.util
 import io
 import json
 import os
@@ -28,6 +29,20 @@ from pypdf import PdfReader
 ROOT = Path(__file__).resolve().parents[1]
 TERMINAL = {"answered", "partial_answer", "insufficient_evidence", "failed"}
 REVIEW = {"status": "pending", "reviewer": None, "notes": None}
+DATASET_CONTRACTS = {
+    "papertrail-development-v0.1": {
+        "papers": 3,
+        "questions": 15,
+        "statuses": {"answered": 10, "insufficient_evidence": 5},
+        "files": {"manifest.json", "questions.json"},
+    },
+    "papertrail-candidate-holdout-v0.2": {
+        "papers": 4,
+        "questions": 20,
+        "statuses": {"answered": 16, "insufficient_evidence": 4},
+        "files": {"manifest.json", "questions.json", "evidence.json", "rubric.json"},
+    },
+}
 
 
 class DiagnosticError(Exception):
@@ -95,21 +110,33 @@ def prepare(dataset: Path, run: Path) -> tuple[dict, list[dict], dict]:
     }
     expected = {}
     for line in raw["checksums.sha256"].decode().splitlines():
-        match = re.fullmatch(r"([a-f0-9]{64})\s+\*?(manifest\.json|questions\.json)", line)
+        match = re.fullmatch(
+            r"([a-f0-9]{64})\s+\*?(manifest\.json|questions\.json|evidence\.json|rubric\.json)",
+            line,
+        )
         if not match or match[2] in expected:
             raise DiagnosticError("Invalid or duplicated dataset checksum entry")
         expected[match[2]] = match[1]
-    if set(expected) != {"manifest.json", "questions.json"}:
+    if not {"manifest.json", "questions.json"} <= set(expected):
         raise DiagnosticError("Dataset checksum file must bind manifest.json and questions.json")
     for name, checksum in expected.items():
+        if name not in raw:
+            raw[name] = (dataset / name).read_bytes()
         if digest(raw[name]) != checksum:
             raise DiagnosticError(f"Dataset checksum mismatch: {name}")
     manifest = json.loads(raw["manifest.json"])
-    questions = json.loads(raw["questions.json"])["questions"]
+    question_set = json.loads(raw["questions.json"])
+    dataset_id = manifest.get("dataset_id")
+    if dataset_id not in DATASET_CONTRACTS or question_set.get("dataset_id") != dataset_id:
+        raise DiagnosticError("Unknown or inconsistent frozen dataset identity")
+    contract = DATASET_CONTRACTS[dataset_id]
+    if set(expected) != contract["files"]:
+        raise DiagnosticError("Checksum file does not bind the complete dataset contract")
+    questions = question_set["questions"]
     if manifest["extractor"]["version"] != version("pypdf"):
         raise DiagnosticError("Installed pypdf version differs from the frozen source extractor")
-    if len(manifest["papers"]) != 3 or len(questions) != 15:
-        raise DiagnosticError("Development v0.1 requires exactly 3 papers and 15 questions")
+    if len(manifest["papers"]) != contract["papers"] or len(questions) != contract["questions"]:
+        raise DiagnosticError("Paper/question count differs from the frozen dataset contract")
     if len({q["id"] for q in questions}) != len(questions):
         raise DiagnosticError("Duplicate question IDs")
     sources = {}
@@ -146,8 +173,30 @@ def prepare(dataset: Path, run: Path) -> tuple[dict, list[dict], dict]:
         if question["expected_status"] == "answered" and not question.get("expected_evidence"):
             raise DiagnosticError(f"Answerable question lacks source evidence: {question['id']}")
     counts = Counter(q["expected_status"] for q in questions)
-    if counts != {"answered": 10, "insufficient_evidence": 5}:
-        raise DiagnosticError("Expected development split is 10 answerable and 5 insufficient")
+    if counts != contract["statuses"]:
+        raise DiagnosticError(
+            "Answerable/insufficient split differs from the frozen dataset contract"
+        )
+    annotation_check = None
+    if dataset_id == "papertrail-candidate-holdout-v0.2":
+        # Verify the same bytes/pages that will be snapshotted, without rereading labels,
+        # fetching sources, contacting the application, or printing held-out answers.
+        spec = importlib.util.spec_from_file_location(
+            "papertrail_holdout_verifier", Path(__file__).with_name("fetch_holdout_papers.py")
+        )
+        verifier = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(verifier)
+        bundle = {name.removesuffix(".json"): json.loads(raw[name]) for name in contract["files"]}
+        development = json.loads((ROOT / "evals/development-v0.1/manifest.json").read_bytes())
+        development_hashes = {paper["sha256"] for paper in development["papers"]}
+        if any(source["paper"]["sha256"] in development_hashes for source in sources.values()):
+            raise DiagnosticError("Holdout source PDF overlaps the development corpus")
+        try:
+            annotation_check = verifier.verify_annotations(
+                bundle, {key: source["pages"] for key, source in sources.items()}
+            )
+        except (ValueError, KeyError, IndexError, TypeError) as exc:
+            raise DiagnosticError("Frozen holdout annotation contract validation failed") from exc
     for name, content in raw.items():
         write_once(run / "dataset" / name, content)
     for paper_id, source in sources.items():
@@ -155,12 +204,14 @@ def prepare(dataset: Path, run: Path) -> tuple[dict, list[dict], dict]:
         write_once(run / "sources" / f"{paper_id}.pages.json", source["pages"])
     report = {
         "status": "passed",
+        "dataset_id": dataset_id,
         "completed_at": now(),
         "paper_count": len(sources),
         "question_count": len(questions),
         "expected_status_counts": dict(counts),
         "dataset_file_sha256": {name: digest(content) for name, content in raw.items()},
         "source_pdfs_and_pages_verified": True,
+        "holdout_annotation_check": annotation_check,
         "expected_quote_checks": sum(len(q.get("expected_evidence", [])) for q in questions),
         "ai_review": dict(REVIEW),
         "human_review": dict(REVIEW),
