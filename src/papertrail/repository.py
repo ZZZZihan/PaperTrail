@@ -98,31 +98,59 @@ class Repository:
             ).fetchall()
 
     def create_question(self, paper_id: UUID, request_id: UUID, question: str):
+        return self._create_task(paper_id, request_id, question, "qa")
+
+    def create_introduction(self, paper_id: UUID, request_id: UUID):
+        from papertrail.introduction import INTRODUCTION_QUESTION
+
+        return self._create_task(paper_id, request_id, INTRODUCTION_QUESTION, "introduction")
+
+    def _create_task(self, paper_id: UUID, request_id: UUID, question: str, kind: str):
         self.require_service_guard()
         self.expire_questions()
         with self.connect() as conn:
             conn.execute("SELECT pg_advisory_xact_lock(18091801)")
             existing = conn.execute(
-                "SELECT * FROM questions WHERE request_id = %s", (request_id,)
+                "SELECT * FROM questions WHERE request_id = %s OR id IN "
+                "(SELECT question_id FROM question_request_aliases WHERE request_id = %s)",
+                (request_id, request_id),
             ).fetchone()
             if existing:
-                if existing["paper_id"] != paper_id or existing["question"] != question:
+                if (
+                    existing["paper_id"] != paper_id
+                    or existing["question"] != question
+                    or existing["kind"] != kind
+                ):
                     raise ImportFailure(
-                        "request_conflict", "提交标识已用于其他问题，请重新提交。", 409
+                        "request_conflict", "提交标识已用于其他任务，请重新提交。", 409
                     )
                 return existing, False
             if not conn.execute("SELECT id FROM papers WHERE id = %s", (paper_id,)).fetchone():
                 raise ImportFailure("not_found", "找不到这篇论文，请返回论文库。", 404)
+            if kind == "introduction":
+                existing = conn.execute(
+                    "SELECT * FROM questions WHERE paper_id = %s AND kind = 'introduction' "
+                    "AND status IN ('pending', 'running', 'answered') "
+                    "ORDER BY created_at DESC, id DESC LIMIT 1",
+                    (paper_id,),
+                ).fetchone()
+                if existing:
+                    conn.execute(
+                        "INSERT INTO question_request_aliases(request_id, question_id) "
+                        "VALUES (%s, %s)",
+                        (request_id, existing["id"]),
+                    )
+                    return existing, False
             if conn.execute(
                 "SELECT id FROM questions WHERE status IN ('pending', 'running') LIMIT 1"
             ).fetchone():
                 raise ImportFailure(
-                    "question_in_progress", "已有问题正在处理，请稍候并刷新问答历史。", 409
+                    "question_in_progress", "已有问题或简介正在处理，请稍候再试。", 409
                 )
             row = conn.execute(
-                "INSERT INTO questions(id, paper_id, request_id, question, status) "
-                "VALUES (%s, %s, %s, %s, 'pending') RETURNING *",
-                (uuid4(), paper_id, request_id, question),
+                "INSERT INTO questions(id, paper_id, request_id, question, kind, status) "
+                "VALUES (%s, %s, %s, %s, %s, 'pending') RETURNING *",
+                (uuid4(), paper_id, request_id, question, kind),
             ).fetchone()
             return row, True
 
@@ -130,7 +158,7 @@ class Repository:
         self.expire_questions()
         with self.connect() as conn:
             return conn.execute(
-                "SELECT * FROM questions WHERE paper_id = %s "
+                "SELECT * FROM questions WHERE paper_id = %s AND kind = 'qa' "
                 "ORDER BY created_at DESC, id DESC LIMIT 100 OFFSET %s",
                 (paper_id, offset),
             ).fetchall()
@@ -139,8 +167,17 @@ class Repository:
         self.expire_questions()
         with self.connect() as conn:
             return conn.execute(
-                "SELECT * FROM questions WHERE id = %s AND paper_id = %s",
+                "SELECT * FROM questions WHERE id = %s AND paper_id = %s AND kind = 'qa'",
                 (question_id, paper_id),
+            ).fetchone()
+
+    def introduction(self, paper_id: UUID) -> dict | None:
+        self.expire_questions()
+        with self.connect() as conn:
+            return conn.execute(
+                "SELECT * FROM questions WHERE paper_id = %s AND kind = 'introduction' "
+                "ORDER BY created_at DESC, id DESC LIMIT 1",
+                (paper_id,),
             ).fetchone()
 
     def progress_question(self, question_id: UUID, stage: str) -> None:
@@ -156,7 +193,7 @@ class Repository:
             conn.execute(
                 "UPDATE questions SET status = %s, stage = 'complete', claims = %s, "
                 "message = %s, error_code = %s, support_status = %s, human_review = %s, "
-                "trace = %s, completed_at = now() "
+                "trace = %s, introduction = %s, completed_at = now() "
                 "WHERE id = %s AND status IN ('pending', 'running')",
                 (
                     result["status"],
@@ -166,6 +203,7 @@ class Repository:
                     result.get("support_status"),
                     Jsonb(result.get("human_review")),
                     Jsonb(result.get("trace", {})),
+                    Jsonb(result.get("introduction") if result["status"] == "answered" else None),
                     question_id,
                 ),
             )

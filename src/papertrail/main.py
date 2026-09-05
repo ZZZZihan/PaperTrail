@@ -84,6 +84,25 @@ class Claim(BaseModel):
     citations: list[Citation]
 
 
+class IntroductionInput(BaseModel):
+    request_id: UUID
+
+
+class IntroductionTerm(BaseModel):
+    term: str
+    explanation: str
+    citations: list[Citation]
+
+
+class Introduction(BaseModel):
+    summary: Claim
+    problem: Claim
+    contribution: Claim
+    mechanism: Claim
+    evidence_and_limits: Claim
+    terms: list[IntroductionTerm]
+
+
 class Question(BaseModel):
     id: UUID
     paper_id: UUID
@@ -98,6 +117,8 @@ class Question(BaseModel):
     trace: dict
     created_at: datetime
     completed_at: datetime | None
+    kind: Literal["qa", "introduction"] = "qa"
+    introduction: Introduction | None = None
 
 
 class BodyTooLarge(Exception):
@@ -279,6 +300,28 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if row is None:
             raise ImportFailure("question_not_found", "当前论文下找不到这个问题。", 404)
         return row
+
+    @app.post(
+        "/api/papers/{paper_id}/introduction",
+        response_model=Question,
+        status_code=202,
+        tags=["introductions"],
+    )
+    def generate_introduction(paper_id: UUID, body: IntroductionInput, background: BackgroundTasks):
+        row, created = repository.create_introduction(paper_id, body.request_id)
+        if created:
+            background.add_task(questions.run_introduction, row["id"], paper_id)
+        return row
+
+    @app.get(
+        "/api/papers/{paper_id}/introduction",
+        response_model=Question | None,
+        tags=["introductions"],
+    )
+    def paper_introduction(paper_id: UUID):
+        if repository.get(paper_id) is None:
+            raise ImportFailure("not_found", "找不到这篇论文，请返回论文库。", 404)
+        return repository.introduction(paper_id)
 
     @app.post("/api/papers", response_model=ImportResult, tags=["papers"])
     def upload(file: UploadFile, response: Response):

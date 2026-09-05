@@ -9,6 +9,7 @@ import {
 } from "react";
 import { createRoot } from "react-dom/client";
 import { QuestionPanel, type Citation } from "./QuestionPanel";
+import { IntroductionPanel } from "./IntroductionPanel";
 import "./style.css";
 
 const PdfPage = lazy(() =>
@@ -160,6 +161,7 @@ function Reader({
   const [text, setText] = useState<string | null>(null);
   const [failure, setFailure] = useState("");
   const [tab, setTab] = useState("qa");
+  const [readingTab, setReadingTab] = useState("introduction");
   const [documentTab, setDocumentTab] = useState("pdf");
   const [citation, setCitation] = useState<Citation | null>(null);
   const [pageInput, setPageInput] = useState(String(route.page + 1));
@@ -175,6 +177,9 @@ function Reader({
     const controller = new AbortController();
     setPaper(null);
     setFailure("");
+    setReadingTab("introduction");
+    setTab("qa");
+    setCitation(null);
     request<Paper>(`/api/papers/${route.id}`, { signal: controller.signal })
       .then((result) => {
         if (!controller.signal.aborted) setPaper(result);
@@ -207,6 +212,19 @@ function Reader({
       });
     return () => controller.abort();
   }, [paper, route.id, route.page]);
+
+  function openCitation(value: Citation) {
+    if (!paper || value.paper_id !== paper.id || !Number.isInteger(value.page_index) || value.page_index < 0 || value.page_index >= paper.page_count) {
+      onError("引用无法对应到当前论文页面，请刷新后重试。");
+      return;
+    }
+    setCitation(value);
+    setDocumentTab("pdf");
+    setTab("pdf");
+    navigate(paper.id, value.page_index);
+    if (window.matchMedia("(max-width: 900px)").matches)
+      requestAnimationFrame(() => original.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }
 
   if (!paper)
     return (
@@ -307,7 +325,7 @@ function Reader({
           aria-selected={tab === "qa"}
           onClick={() => setTab("qa")}
         >
-          证据问答
+          简介与问答
         </button>
       </div>
       <div className={`reader-grid show-${tab}`}>
@@ -365,22 +383,25 @@ function Reader({
             </>
           )}
         </section>
-        <QuestionPanel
-          key={paper.id}
-          paperId={paper.id}
-          onCitation={(value) => {
-            if (value.paper_id !== paper.id || !Number.isInteger(value.page_index) || value.page_index < 0 || value.page_index >= paper.page_count) {
-              onError("引用无法对应到当前论文页面，请刷新问答后重试。");
-              return;
-            }
-            setCitation(value);
-            setDocumentTab("pdf");
-            setTab("pdf");
-            navigate(paper.id, value.page_index);
-            if (window.matchMedia("(max-width: 900px)").matches)
-              requestAnimationFrame(() => original.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
-          }}
-        />
+        <section className="reader-panel reading-assistant" aria-label="论文研读">
+          <div className="panel-heading reading-tabs-heading">
+            <div className="document-tabs" role="tablist" aria-label="研读方式">
+              <button type="button" role="tab" id="introduction-tab" aria-controls="introduction-view" aria-selected={readingTab === "introduction"} onClick={() => setReadingTab("introduction")}>
+                论文简介
+              </button>
+              <button type="button" role="tab" id="questions-tab" aria-controls="questions-view" aria-selected={readingTab === "qa"} onClick={() => setReadingTab("qa")}>
+                证据问答
+              </button>
+            </div>
+            <small>基于当前论文</small>
+          </div>
+          <div id="introduction-view" role="tabpanel" aria-labelledby="introduction-tab" hidden={readingTab !== "introduction"}>
+            <IntroductionPanel key={paper.id} paperId={paper.id} onCitation={openCitation} onAsk={() => setReadingTab("qa")} />
+          </div>
+          <div id="questions-view" role="tabpanel" aria-labelledby="questions-tab" hidden={readingTab !== "qa"}>
+            <QuestionPanel key={paper.id} paperId={paper.id} onCitation={openCitation} embedded />
+          </div>
+        </section>
       </div>
       <details className="provenance">
         <summary>文件与来源记录</summary>

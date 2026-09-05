@@ -193,9 +193,11 @@ function QuestionCard({
 export function QuestionPanel({
   paperId,
   onCitation,
+  embedded = false,
 }: {
   paperId: string;
   onCitation: (citation: Citation) => void;
+  embedded?: boolean;
 }) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [draft, setDraft] = useState("");
@@ -318,10 +320,10 @@ export function QuestionPanel({
 
   return (
     <section className="reader-panel question-panel" aria-label="论文证据问答">
-      <div className="panel-heading">
+      {!embedded && <div className="panel-heading">
         <span>证据问答 <span className="version-badge">v0.1</span></span>
         <small>仅基于当前论文</small>
-      </div>
+      </div>}
       <div className="question-panel-content">
         <form className="question-composer" ref={form} onSubmit={(event) => void submit(event)}>
           <label htmlFor="paper-question">从你想理解的问题开始</label>

@@ -1159,6 +1159,283 @@ main {
 .history-error {
   margin: 0 16px 15px;
 }
+.reading-assistant .question-panel {
+  border: 0;
+  border-radius: 0;
+}
+.reading-tabs-heading .document-tabs {
+  gap: 22px;
+}
+.reading-tabs-heading .document-tabs button {
+  font-size: 12px;
+}
+.introduction-panel-content {
+  padding: 24px 24px 22px;
+  min-height: 560px;
+  max-height: max(650px, calc(100vh - 338px));
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.introduction-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.introduction-eyebrow {
+  display: block;
+  color: #819076;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  line-height: 1.8;
+}
+.introduction-heading h2 {
+  font-size: 18px;
+  font-weight: 550;
+  margin-top: 5px;
+  line-height: 1.6;
+}
+.introduction-heading .text-button {
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.introduction-loading {
+  padding: 36px 0;
+  color: #7a8671;
+  font-size: 12px;
+  text-align: center;
+}
+.introduction-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 17px;
+  font-size: 10px;
+  color: #829077;
+}
+.ai-label {
+  padding: 4px 8px;
+  border: 1px solid #d5decf;
+  border-radius: 4px;
+  color: #66805c;
+  background: #f3f6ec;
+}
+.introduction-summary {
+  padding: 19px 20px;
+  background: #eef3e7;
+  border: 1px solid #dce5d1;
+  border-radius: 8px;
+}
+.introduction-summary > p {
+  font-size: 15px;
+  line-height: 1.95;
+  color: #35503e;
+  margin-top: 7px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.introduction-section {
+  padding: 23px 0;
+  border-bottom: 1px solid #e8ecdf;
+}
+.introduction-section h3 {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 550;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.introduction-section h3 > span {
+  color: #9aa78b;
+  font-family: Georgia, serif;
+  font-size: 12px;
+  font-weight: 400;
+}
+.introduction-section > p {
+  font-size: 13px;
+  line-height: 2;
+  color: #52624b;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.introduction-sources {
+  margin-top: 11px;
+  font-size: 10px;
+  color: #768968;
+}
+.introduction-sources > summary {
+  cursor: pointer;
+  width: fit-content;
+  line-height: 1.9;
+}
+.introduction-sources > summary:focus-visible {
+  outline: 3px solid #a4bbac;
+  outline-offset: 4px;
+}
+.introduction-sources .citation-link {
+  background: #fcfcf5;
+}
+.introduction-sources .citation-link:hover {
+  background: #f0f4e8;
+}
+.introduction-terms {
+  margin-top: 24px;
+  padding: 19px 18px 5px;
+  background: #f6f6ef;
+  border: 1px solid #e6e8dc;
+  border-radius: 8px;
+}
+.introduction-terms h3 {
+  font-size: 14px;
+  font-weight: 550;
+}
+.introduction-terms-note {
+  color: #8a9580;
+  font-size: 10px;
+  margin-top: 7px;
+  line-height: 1.8;
+}
+.introduction-terms dl {
+  margin: 6px 0 0;
+}
+.introduction-terms dl > div {
+  padding: 15px 0;
+}
+.introduction-terms dl > div + div {
+  border-top: 1px solid #e5e8da;
+}
+.introduction-terms dt {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4e6744;
+  overflow-wrap: anywhere;
+  line-height: 1.8;
+}
+.introduction-terms dd {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.9;
+  color: #6b765f;
+  overflow-wrap: anywhere;
+}
+.introduction-footer {
+  margin-top: 20px;
+}
+.introduction-footer > p {
+  color: #89947e;
+  font-size: 10px;
+  line-height: 1.9;
+}
+.introduction-footer .text-button {
+  margin-top: 16px;
+  font-size: 12px;
+  line-height: 1.8;
+  text-align: left;
+}
+.introduction-empty {
+  padding: 22px 10px 24px;
+  text-align: center;
+}
+.introduction-bookmark {
+  display: grid;
+  place-items: center;
+  margin: 0 auto 19px;
+  width: 55px;
+  height: 66px;
+  color: #728d63;
+  background: #eaf0e2;
+  border: 1px solid #dce5d2;
+  border-radius: 4px 4px 15px 4px;
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 25px;
+}
+.introduction-empty h3 {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 11px;
+}
+.introduction-empty > p {
+  max-width: 380px;
+  margin: auto;
+  font-size: 12px;
+  line-height: 1.95;
+  color: #819075;
+}
+.introduction-outline {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 21px;
+}
+.introduction-outline span {
+  padding: 5px 9px;
+  color: #829172;
+  background: #f4f6ed;
+  border-radius: 4px;
+  font-size: 10px;
+}
+.introduction-generate {
+  padding-top: 20px;
+  border-top: 1px solid #e5eadc;
+}
+.introduction-generate p {
+  font-size: 11px;
+  line-height: 1.85;
+  color: #819075;
+}
+.introduction-generate .primary-button {
+  margin-top: 16px;
+  padding: 11px 18px;
+  width: 100%;
+  justify-content: center;
+  font-size: 12px;
+}
+.introduction-progress {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin: 26px 0;
+  padding: 23px 18px;
+  background: #f1f5ea;
+  border: 1px solid #dfe7d6;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.introduction-progress .spinner {
+  margin-top: 3px;
+}
+.introduction-progress strong {
+  font-weight: 500;
+}
+.introduction-progress p {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #809070;
+}
+.introduction-failure {
+  margin: 22px 0;
+  padding: 19px 17px;
+  background: #fbf3e8;
+  border: 1px solid #e7d8bd;
+  border-radius: 7px;
+  color: #8a6d48;
+  line-height: 1.9;
+}
+.introduction-failure h3 {
+  font-size: 13px;
+  font-weight: 550;
+  margin-bottom: 8px;
+}
+.introduction-failure p {
+  font-size: 11px;
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+}
 @media (min-width: 1600px) {
   .workspace:not(.reading) {
     padding-top: 70px;
@@ -1296,7 +1573,7 @@ main {
     border-bottom: 2px solid var(--green);
     color: var(--green);
   }
-  .show-pdf .question-panel,
+  .show-pdf .reading-assistant,
   .show-qa .original {
     display: none;
   }
@@ -1312,6 +1589,11 @@ main {
     font-size: 11px;
   }
   .question-panel-content {
+    max-height: none;
+    overflow: visible;
+    min-height: 500px;
+  }
+  .introduction-panel-content {
     max-height: none;
     overflow: visible;
     min-height: 500px;
@@ -1416,6 +1698,18 @@ main {
   }
   .question-composer {
     padding: 20px 17px 16px;
+  }
+  .introduction-panel-content {
+    padding: 20px 18px;
+  }
+  .introduction-heading h2 {
+    font-size: 17px;
+  }
+  .introduction-summary {
+    padding: 16px;
+  }
+  .introduction-summary > p {
+    font-size: 14px;
   }
   .mobile-break {
     display: block;

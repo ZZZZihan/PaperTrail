@@ -50,3 +50,14 @@ CREATE TABLE IF NOT EXISTS model_calls (
     completed_at timestamptz
 );
 INSERT INTO schema_version(version) VALUES (2) ON CONFLICT DO NOTHING;
+
+ALTER TABLE questions ADD COLUMN IF NOT EXISTS kind text NOT NULL DEFAULT 'qa'
+    CHECK (kind IN ('qa', 'introduction'));
+ALTER TABLE questions ADD COLUMN IF NOT EXISTS introduction jsonb;
+CREATE TABLE IF NOT EXISTS question_request_aliases (
+    request_id uuid PRIMARY KEY,
+    question_id uuid NOT NULL REFERENCES questions(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS questions_introduction_paper_created
+    ON questions(paper_id, created_at DESC, id DESC) WHERE kind = 'introduction';
+INSERT INTO schema_version(version) VALUES (3) ON CONFLICT DO NOTHING;
