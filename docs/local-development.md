@@ -49,11 +49,16 @@ make serve
 | `PAPERTRAIL_MODEL_INPUT_PRICE_PER_MILLION` / `PAPERTRAIL_MODEL_OUTPUT_PRICE_PER_MILLION` | 同币种每百万 token 保守输入/输出单价，用于调用前预留及用量后估算 |
 | `PAPERTRAIL_MODEL_BUDGET_SCOPE` | 本轮账本范围，默认 `v01-development`；不要通过换值绕过已经消耗的额度 |
 
-每题最多三次固定调用，单次默认 45 秒，总期限 180 秒；输出默认限制 1800 tokens。`PAPERTRAIL_MODEL_THINKING` 默认空，仅在服务支持时设 `disabled` 或 `enabled`。本轮建议非推理模式，避免思考 token 占用结构化输出额度。服务必须支持 JSON 输出；未配置时可浏览 PDF 与历史，不生成模拟答案。
+每题最多三次固定调用，单次默认 45 秒，总期限 180 秒；输出默认限制 1800 tokens。`PAPERTRAIL_MODEL_THINKING` 默认空，仅在服务支持时设 `disabled` 或 `enabled`。普通问答使用非推理模式，避免思考 token 占用结构化输出额度。服务必须支持 JSON 输出；未配置时可浏览 PDF 与历史，不生成模拟答案。
 
-论文简介 v6 另用至少 120 秒的单次窗口和至少 5,000 tokens 输出上限，共享固定 300 秒总期限；正常两次调用，发生一次内容修订时最多四次，全部进入同一账本。每项可选 1—8 个原文片段用于补齐必要依据，普通问答每条仍最多 4 个引用。刷新、查看成功缓存、重新点击已有成功简介均不再调用模型。旧格式成功简介可经用户主动“补全为研读卡”新建任务，POST 使用新的 request_id 和 refresh_if_outdated: true；当前 paper-reading-card-v1 成功结果仍复用。升级中或失败时接口通过 previous_introduction 保留旧卡可读，失败后主动重试创建新任务。同一 request_id 始终指向原任务，网络提交不确定时先确认原提交结果。
+论文简介自 v6 起另用至少 120 秒的单次窗口和至少 5,000 tokens 输出上限，共享固定 300 秒总期限；正常两次调用，发生一次内容修订时最多四次，全部进入同一账本。每项可选 1—8 个原文片段用于补齐必要依据，普通问答每条仍最多 4 个引用。刷新、查看成功缓存、重新点击已有成功简介均不再调用模型。旧格式成功简介可经用户主动“补全为研读卡”新建任务，POST 使用新的 request_id 和 refresh_if_outdated: true；当前 paper-reading-card-v1 成功结果仍复用。升级中或失败时接口通过 previous_introduction 保留旧卡可读，失败后主动重试创建新任务。同一 request_id 始终指向原任务，网络提交不确定时先确认原提交结果。
 
-`compatible` 请求使用 `max_tokens`、`temperature: 0`，并在配置非空时附带服务的 `thinking` 参数。`openai` 请求使用 `max_completion_tokens` 和 `reasoning_effort: "none"`，省略 `temperature` 与 `thinking`；此方案下 `PAPERTRAIL_MODEL_THINKING` 必须留空，否则视为配置无效。两种方案都使用 Chat Completions、JSON 对象输出及 `stream: false`，内部输出上限与预算预留仍使用同一个 `PAPERTRAIL_MODEL_MAX_OUTPUT_TOKENS`。配置必须与所选服务和模型的实际参数支持一致；程序不会根据模型前缀切换方案，也不会在请求失败后自动换参数重试。运行追踪保存所选方案、实际输出参数名、推理强度和温度；未发送的温度记录为 `null`。
+`compatible` 请求使用 `max_tokens`、`temperature: 0`，并在配置非空时附带服务的 `thinking` 参数。`openai` 请求使用 `max_completion_tokens` 和 `reasoning_effort: "none"`（简介显式 opt-in 可为 `low`），省略 `temperature` 与 `thinking`；此方案下 `PAPERTRAIL_MODEL_THINKING` 必须留空，否则视为配置无效。两种方案都使用 Chat Completions、JSON 对象输出及 `stream: false`，内部输出上限与预算预留仍使用同一个 `PAPERTRAIL_MODEL_MAX_OUTPUT_TOKENS`。配置必须与所选服务和模型的实际参数支持一致；程序不会根据模型前缀切换方案，也不会在请求失败后自动换参数重试。运行追踪保存所选方案、实际输出参数名、推理强度和温度；未发送的温度记录为 `null`。
+
+简介 v10 新增可选 `PAPERTRAIL_INTRODUCTION_REASONING_EFFORT=none|low`，缺省 `none`。
+它只影响简介，普通问答保持 `none`；`low` 需 `openai` profile，非法简介选项在网络前失败。
+推理和可见内容共用输出预算；实际返回的 reasoning tokens 为独立可选诊断，未知不补零、不重复计费。
+变更推理参数不会自动刷新缓存；当前流程旧卡需主动更新，后续同流程已有卡继续复用。
 
 HTTPS 和 `http://127.0.0.1` / `http://localhost` 沿用默认支持。若用户指定局域网 HTTP 中转站，例如服务根路径为 `http://192.168.1.2:8080/private-route/v1`，则将 `PAPERTRAIL_MODEL_ALLOW_HTTP_ORIGIN` 设为 `http://192.168.1.2:8080`。允许项只接受单个 origin，不含用户信息、查询参数、片段或业务路径（末尾单个 `/` 可省略）；协议、主机和有效端口必须与服务根路径一致，未写 HTTP 端口时按 80 匹配。该设置只允许这个明确入口，不接受地址列表或通配符，也不因地址属于局域网而自动允许。运行追踪仅保存服务 origin 和完整根路径的哈希，不保存业务路径或密钥。
 
