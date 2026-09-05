@@ -4,7 +4,7 @@
 
 状态：项目名与公开仓库已确定为 [PaperTrail](https://github.com/ZZZZihan/PaperTrail)；已建立 [Linear 项目](https://linear.app/colife/project/papertrail-论文研读-agent-93a0ba2ee811)、P0—P5 里程碑及 P0 任务。当前仍处于需求、样例与设计阶段，产品实现、评测结果和上线状态尚未建立。
 
-后续接手更新（2026-09-05）：用户要求开始开发，选文后续进行。已按本文建议建立 Python / FastAPI 的本地基础，版本与实测记录见 [本地开发基线](local-development.md)；P0 需求、样例及整体验收仍待完成。下文路线和指标继续作为目标，不能视为已经实现。
+后续接手更新（2026-09-05）：用户确认首个 PDF 导入、保存与逐页核对功能，已在本地实现；范围见 [PDF 导入规格](pdf-import.md)，实际检查见 [验证记录](verification-col-16.md)。PostgreSQL 与 React/PDF.js 已随功能引入。自动查找与下载论文为新提出的后续候选（COL-17）。P0 需求、人工样例及整体验收仍待完成。下文原始路线和指标继续作为目标，不能视为已经实现。
 
 本文整理自此前 v0.1 项目与学习基线，本次只更新名称、仓库、任务入口与接手方式。岗位及工具链接沿用此前讨论，未在本次交接重新调查。实时任务以 Linear 为准，见 [交接说明](handoff.md)。
 

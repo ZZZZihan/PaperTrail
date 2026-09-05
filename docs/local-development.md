@@ -1,4 +1,45 @@
-# 本地开发基线
+# 本地开发与运行
+
+## 当前功能（COL-16）
+
+本地 PDF 导入、持久保存、逐页核对已实现。关联分支 `codex/col-16-pdf-import`；[行为规格](pdf-import.md)、[实际验证记录](verification-col-16.md)。下方 COL-15 记录保留为历史。
+
+### 准备与启动
+
+需要 Make、uv、Node.js 22.13+、PostgreSQL 17 原生命令。macOS 安装 PostgreSQL：`brew install postgresql@17`。本机已安装该版本；未启用 Homebrew 数据库登录服务。其他安装位置可通过 `PAPERTRAIL_PG_BIN` 指定包含 `initdb` 与 `pg_ctl` 的目录。
+
+在仓库根目录运行：
+
+```bash
+make setup
+make check
+make dev
+```
+
+`make setup` 根据 `uv.lock` 与 `web/package-lock.json` 安装依赖，仅在缺失时创建 `.env.local`。`make dev` 构建网页、启动专用数据库，再启动 FastAPI。访问 <http://127.0.0.1:8000/>。按 Ctrl+C 停止应用；`make db-stop` 停止数据库。下次 `make dev` 继续使用已保存论文。
+
+本地 PostgreSQL 仅监听 `127.0.0.1:55432`，数据位于 `data/postgres/`，角色和数据库名均为 `papertrail`，本地开发使用 trust 认证。该配置用于当前单用户开发，不作为多人服务配置。脚本不会启动或停止其他项目的数据库。首次安装 Homebrew 创建的默认集群并未用于本项目。
+
+### 配置与存储
+
+`.env.example` 列出监听地址、数据库连接、数据目录、大小/页数/时限。已有 `.env.local` 不覆盖，缺失的 PaperTrail 配置使用相同默认值。修改监听端口使用 `UVICORN_PORT`。
+
+- `data/library/papers/` 保存 PDF 原件，系统 UUID 命名；`staging/` 用于上传临时文件。
+- PostgreSQL 保存文件哈希、原始名称、解析版本和逐页文本；使用版本 1 的 SQL 建表，启动时幂等执行。
+- 如需备份，保留完整数据库及 `data/library/` 两部分。只拷贝 PDF 不会带回页面记录，删除 `data/` 会丢失论文及数据库。
+- `data/`、PDF、配置、虚拟环境、网页产物及浏览器证据不提交 Git；锁文件和结构 SQL 纳入 Git。
+
+### 前端与检查
+
+生产网页由 FastAPI 同源提供；PDF.js 的 worker、字符映射、字体与图片解码资源均随构建放在本地，无 CDN 依赖。阅读器只渲染页面，提取文字作为文本显示。
+
+开发前端时可在另一个终端运行 `npm run dev --prefix web`，默认代理 `/api` 到 `127.0.0.1:8000`。若后端端口改变，需相应修改 `web/vite.config.ts`；日常用 `make dev` 无需单独启动前端。
+
+`make check` 运行 Ruff、前端类型检查与生产构建、18 项业务测试、HTTP/OpenAPI 冒烟和 `git diff --check`。本地测试自动启动临时 PostgreSQL 集群并清理；不会清空开发论文库。CI 使用 PostgreSQL 17 服务，检查脚本创建独立 UUID 命名数据库再删除它；需 `PAPERTRAIL_TEST_ADMIN_URL` 指向专用测试服务。CI 是否通过以实际远端运行记录为准。
+
+学习入口：`src/papertrail/ingestion.py` 解释文件怎样进入系统；`repository.py` 解释文件与数据库的事务边界；`web/src/main.tsx` 解释页面怎样发起请求、读取逐页结果。正文/图表质量限制见验证记录。
+
+## COL-15 初始服务基线（历史）
 
 日期：2026-09-05 · 关联 [COL-15](https://linear.app/colife/issue/COL-15) · 分支 `codex/col-15-development-baseline`。
 

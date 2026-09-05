@@ -27,3 +27,11 @@ data/
 .DS_Store
 .idea/
 .vscode/
+
+# Web dependencies and verification artifacts
+node_modules/
+.playwright-cli/
+output/
+tmp/
+*.tsbuildinfo
+web/public/pdfjs/
