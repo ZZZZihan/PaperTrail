@@ -9,7 +9,7 @@ from collections.abc import Callable
 from papertrail.model import ModelClient, ModelConfig, ModelError
 from papertrail.retrieval import CHUNK_VERSION, RETRIEVAL_VERSION, build_chunks, retrieve
 
-PROMPT_VERSION = "evidence-qa-v2"
+PROMPT_VERSION = "evidence-qa-v3"
 PIPELINE_TIMEOUT = 180
 INSUFFICIENT = "在当前已检索证据中未找到足够支持。请尝试更具体的问题，或直接查看原文核对。"
 QUERY_PROMPT = """You prepare search queries for a single academic paper. Return JSON only:
@@ -25,11 +25,27 @@ Return JSON only, in this schema:
 "citations":[{"chunk_id":"provided ID", "quote":"exact contiguous original text"}]}],
 "message":""}.
 Answer in Chinese. Every claim must have at least one citation, quoting 8-1200 original characters.
-Use at most 8 concise claims and at most 4 citations per claim. Preserve experimental settings,
-scope and limitations. Distinguish the authors' results from hypotheses. Never generalize beyond
-the cited evidence, infer an absence from missing retrieval, or fabricate an ID or quotation.
-Every cited quote must itself support the attached claim. Prefer a short full sentence; quotes
-must be contiguous (no ellipses or omissions), preserving original words and punctuation.
+Prefer 1-3 concise claims containing only facts necessary to answer the question directly.
+Complex questions may require more, up to 8 claims and at most 4 citations per claim. Do not add
+unasked peripheral procedures, formulas, or derivations just because they appear in the passages.
+For EACH claim, FIRST select the original quote(s) that support ALL of its details, THEN write
+the Chinese claim from those quotes. Each claim is checked independently: a quote attached to
+another claim cannot support this claim. If a claim describes several steps, attach evidence for
+every step to that same claim, or limit the claim to what its own citations actually establish.
+Preserve necessary experimental conditions, numbers, training procedures, frozen parameters,
+scope and limitations when relevant to the answer. Do not add technical modifiers or definitions
+that the attached quotes do not cover, even if they seem familiar or plausible.
+For comparisons, changes and differences, preserve the direction and reference baseline. State
+which quantity increases or decreases relative to which baseline, or which quantity is subtracted
+from which; do not ambiguously describe an ordered subtraction as merely a difference between two.
+Distinguish the authors' results from hypotheses. Never generalize beyond cited evidence, infer
+an absence from missing retrieval, or fabricate an ID or quotation.
+Prefer a short complete sentence; two adjacent complete sentences from the SAME supplied chunk
+may form one quote when both are needed. Every quote must be one contiguous span of its own chunk,
+with no ellipses, omissions, or text joined from different chunks. Copy original words, numbers,
+punctuation, symbols and whitespace. For a method overview, prefer prose evidence over equation
+layout unless the question requires the formula. Never silently join subscripts, remove symbols,
+or rewrite mathematical notation to make an extracted formula look cleaner.
 If the retrieved evidence cannot answer the question, return insufficient_evidence with empty
 claims and message. Missing numbers, unavailable details, or unsupported universality warrant
 insufficient evidence. Do not fill gaps using prior knowledge. Citations must use supplied IDs;

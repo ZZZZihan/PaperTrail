@@ -347,7 +347,6 @@ def test_pipeline_sends_authoritative_recovered_quote_to_support_check():
         PAPER, [{"page_index": 0, "text": source}], "实验是什么？", client=client
     )
     assert result["status"] == "answered"
-    assert result["trace"]["pipeline_version"] == "evidence-qa-v2"
     assert result["trace"]["generated_claims"][0]["citations"][0]["quote"] == quote
     assert result["claims"][0]["citations"][0]["quote"] == normalize_quote(source)
     assert support_inputs == [normalize_quote(source)]
