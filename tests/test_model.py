@@ -1,0 +1,164 @@
+import asyncio
+import json
+
+import httpx2 as httpx
+import pytest
+
+from papertrail.model import ModelClient, ModelConfig, ModelError
+
+
+def config(**kwargs):
+    return ModelConfig(
+        base_url="https://provider.test/v1",
+        api_key="secret-test-key",
+        model_name="test-model",
+        **kwargs,
+    )
+
+
+MESSAGES = [{"role": "system", "content": "Return JSON."}, {"role": "user", "content": "中文问题"}]
+
+
+def response(content='{"ok":true}', **kwargs):
+    return httpx.Response(
+        200,
+        json={
+            "choices": [{"finish_reason": "stop", "message": {"content": content}}],
+            "usage": {"prompt_tokens": 30, "completion_tokens": 10, "total_tokens": 40},
+            "model": "test-model-version",
+            **kwargs,
+        },
+    )
+
+
+def test_json_request_and_safe_usage_recording():
+    reserved, recorded = [], []
+
+    def handler(request):
+        payload = json.loads(request.content)
+        assert payload["response_format"] == {"type": "json_object"}
+        assert payload["thinking"] == {"type": "disabled"}
+        assert payload["temperature"] == 0
+        assert "tools" not in payload
+        assert request.headers["authorization"] == "Bearer secret-test-key"
+        return response()
+
+    client = ModelClient(
+        config(thinking="disabled"),
+        transport=httpx.MockTransport(handler),
+        before_call=reserved.append,
+        record_call=recorded.append,
+    )
+    assert client.complete_json("query", MESSAGES) == {"ok": True}
+    assert len(reserved) == len(recorded) == len(client.calls) == 1
+    assert reserved[0]["input_token_upper_bound"] > len("中文问题".encode())
+    call = recorded[0]
+    assert call["status"] == "succeeded"
+    assert call["usage"]["total_tokens"] == 40
+    assert call["returned_model"] == "test-model-version"
+    assert call["cost"] is None and call["cost_status"] == "unknown"
+    assert "secret-test-key" not in json.dumps(recorded) + repr(client.config)
+    assert "provider.test" not in json.dumps(recorded)
+
+
+def test_missing_or_invalid_configuration_never_calls_network(monkeypatch):
+    requests = []
+    client = ModelClient(ModelConfig(), transport=httpx.MockTransport(requests.append))
+    with pytest.raises(ModelError) as error:
+        client.complete_json("query", MESSAGES)
+    assert error.value.code == "model_not_configured"
+    assert requests == client.calls == []
+    monkeypatch.setenv("PAPERTRAIL_MODEL_TIMEOUT", "invalid")
+    assert not ModelConfig.from_env().configured
+    monkeypatch.setenv("PAPERTRAIL_MODEL_TIMEOUT", "nan")
+    assert not ModelConfig.from_env().configured
+
+
+def test_budget_refusal_does_not_count_as_an_external_call():
+    records = []
+
+    def refuse(_):
+        raise ModelError("budget_exceeded", "预算不足")
+
+    client = ModelClient(config(), before_call=refuse, record_call=records.append)
+    with pytest.raises(ModelError, match="预算不足"):
+        client.complete_json("query", MESSAGES)
+    assert records == client.calls == []
+
+
+@pytest.mark.parametrize("bad_content", ["not JSON", "[]", "```json\n{}\n```"])
+def test_invalid_json_keeps_usage_and_does_not_retry(bad_content):
+    records = []
+    client = ModelClient(
+        config(),
+        transport=httpx.MockTransport(lambda _: response(bad_content)),
+        record_call=records.append,
+    )
+    with pytest.raises(ModelError) as error:
+        client.complete_json("generate", MESSAGES)
+    assert error.value.code == "invalid_output"
+    assert len(records) == 1
+    assert records[0]["usage"]["prompt_tokens"] == 30
+    assert records[0]["status"] == "failed"
+
+
+def test_timeout_is_total_and_recorded_without_retry():
+    async def delayed(_):
+        await asyncio.sleep(0.1)
+        return response()
+
+    client = ModelClient(config(timeout=0.01), transport=httpx.MockTransport(delayed))
+    with pytest.raises(ModelError) as error:
+        client.complete_json("query", MESSAGES)
+    assert error.value.code == "model_timeout"
+    assert len(client.calls) == 1
+    assert client.calls[0]["error_code"] == "model_timeout"
+    assert client.calls[0]["usage"] is None
+
+
+def test_provider_error_does_not_expose_body_or_credentials():
+    client = ModelClient(
+        config(),
+        transport=httpx.MockTransport(
+            lambda _: httpx.Response(401, text="secret-test-key raw internal credentials")
+        ),
+    )
+    with pytest.raises(ModelError) as error:
+        client.complete_json("query", MESSAGES)
+    assert error.value.code == "model_failure"
+    assert "secret" not in str(error.value) + json.dumps(client.calls)
+
+
+@pytest.mark.parametrize("choices", [[], [None], [{"finish_reason": "length", "message": {}}]])
+def test_malformed_or_truncated_choices_are_invalid_output(choices):
+    client = ModelClient(
+        config(), transport=httpx.MockTransport(lambda _: response(choices=choices))
+    )
+    with pytest.raises(ModelError) as error:
+        client.complete_json("query", MESSAGES)
+    assert error.value.code == "invalid_output"
+    assert client.calls[0]["usage"]["total_tokens"] == 40
+
+
+@pytest.mark.parametrize("unsafe", ["\\u0000", "\\ud800", "\\udfff"])
+def test_model_json_rejects_postgresql_unsafe_unicode_and_preserves_usage(unsafe):
+    content = '{"nested":[{"text":"' + unsafe + '"}]}'
+    client = ModelClient(config(), transport=httpx.MockTransport(lambda _: response(content)))
+    with pytest.raises(ModelError) as error:
+        client.complete_json("generate", MESSAGES)
+    assert error.value.code == "invalid_output"
+    assert client.calls[0]["usage"]["total_tokens"] == 40
+    assert "\\ud800" not in json.dumps(client.calls)
+
+
+def test_unsafe_returned_model_and_nonfinite_config_never_enter_trace():
+    client = ModelClient(
+        config(), transport=httpx.MockTransport(lambda _: response(model="provider\0model"))
+    )
+    with pytest.raises(ModelError) as error:
+        client.complete_json("query", MESSAGES)
+    assert error.value.code == "invalid_output"
+    assert "returned_model" not in client.calls[0]
+    assert client.calls[0]["usage"]["total_tokens"] == 40
+    assert config(timeout=float("nan")).public()["timeout_seconds"] is None
+    assert config(timeout=float("inf")).public()["timeout_seconds"] is None

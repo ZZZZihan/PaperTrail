@@ -1,5 +1,7 @@
 """PostgreSQL owns document identity and all-or-nothing page records."""
 
+from __future__ import annotations
+
 import os
 from importlib.resources import files
 from pathlib import Path
@@ -7,8 +9,10 @@ from uuid import UUID, uuid4
 
 import psycopg
 from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 
 from papertrail.config import Settings
+from papertrail.errors import ImportFailure
 
 
 class Repository:
@@ -61,6 +65,113 @@ class Repository:
                 "WHERE paper_id = %s AND page_index = %s",
                 (paper_id, page_index),
             ).fetchone()
+
+    def pages(self, paper_id: UUID) -> list[dict]:
+        with self.connect() as conn:
+            return conn.execute(
+                "SELECT paper_id, page_index, text FROM pages "
+                "WHERE paper_id = %s ORDER BY page_index",
+                (paper_id,),
+            ).fetchall()
+
+    def create_question(self, paper_id: UUID, request_id: UUID, question: str):
+        self.expire_questions()
+        with self.connect() as conn:
+            conn.execute("SELECT pg_advisory_xact_lock(18091801)")
+            existing = conn.execute(
+                "SELECT * FROM questions WHERE request_id = %s", (request_id,)
+            ).fetchone()
+            if existing:
+                if existing["paper_id"] != paper_id or existing["question"] != question:
+                    raise ImportFailure(
+                        "request_conflict", "提交标识已用于其他问题，请重新提交。", 409
+                    )
+                return existing, False
+            if not conn.execute("SELECT id FROM papers WHERE id = %s", (paper_id,)).fetchone():
+                raise ImportFailure("not_found", "找不到这篇论文，请返回论文库。", 404)
+            if conn.execute(
+                "SELECT id FROM questions WHERE status IN ('pending', 'running') LIMIT 1"
+            ).fetchone():
+                raise ImportFailure(
+                    "question_in_progress", "已有问题正在处理，请稍候并刷新问答历史。", 409
+                )
+            row = conn.execute(
+                "INSERT INTO questions(id, paper_id, request_id, question, status) "
+                "VALUES (%s, %s, %s, %s, 'pending') RETURNING *",
+                (uuid4(), paper_id, request_id, question),
+            ).fetchone()
+            return row, True
+
+    def questions(self, paper_id: UUID, offset: int = 0) -> list[dict]:
+        self.expire_questions()
+        with self.connect() as conn:
+            return conn.execute(
+                "SELECT * FROM questions WHERE paper_id = %s "
+                "ORDER BY created_at DESC, id DESC LIMIT 100 OFFSET %s",
+                (paper_id, offset),
+            ).fetchall()
+
+    def question(self, paper_id: UUID, question_id: UUID) -> dict | None:
+        self.expire_questions()
+        with self.connect() as conn:
+            return conn.execute(
+                "SELECT * FROM questions WHERE id = %s AND paper_id = %s",
+                (question_id, paper_id),
+            ).fetchone()
+
+    def progress_question(self, question_id: UUID, stage: str) -> None:
+        with self.connect() as conn:
+            conn.execute(
+                "UPDATE questions SET status = 'running', stage = %s "
+                "WHERE id = %s AND status IN ('pending', 'running')",
+                (stage, question_id),
+            )
+
+    def finish_question(self, question_id: UUID, result: dict) -> None:
+        with self.connect() as conn:
+            conn.execute(
+                "UPDATE questions SET status = %s, stage = 'complete', claims = %s, "
+                "message = %s, error_code = %s, support_status = %s, human_review = %s, "
+                "trace = %s, completed_at = now() "
+                "WHERE id = %s AND status IN ('pending', 'running')",
+                (
+                    result["status"],
+                    Jsonb(result.get("claims", [])),
+                    result.get("message", ""),
+                    result.get("error_code"),
+                    result.get("support_status"),
+                    Jsonb(result.get("human_review")),
+                    Jsonb(result.get("trace", {})),
+                    question_id,
+                ),
+            )
+
+    def recover_questions(self) -> int:
+        with self.connect() as conn:
+            return conn.execute(
+                "UPDATE questions SET status = 'failed', stage = 'complete', "
+                "error_code = 'interrupted', message = %s, completed_at = now() "
+                "WHERE status IN ('pending', 'running')",
+                (
+                    "上次处理因应用停止而中断。模型调用可能已发生，费用可能未知。"
+                    "原问题已保存，可确认后主动重试。",
+                ),
+            ).rowcount
+
+    def expire_questions(self) -> None:
+        # The fixed pipeline has a 180s deadline. Leave a generous persistence margin.
+        # This also releases tasks whose terminal write failed during a database outage.
+        with self.connect() as conn:
+            conn.execute(
+                "UPDATE questions SET status = 'failed', stage = 'complete', "
+                "error_code = 'interrupted', message = %s, completed_at = now() "
+                "WHERE status IN ('pending', 'running') "
+                "AND created_at < now() - interval '5 minutes'",
+                (
+                    "处理记录超过时间上限，可能在服务异常时中断。模型调用可能已发生，"
+                    "请核对后主动重试。",
+                ),
+            )
 
     def file_path(self, paper_id: UUID) -> Path:
         return self.settings.data_dir / "papers" / f"{paper_id}.pdf"

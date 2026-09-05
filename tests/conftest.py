@@ -15,6 +15,7 @@ def settings(tmp_path):
     settings = Settings(
         database_url=os.environ["PAPERTRAIL_TEST_DATABASE_URL"],
         data_dir=tmp_path / "library",
+        exclusive_service=False,
     )
     repository = Repository(settings)
     repository.migrate()

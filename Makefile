@@ -1,4 +1,4 @@
-.PHONY: setup dev check db-start db-stop web-build
+.PHONY: setup dev serve check db-start db-stop web-build
 
 setup:
 	uv sync --locked
@@ -16,6 +16,10 @@ db-stop:
 
 dev: setup web-build db-start
 	uv run --locked --env-file .env.local uvicorn papertrail.main:app --reload
+
+# Stable single-process trial server: reload is intentionally limited to `make dev`.
+serve: setup web-build db-start
+	uv run --locked --env-file .env.local uvicorn papertrail.main:app --timeout-graceful-shutdown 15
 
 check:
 	uv sync --locked

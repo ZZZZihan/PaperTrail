@@ -1,0 +1,228 @@
+"""Durable task contracts; test doubles here never stand in for real model acceptance."""
+
+from dataclasses import replace
+from decimal import Decimal
+from uuid import UUID, uuid4
+
+import pytest
+from fastapi.testclient import TestClient
+from test_import import upload
+
+from papertrail.budget import Budget, CallLedger
+from papertrail.errors import ImportFailure
+from papertrail.main import create_app
+from papertrail.repository import Repository
+
+
+def test_history_idempotency_and_paper_scope_survive_restart(client, settings, monkeypatch):
+    paper = upload(client).json()["paper"]
+    path = f"/api/papers/{paper['id']}/questions"
+    repository = client.app.state.repository
+    runs = []
+
+    def run(question_id, paper_id, question):
+        runs.append(question_id)
+        repository.finish_question(
+            question_id,
+            {
+                "status": "answered",
+                "claims": [
+                    {
+                        "text": "测试原文事实",
+                        "citations": [
+                            {
+                                "chunk_id": "test-only",
+                                "paper_id": str(paper_id),
+                                "page_index": 0,
+                                "quote": "Alpha evidence on physical page one",
+                            }
+                        ],
+                    }
+                ],
+                "message": "",
+                "support_status": "ai_checked",
+                "trace": {"fixture": True},
+            },
+        )
+
+    monkeypatch.setattr(client.app.state.questions, "run", run)
+    body = {"question": "  研究问题是什么？  ", "request_id": str(uuid4())}
+    submitted = client.post(path, json=body)
+    assert submitted.status_code == 202
+    row = client.get(path).json()[0]
+    assert row["question"] == "研究问题是什么？"
+    assert row["status"] == "answered"
+    assert client.post(path, json=body).json()["id"] == row["id"]
+    assert len(runs) == 1
+    assert client.post(path, json={**body, "question": "另一个问题"}).status_code == 409
+    assert client.get(f"/api/papers/{uuid4()}/questions/{row['id']}").status_code == 404
+    with TestClient(create_app(settings)) as restarted:
+        assert restarted.get(path + "/" + row["id"]).json() == row
+
+
+def test_pending_question_blocks_new_request_and_recovers(settings, client, monkeypatch):
+    paper = upload(client).json()["paper"]
+    repository = Repository(settings)
+    row, created = repository.create_question(UUID(paper["id"]), uuid4(), "待处理问题")
+    assert created
+    with pytest.raises(ImportFailure, match="已有问题"):
+        repository.create_question(UUID(paper["id"]), uuid4(), "第二题")
+    repository.progress_question(row["id"], "generating")
+    with TestClient(create_app(settings)) as restarted:
+        found = restarted.get(f"/api/papers/{paper['id']}/questions/{row['id']}").json()
+        assert found["status"] == "failed"
+        assert found["error_code"] == "interrupted"
+        assert "费用可能未知" in found["message"]
+        assert repository.create_question(UUID(paper["id"]), uuid4(), "恢复后提问")[1]
+
+
+def test_second_server_cannot_interrupt_first_servers_pending_work(settings):
+    exclusive = replace(settings, exclusive_service=True)
+    with TestClient(create_app(exclusive)) as first:
+        paper = upload(first).json()["paper"]
+        repository = first.app.state.repository
+        row, _ = repository.create_question(UUID(paper["id"]), uuid4(), "真实服务仍在处理")
+        with pytest.raises(RuntimeError, match="已有服务"):
+            with TestClient(create_app(exclusive)):
+                pass
+        assert repository.question(UUID(paper["id"]), row["id"])["status"] == "pending"
+    with TestClient(create_app(exclusive)) as restarted:
+        recovered = restarted.app.state.repository.question(UUID(paper["id"]), row["id"])
+        assert recovered["error_code"] == "interrupted"
+
+
+def test_invalid_question_and_unknown_paper_never_start(client):
+    paper = upload(client).json()["paper"]
+    path = f"/api/papers/{paper['id']}/questions"
+    for question in (" ", "x" * 2001, None, "bad\x00text"):
+        assert (
+            client.post(path, json={"question": question, "request_id": str(uuid4())}).status_code
+            == 422
+        )
+    assert (
+        client.post(
+            f"/api/papers/{uuid4()}/questions",
+            json={
+                "question": "test",
+                "request_id": str(uuid4()),
+            },
+        ).status_code
+        == 404
+    )
+    assert client.get(path).json() == []
+
+
+def test_invalid_unicode_request_is_safe_json(client):
+    paper = upload(client).json()["paper"]
+    response = client.post(
+        f"/api/papers/{paper['id']}/questions",
+        content='{"question":"\\ud800","request_id":"' + str(uuid4()) + '"}',
+        headers={"Content-Type": "application/json"},
+    )
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "invalid_request"
+
+
+def test_lost_terminal_write_expires_without_restart(client, settings):
+    paper = upload(client).json()["paper"]
+    repository = Repository(settings)
+    row, _ = repository.create_question(UUID(paper["id"]), uuid4(), "写入中断")
+    with repository.connect() as conn:
+        conn.execute(
+            "UPDATE questions SET created_at = now() - interval '6 minutes' WHERE id = %s",
+            (row["id"],),
+        )
+    assert repository.questions(UUID(paper["id"]))[0]["error_code"] == "interrupted"
+    assert repository.create_question(UUID(paper["id"]), uuid4(), "可以继续")[1]
+
+
+def test_ledger_snapshot_failure_still_saves_terminal_state(client, monkeypatch):
+    for name in ("PAPERTRAIL_MODEL_API_KEY", "PAPERTRAIL_MODEL_NAME", "PAPERTRAIL_MODEL_BASE_URL"):
+        monkeypatch.delenv(name, raising=False)
+
+    def fail_snapshot(self):
+        raise OSError("transient storage fault")
+
+    monkeypatch.setattr(CallLedger, "snapshot", fail_snapshot)
+    paper = upload(client).json()["paper"]
+    path = f"/api/papers/{paper['id']}/questions"
+    assert (
+        client.post(path, json={"question": "问题", "request_id": str(uuid4())}).status_code == 202
+    )
+    row = client.get(path).json()[0]
+    assert row["status"] == "failed"
+    assert row["trace"]["ledger"]["status"] == "unavailable"
+
+
+def test_nonfinite_model_config_never_leaves_running_task(client, monkeypatch):
+    monkeypatch.setenv("PAPERTRAIL_MODEL_TIMEOUT", "nan")
+    paper = upload(client).json()["paper"]
+    path = f"/api/papers/{paper['id']}/questions"
+    assert (
+        client.post(path, json={"question": "问题", "request_id": str(uuid4())}).status_code == 202
+    )
+    row = client.get(path).json()[0]
+    assert row["status"] == "failed"
+    assert row["error_code"] == "model_not_configured"
+
+
+def test_missing_model_saved_as_failure_and_config_safe(client, monkeypatch):
+    for name in ("PAPERTRAIL_MODEL_API_KEY", "PAPERTRAIL_MODEL_NAME", "PAPERTRAIL_MODEL_BASE_URL"):
+        monkeypatch.delenv(name, raising=False)
+    paper = upload(client).json()["paper"]
+    path = f"/api/papers/{paper['id']}/questions"
+    result = client.post(path, json={"question": "问题是什么？", "request_id": str(uuid4())})
+    assert result.status_code == 202
+    row = client.get(path).json()[0]
+    assert row["status"] == "failed"
+    assert row["error_code"] == "model_not_configured"
+    assert row["trace"]["ledger"]["calls"] == []
+    config = client.get("/api/config").json()
+    assert config["model"]["configured"] is False
+    assert "api_key" not in str(config).lower()
+
+
+def test_budget_reserves_before_call_and_persists_unknown_consumption(client, settings):
+    from papertrail.model import ModelError
+
+    paper = upload(client).json()["paper"]
+    repository = Repository(settings)
+    row, _ = repository.create_question(UUID(paper["id"]), uuid4(), "预算测试")
+    budget = Budget(Decimal("0.003"), Decimal("1"), Decimal("2"), "USD", "test")
+    ledger = CallLedger(repository, row["id"], budget)
+    metadata = {"stage": "query", "input_token_upper_bound": 1000, "max_output_tokens": 1000}
+    ledger.before_call(metadata)
+    # A timeout without usage keeps the full reservation; restarting cannot erase it.
+    ledger.record_call({"stage": "query", "error_code": "model_timeout", "usage": None})
+    with pytest.raises(ModelError):
+        CallLedger(repository, row["id"], budget).before_call(metadata)
+    saved = ledger.snapshot()
+    assert len(saved["calls"]) == 1
+    assert saved["unknown_cost_calls"] == 1
+    assert saved["calls"][0]["actual_cost"] is None
+
+
+def test_budget_actual_usage_releases_only_known_unused_reservation(client, settings):
+    paper = upload(client).json()["paper"]
+    repository = Repository(settings)
+    row, _ = repository.create_question(UUID(paper["id"]), uuid4(), "预算测试")
+    budget = Budget(Decimal("0.006"), Decimal("1"), Decimal("2"), "USD", "test-actual")
+    ledger = CallLedger(repository, row["id"], budget)
+    metadata = {"stage": "query", "input_token_upper_bound": 1000, "max_output_tokens": 1000}
+    ledger.before_call(metadata)
+    ledger.record_call({"usage": {"prompt_tokens": 100, "completion_tokens": 50}})
+    assert Decimal(ledger.snapshot()["estimated_cost"]) == Decimal("0.0002")
+    ledger.before_call(metadata)
+    assert len(ledger.snapshot()["calls"]) == 2
+
+
+def test_missing_budget_refuses_call_before_reservation(client, settings):
+    from papertrail.model import ModelError
+
+    paper = upload(client).json()["paper"]
+    repository = Repository(settings)
+    row, _ = repository.create_question(UUID(paper["id"]), uuid4(), "预算未配置")
+    ledger = CallLedger(repository, row["id"], None)
+    with pytest.raises(ModelError):
+        ledger.before_call({})
+    assert ledger.snapshot()["calls"] == []

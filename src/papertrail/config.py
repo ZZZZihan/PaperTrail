@@ -13,6 +13,8 @@ class Settings:
     max_pages: int = 100
     parse_timeout: float = 20
     max_text_chars: int = 2_000_000
+    # Test fixtures may explicitly disable this for nested lifespan persistence checks.
+    exclusive_service: bool = True
 
     @classmethod
     def from_env(cls) -> "Settings":
