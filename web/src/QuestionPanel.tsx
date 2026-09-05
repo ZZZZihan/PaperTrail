@@ -214,10 +214,12 @@ export function QuestionPanel({
   paperId,
   onCitation,
   embedded = false,
+  focusRequest = 0,
 }: {
   paperId: string;
   onCitation: (citation: Citation) => void;
   embedded?: boolean;
+  focusRequest?: number;
 }) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [draft, setDraft] = useState("");
@@ -237,6 +239,13 @@ export function QuestionPanel({
   const textarea = useRef<HTMLTextAreaElement>(null);
   const form = useRef<HTMLFormElement>(null);
   const active = questions.some(inProgress);
+
+  useEffect(() => {
+    if (!focusRequest) return;
+    // The parent has committed the tab change, so the composer is no longer hidden.
+    textarea.current?.focus({ preventScroll: true });
+    textarea.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [focusRequest]);
 
   useEffect(() => {
     mounted.current = true;

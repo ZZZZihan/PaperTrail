@@ -162,6 +162,7 @@ function Reader({
   const [failure, setFailure] = useState("");
   const [tab, setTab] = useState("qa");
   const [readingTab, setReadingTab] = useState("introduction");
+  const [questionFocusRequest, setQuestionFocusRequest] = useState(0);
   const [documentTab, setDocumentTab] = useState("pdf");
   const [citation, setCitation] = useState<Citation | null>(null);
   const [pageInput, setPageInput] = useState(String(route.page + 1));
@@ -396,10 +397,13 @@ function Reader({
             <small>基于当前论文</small>
           </div>
           <div id="introduction-view" role="tabpanel" aria-labelledby="introduction-tab" hidden={readingTab !== "introduction"}>
-            <IntroductionPanel key={paper.id} paperId={paper.id} onCitation={openCitation} onAsk={() => setReadingTab("qa")} />
+            <IntroductionPanel key={paper.id} paperId={paper.id} onCitation={openCitation} onAsk={() => {
+              setReadingTab("qa");
+              setQuestionFocusRequest((value) => value + 1);
+            }} />
           </div>
           <div id="questions-view" role="tabpanel" aria-labelledby="questions-tab" hidden={readingTab !== "qa"}>
-            <QuestionPanel key={paper.id} paperId={paper.id} onCitation={openCitation} embedded />
+            <QuestionPanel key={paper.id} paperId={paper.id} onCitation={openCitation} focusRequest={questionFocusRequest} embedded />
           </div>
         </section>
       </div>

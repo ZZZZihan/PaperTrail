@@ -24,6 +24,18 @@ make serve
 
 本地 PostgreSQL 仅监听 `127.0.0.1:55432`，数据位于 `data/postgres/`，角色和数据库名均为 `papertrail`，本地开发使用 trust 认证。该配置用于当前单用户开发，不作为多人服务配置。脚本不会启动或停止其他项目的数据库。首次安装 Homebrew 创建的默认集群并未用于本项目。
 
+### 可重复的离线端到端检查
+
+`make check` 验证静态规则、前端构建、后端测试和基础 HTTP 契约。需要进一步走完整 HTTP 与持久化链路时运行：
+
+```bash
+make check-e2e
+```
+
+此命令构建前端，再用动态空闲端口启动独立应用、临时论文库与 PostgreSQL 17，调用明确标为 OFFLINE 的模型替身。检查上传、空白物理页、重复文件、错误输入、六种问答结果、请求幂等、引用与原件，以及应用和数据库真实重启后的完整对象一致性；每次写请求前验证 fixture 标识，结束后清理临时服务和数据。结果保存于被忽略的 `output/e2e/latest.json`。它不读取 `.env.local`，不使用现有论文库或真实模型额度，也不是浏览器自动化或模型质量评分。该命令目前是本地扩展检查，远端 CI 仍执行 `make check`。
+
+浏览器故障走查可另运行 `uv run --locked python scripts/browser_fixture.py --port 8001`，打开打印的地址，上传打印的合成 PDF。问答支持“正常”“部分回答”“证据不足”“无效引用”“超时”“失败”；`introduction_pdfs` 提供简介成功、一次修订、失败、检查不通过、慢响应，以及旧卡升级成功/失败七种文件。旧卡仅为明确标识的合成 fixture 播种；不属于真实论文评测。向打印的 supervisor PID 发送 SIGUSR2 可重启应用与其私有数据库；Ctrl+C 清理环境。本次实际浏览器、API 和审查证据见 [提交前审查与端到端验证](verification-review-2026-09-05.md)。
+
 ### 配置与存储
 
 `.env.example` 列出监听地址、数据库连接、数据目录、大小/页数/时限。已有 `.env.local` 不覆盖，缺失的 PaperTrail 配置使用相同默认值。修改监听端口使用 `UVICORN_PORT`。
