@@ -15,8 +15,9 @@ from test_introduction import (
 )
 from test_model import config, response
 
-from papertrail.introduction import introduce_paper
+from papertrail.introduction import INTRODUCTION_PIPELINE_TIMEOUT, introduce_paper
 from papertrail.model import ModelClient
+from papertrail.qa import PIPELINE_TIMEOUT as QA_PIPELINE_TIMEOUT
 
 
 def verdicts(data, *, supported):
@@ -142,11 +143,11 @@ def test_all_calls_share_original_deadline_and_timeout_stops_before_last_support
         data = json.loads(json.loads(request.content)["messages"][1]["content"])
         requests.append(data)
         if "claims" in data:
-            clock["now"] = start + 179
+            clock["now"] = start + INTRODUCTION_PIPELINE_TIMEOUT - 1
             result = verdicts(data, supported=False)
         else:
             if "draft" in data:
-                clock["now"] = start + 181
+                clock["now"] = start + INTRODUCTION_PIPELINE_TIMEOUT + 1
             result = introduction_output(data["passages"][0]["chunk_id"])
         return response(json.dumps(result))
 
@@ -161,5 +162,42 @@ def test_all_calls_share_original_deadline_and_timeout_stops_before_last_support
     result = introduce_paper(PAPER, PAGES, client=client)
     assert result["error_code"] == "model_timeout" and result["introduction"] is None
     assert result["claims"] == [] and len(requests) == 3
-    assert deadlines == [start + 180] * 3
+    assert deadlines == [start + 300] * 3
+    assert QA_PIPELINE_TIMEOUT == 180
     assert len(result["trace"]["attempts"]) == 2
+
+
+def test_four_calls_keep_one_300_second_deadline_without_extending_ordinary_qa(monkeypatch):
+    start = time.monotonic()
+    clock = {"now": start}
+    monkeypatch.setattr(
+        "papertrail.introduction.time", SimpleNamespace(monotonic=lambda: clock["now"])
+    )
+    elapsed = iter((30, 65, 90, 210))
+    checked, deadlines = 0, []
+
+    def handler(request):
+        nonlocal checked
+        data = json.loads(json.loads(request.content)["messages"][1]["content"])
+        clock["now"] = start + next(elapsed)
+        if "claims" in data:
+            checked += 1
+            generated = verdicts(data, supported=checked == 2)
+        else:
+            generated = introduction_output(data["passages"][0]["chunk_id"])
+        return response(json.dumps(generated))
+
+    client = ModelClient(config(), transport=httpx.MockTransport(handler))
+    complete = client.complete_json
+
+    def record_deadline(stage, messages, *, deadline=None):
+        deadlines.append(deadline)
+        return complete(stage, messages, deadline=deadline)
+
+    monkeypatch.setattr(client, "complete_json", record_deadline)
+    result = introduce_paper(PAPER, PAGES, client=client)
+    assert result["status"] == "answered" and result["trace"]["call_count"] == 4
+    assert result["trace"]["elapsed_ms"] == 210_000
+    assert result["trace"]["pipeline_timeout_seconds"] == 300
+    assert deadlines == [start + 300] * 4
+    assert QA_PIPELINE_TIMEOUT == 180

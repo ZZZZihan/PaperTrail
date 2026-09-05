@@ -8,7 +8,7 @@
 
 ## 按实际阶段工作
 
-- 当前由用户的“准确性与专业度”Goal 授权继续 COL-19，任务为 In Progress，分支 `codex/col-19-paper-introduction-demo`，PR 为 draft、未合并。本轮以 docs/reading-quality-v02.md 与 docs/paper-introduction-demo.md 为规格，实际版本、运行及用量统一见 docs/verification-quality-v02.md。已实现问答 coverage/partial_answer 和 v5 研读卡：必要要点与事实支持分别检查，内容来源分四类，旧回答不回填成绩，旧简介仅在主动升级时重新生成，失败仍保留旧卡可读。
+- 当前由用户的“准确性与专业度”Goal 授权继续 COL-19，任务为 In Progress，分支 `codex/col-19-paper-introduction-demo`，PR 为 draft、未合并。本轮以 docs/reading-quality-v02.md 与 docs/paper-introduction-demo.md 为规格，实际版本、运行及用量统一见 docs/verification-quality-v02.md。已实现问答 coverage/partial_answer 和研读卡；简介 v6 使用独立 300 秒总期限、至少 120 秒单次窗口、每项最多 8 个原文片段，仍最多 4 次调用/1 次修订，QA 仍 180 秒/每条最多 4 个引用：必要要点与事实支持分别检查，内容来源分四类，旧回答不回填成绩，旧简介仅在主动升级时重新生成，失败仍保留旧卡可读。
 - 本轮一次 make check 的 299 项后端测试通过，但准确性修复尚未完成：`8fb80483c9103101ff8c0e8c4b5923cb95add10d` / `evidence-qa-v4-coverage` 的新 react-03 真实运行仍漏模型冻结、人工编排轨迹条件，已正确返回 partial_answer。冻结条件是检索缺口，人工轨迹是生成覆盖缺口，继续按证据修复；不得以部分回答标记正确替代完整回答目标。新 ReAct `paper-introduction-v5` 真实诊断末次检查因总期限超时失败，旧成功卡继续可读，新卡待再验证。旧 v3/v4 成绩与失败保持原样。
 - 本轮开始前账本快照为同 scope 153/160；这不是实时余量。继续沿原账本持久累计 160 次上限，真实运行先核对当前余量，不能换 scope、重置或换模式绕过；未知费用保持未知。4 篇 20 题候选留出集已冻结来源与规则，AI 准备和人工核对分别标记，完整模型评测未执行不记完成。工程工作继续，产品认可、人工样例核对与学习掌握均待本人实际反馈，不把等待反馈当作停止工程工作的条件。
 - 前置阶段（以下保留历史）：

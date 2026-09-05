@@ -4,7 +4,7 @@
 
 单篇文本 PDF 支持上传、持久保存与逐页核对。问答采用问题要点整理、中文查询转换、BM25 检索、结构化生成、引用校验，以及同一次独立 AI 调用中的事实支持和覆盖检查；有据但不完整时保存 `partial_answer` 与缺失项。简介按需生成研读卡，解释术语、研究问题、方法输入/过程/输出和实验条件，区分论文陈述、作者解释、教学示意和系统推断。两条链路共用原文、引用跳页及原调用账本。
 
-当前分支 `codex/col-19-paper-introduction-demo`，任务为 In Progress，PR 为 draft、未合并。代码检查与效果验收分开：一次 `make check` 的 299 项后端测试通过；新 react-03 真实运行仍有模型冻结与人工轨迹条件遗漏，已标部分回答，修复继续。新 ReAct v5 简介运行因总期限内末次检查超时失败，旧卡继续可读，新卡待再验证。范围见 [质量规格](reading-quality-v02.md) 与 [研读卡规格](paper-introduction-demo.md)，实际版本、运行及用量见 [v0.2 验证记录](verification-quality-v02.md)。
+当前分支 `codex/col-19-paper-introduction-demo`，任务为 In Progress，PR 为 draft、未合并。代码检查与效果验收分开：一次 `make check` 的 299 项后端测试通过；新 react-03 真实运行仍有模型冻结与人工轨迹条件遗漏，已标部分回答，修复继续。新 ReAct v5 简介运行因总期限内末次检查超时失败，旧卡继续可读。v6 仅为简介扩大来源引用容量与时间窗口，普通问答保持原限制，新卡待再验证。范围见 [质量规格](reading-quality-v02.md) 与 [研读卡规格](paper-introduction-demo.md)，实际版本、运行及用量见 [v0.2 验证记录](verification-quality-v02.md)。
 
 本机已配置真实 `gpt-5.6-sol`，已获准的 provider_quota 原 scope 累计上限 160 次；本轮开始前快照 153/160 不代表实时余量，实际费用未知。优先按 [简短人工清单](manual-trial-v02.md) 核对已保存结果。旧 [问答 v0.1 规格](evidence-qa-v01.md)、[开发诊断](development-diagnostics.md)、[简介 v4 验证](verification-col-19.md)、COL-16 的 [PDF 行为](pdf-import.md) 和 [验证](verification-col-16.md) 保留历史证据，下方 COL-15 记录同样为历史。
 
@@ -51,7 +51,7 @@ make serve
 
 每题最多三次固定调用，单次默认 45 秒，总期限 180 秒；输出默认限制 1800 tokens。`PAPERTRAIL_MODEL_THINKING` 默认空，仅在服务支持时设 `disabled` 或 `enabled`。本轮建议非推理模式，避免思考 token 占用结构化输出额度。服务必须支持 JSON 输出；未配置时可浏览 PDF 与历史，不生成模拟答案。
 
-论文简介另用至少 90 秒的单次窗口和至少 5,000 tokens 输出上限，总期限仍为 180 秒；正常两次调用，发生一次内容修订时最多四次，全部进入同一账本。刷新、查看成功缓存、重新点击已有成功简介均不再调用模型。旧格式成功简介可经用户主动“补全为研读卡”新建任务，POST 使用新的 request_id 和 refresh_if_outdated: true；当前 paper-reading-card-v1 成功结果仍复用。升级中或失败时接口通过 previous_introduction 保留旧卡可读，失败后主动重试创建新任务。同一 request_id 始终指向原任务，网络提交不确定时先确认原提交结果。
+论文简介 v6 另用至少 120 秒的单次窗口和至少 5,000 tokens 输出上限，共享固定 300 秒总期限；正常两次调用，发生一次内容修订时最多四次，全部进入同一账本。每项可选 1—8 个原文片段用于补齐必要依据，普通问答每条仍最多 4 个引用。刷新、查看成功缓存、重新点击已有成功简介均不再调用模型。旧格式成功简介可经用户主动“补全为研读卡”新建任务，POST 使用新的 request_id 和 refresh_if_outdated: true；当前 paper-reading-card-v1 成功结果仍复用。升级中或失败时接口通过 previous_introduction 保留旧卡可读，失败后主动重试创建新任务。同一 request_id 始终指向原任务，网络提交不确定时先确认原提交结果。
 
 `compatible` 请求使用 `max_tokens`、`temperature: 0`，并在配置非空时附带服务的 `thinking` 参数。`openai` 请求使用 `max_completion_tokens` 和 `reasoning_effort: "none"`，省略 `temperature` 与 `thinking`；此方案下 `PAPERTRAIL_MODEL_THINKING` 必须留空，否则视为配置无效。两种方案都使用 Chat Completions、JSON 对象输出及 `stream: false`，内部输出上限与预算预留仍使用同一个 `PAPERTRAIL_MODEL_MAX_OUTPUT_TOKENS`。配置必须与所选服务和模型的实际参数支持一致；程序不会根据模型前缀切换方案，也不会在请求失败后自动换参数重试。运行追踪保存所选方案、实际输出参数名、推理强度和温度；未发送的温度记录为 `null`。
 

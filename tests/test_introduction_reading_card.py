@@ -215,3 +215,64 @@ def test_model_cannot_supply_its_own_version_or_fake_a_coverage_verdict():
     assert result["introduction"]["schema_version"] == INTRODUCTION_SCHEMA_VERSION
     assert result["introduction"]["coverage"] == complete_coverage()["coverage"]
     assert result["human_review"] is None
+
+
+@pytest.mark.parametrize("location", ["mechanism", "term", "learning_aid"])
+@pytest.mark.parametrize("count", [8, 9])
+def test_intro_can_attach_eight_distinct_source_spans_but_never_nine(location, count):
+    from papertrail.introduction import build_introduction_chunks
+
+    pages = [{"page_index": i, "text": f"Evidence {i}: {PAGES[1]['text']}"} for i in range(9)]
+    chunks = build_introduction_chunks(PAPER["id"], PAPER["sha256"], pages)
+    citations = [{"chunk_id": c["chunk_id"]} for c in chunks[:count]]
+    inputs = []
+
+    def generate(draft):
+        intro = draft["introduction"]
+        if location == "term":
+            intro["terms"][0]["citations"] = citations
+        elif location == "learning_aid":
+            intro["learning_aids"] = [
+                {
+                    "text": "教学示意：假设模型参考轨迹生成工具动作，再读取观察。",
+                    "basis": "teaching_example",
+                    "citations": citations,
+                }
+            ]
+        else:
+            intro[location]["citations"] = citations
+        return draft
+
+    result = introduce_paper(
+        PAPER, pages, client=introduction_client(generate=generate, observed=inputs)
+    )
+    if count == 9:
+        assert result["status"] == "failed" and result["error_code"] == "invalid_citation"
+        assert result["introduction"] is None and result["trace"]["call_count"] == 2
+        assert all("claims" not in data for data in inputs)
+        return
+    assert result["status"] == "answered" and result["trace"]["call_count"] == 2
+    index = 5 if location == "term" else 7 if location == "learning_aid" else 3
+    published = result["claims"][index]["citations"]
+    assert len(published) == len(inputs[1]["claims"][index]["citations"]) == 8
+    assert [c["quote"] for c in published] == [c["text"] for c in chunks[:8]]
+    assert [c["page_index"] for c in published] == list(range(8))
+    assert result["trace"]["max_citations_per_claim"] == 8
+
+
+def test_ordinary_qa_still_rejects_five_citations_without_explicit_intro_limit():
+    from papertrail.introduction import build_introduction_chunks
+    from papertrail.model import ModelError
+    from papertrail.qa import validate_claims
+
+    pages = [{"page_index": i, "text": f"Evidence {i}: {PAGES[1]['text']}"} for i in range(5)]
+    chunks = build_introduction_chunks(PAPER["id"], PAPER["sha256"], pages)
+    citations = [{"chunk_id": c["chunk_id"], "quote": c["text"]} for c in chunks]
+    claim = {"text": "冻结模型参考人工轨迹。", "citations": citations}
+    with pytest.raises(ModelError) as error:
+        validate_claims([claim], chunks, PAPER)
+    assert error.value.code == "invalid_citation"
+    assert (
+        len(validate_claims([{**claim, "citations": citations[:4]}], chunks, PAPER)[0]["citations"])
+        == 4
+    )

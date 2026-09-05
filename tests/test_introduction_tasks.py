@@ -79,9 +79,10 @@ def test_intro_persists_across_refresh_restart_and_never_enters_qa_history(
     assert row["introduction"]["coverage"] == complete_coverage()["coverage"]
     assert row["introduction"]["learning_aids"] == []
     assert len(row["claims"]) == 7 and len(requests) == 2
-    assert row["trace"]["model_config"]["timeout_seconds"] == 90
+    assert row["trace"]["model_config"]["timeout_seconds"] == 120
+    assert row["trace"]["pipeline_timeout_seconds"] == 300
     # The introduction adjusts its own runtime config; ordinary QA still reads the
-    # existing provider settings, and the shared pipeline deadline remains 180s.
+    # existing provider settings; only the introduction deadline expands to 300s.
     assert ModelConfig.from_env().timeout == 45
     assert ModelConfig.from_env().max_output_tokens == 1800
     assert all(payload["max_tokens"] == 5000 for payload in requests)
