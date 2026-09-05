@@ -1,4 +1,5 @@
 import {
+  Component,
   lazy,
   Suspense,
   useEffect,
@@ -7,11 +8,40 @@ import {
   type ReactNode,
 } from "react";
 import { createRoot } from "react-dom/client";
+import { QuestionPanel, type Citation } from "./QuestionPanel";
 import "./style.css";
 
 const PdfPage = lazy(() =>
   import("./PdfPage").then((module) => ({ default: module.PdfPage })),
 );
+
+class ReaderResourceBoundary extends Component<
+  { children: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    if (this.state.failed)
+      return (
+        <div className="loading-card inline-error" role="alert">
+          阅读器资源已更新或加载失败，请刷新页面重试。
+          <button
+            type="button"
+            className="text-button"
+            onClick={() => window.location.reload()}
+          >
+            刷新页面
+          </button>
+        </div>
+      );
+    return this.props.children;
+  }
+}
 
 type Paper = {
   id: string;
@@ -107,6 +137,18 @@ const fileSize = (bytes: number) =>
 const title = (filename: string) =>
   filename.replace(/\.pdf$/i, "").replace(/[_]/g, " ");
 
+function highlightedText(text: string, quote?: string) {
+  if (!quote) return text;
+  // Extraction preserves line breaks; the server returns whitespace-normalized quotes.
+  const pattern = quote.trim().split(/\s+/).map((word) =>
+    word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+  ).join("\\s+");
+  if (!pattern) return text;
+  const match = new RegExp(pattern).exec(text);
+  if (!match) return text;
+  return <>{text.slice(0, match.index)}<mark>{match[0]}</mark>{text.slice(match.index + match[0].length)}</>;
+}
+
 function Reader({
   route,
   onError,
@@ -117,15 +159,26 @@ function Reader({
   const [paper, setPaper] = useState<Paper | null>(null);
   const [text, setText] = useState<string | null>(null);
   const [failure, setFailure] = useState("");
-  const [tab, setTab] = useState("pdf");
+  const [tab, setTab] = useState("qa");
+  const [documentTab, setDocumentTab] = useState("pdf");
+  const [citation, setCitation] = useState<Citation | null>(null);
   const [pageInput, setPageInput] = useState(String(route.page + 1));
+  const original = useRef<HTMLElement>(null);
+  const extracted = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (documentTab === "text" && citation?.page_index === route.page)
+      extracted.current?.querySelector("mark")?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [documentTab, text, citation, route.page]);
 
   useEffect(() => {
     const controller = new AbortController();
     setPaper(null);
     setFailure("");
     request<Paper>(`/api/papers/${route.id}`, { signal: controller.signal })
-      .then(setPaper)
+      .then((result) => {
+        if (!controller.signal.aborted) setPaper(result);
+      })
       .catch((error) => {
         if (!controller.signal.aborted) setFailure(error.message);
       });
@@ -145,6 +198,7 @@ function Reader({
       signal: controller.signal,
     })
       .then((result) => {
+        if (controller.signal.aborted) return;
         setText(result.text);
         setFailure("");
       })
@@ -172,7 +226,7 @@ function Reader({
         <h1>{title(paper.filename)}</h1>
         <div className="paper-meta">
           <span className="status">
-            <i /> 已保存
+            <i /> 已解析并保存
           </span>
           <span>{paper.page_count} 页</span>
           <span>{fileSize(paper.size_bytes)}</span>
@@ -250,52 +304,83 @@ function Reader({
         </button>
         <button
           role="tab"
-          aria-selected={tab === "text"}
-          onClick={() => setTab("text")}
+          aria-selected={tab === "qa"}
+          onClick={() => setTab("qa")}
         >
-          提取文字
+          证据问答
         </button>
       </div>
       <div className={`reader-grid show-${tab}`}>
-        <section className="reader-panel original">
+        <section className="reader-panel original" ref={original} aria-label="论文原文">
           <div className="panel-heading">
-            <span>
-              <Icon name="paper" size={17} /> PDF 原文
-            </span>
+            <div className="document-tabs" role="tablist" aria-label="原文显示方式">
+              <button type="button" role="tab" aria-selected={documentTab === "pdf"} onClick={() => setDocumentTab("pdf")}>
+                PDF 原文
+              </button>
+              <button type="button" role="tab" aria-selected={documentTab === "text"} onClick={() => setDocumentTab("text")}>
+                提取文字
+              </button>
+            </div>
             <small>第 {route.page + 1} 页</small>
           </div>
-          <Suspense
-            fallback={<div className="loading-card">正在打开阅读器…</div>}
-          >
-            <PdfPage key={paper.id} id={paper.id} page={route.page} />
-          </Suspense>
-        </section>
-        <section className="reader-panel extracted">
-          <div className="panel-heading">
-            <span>提取文字</span>
-            <small>与当前页对应</small>
-          </div>
-          <div className="extraction-note">
-            文字顺序、图内文字、表格和公式可能有误，请以原 PDF 为准。
-          </div>
-          <div className="page-text" key={`${route.id}-${route.page}`}>
-            {failure ? (
-              <p className="inline-error" role="alert">
-                {failure}
-              </p>
-            ) : text === null ? (
-              <p role="status">正在读取文字…</p>
-            ) : text.trim() ? (
-              text
-            ) : (
-              <div className="no-text">
-                <Icon name="paper" size={32} />
-                <p>这一页没有提取到文字</p>
-                <small>可能是空白页、图片或扫描内容，页码已保留。</small>
+          {citation?.page_index === route.page && (
+            <div className="selected-evidence" role="status">
+              <div>
+                <strong>已定位引用 · PDF 第 {route.page + 1} 页</strong>
+                <button type="button" aria-label="关闭当前引用提示" onClick={() => setCitation(null)}>×</button>
               </div>
-            )}
+              <q>{citation.quote}</q>
+              {documentTab === "pdf" && (
+                <button className="text-button" type="button" onClick={() => setDocumentTab("text")}>在提取文字中查看引用</button>
+              )}
+            </div>
+          )}
+          <div className={documentTab === "pdf" ? "" : "hidden-view"}>
+            <ReaderResourceBoundary>
+              <Suspense fallback={<div className="loading-card">正在打开阅读器…</div>}>
+                <PdfPage key={paper.id} id={paper.id} page={route.page} />
+              </Suspense>
+            </ReaderResourceBoundary>
           </div>
+          {documentTab === "text" && (
+            <>
+              <div className="extraction-note">
+                文字顺序、图内文字、表格和公式可能有误，请以原 PDF 为准。
+              </div>
+              <div className="page-text" ref={extracted} key={`${route.id}-${route.page}`}>
+                {failure ? (
+                  <p className="inline-error" role="alert">{failure}</p>
+                ) : text === null ? (
+                  <p role="status">正在读取文字…</p>
+                ) : text.trim() ? (
+                  highlightedText(text, citation?.page_index === route.page ? citation.quote : undefined)
+                ) : (
+                  <div className="no-text">
+                    <Icon name="paper" size={32} />
+                    <p>这一页没有提取到文字</p>
+                    <small>可能是空白页、图片或扫描内容，页码已保留。</small>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </section>
+        <QuestionPanel
+          key={paper.id}
+          paperId={paper.id}
+          onCitation={(value) => {
+            if (value.paper_id !== paper.id || !Number.isInteger(value.page_index) || value.page_index < 0 || value.page_index >= paper.page_count) {
+              onError("引用无法对应到当前论文页面，请刷新问答后重试。");
+              return;
+            }
+            setCitation(value);
+            setDocumentTab("pdf");
+            setTab("pdf");
+            navigate(paper.id, value.page_index);
+            if (window.matchMedia("(max-width: 900px)").matches)
+              requestAnimationFrame(() => original.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+          }}
+        />
       </div>
       <details className="provenance">
         <summary>文件与来源记录</summary>
@@ -492,6 +577,7 @@ function App() {
           )}
           {route.id ? (
             <Reader
+              key={route.id}
               route={route}
               onError={(text) => setNotice({ text, error: true })}
             />
