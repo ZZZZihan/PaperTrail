@@ -1,0 +1,173 @@
+{
+  "actual_question_result_sha256": "4a5d85083c3c07ed2d40770abad1741c4134b56b71f2d88aaa7d194d5ca208ae",
+  "application_question_id": "e79c4bc4-503e-41c3-957b-f009c131f112",
+  "application_self_check_used_as_quality_evidence": false,
+  "application_status": "answered",
+  "artifacts": [
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T091447.930920Z-f626602b67854d9ab24958ea7edceb17/ai-template.json",
+      "sha256": "080d5bd84521ba06fee0f1d2899c89a621459190ad2062718738d107f0873029"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T091447.930920Z-f626602b67854d9ab24958ea7edceb17/ai-review.json",
+      "sha256": "fd0df5960cbfce29c07d2f5900fc81ce9be15a79d5118189c0e236904cc4aaa5"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T091447.930920Z-f626602b67854d9ab24958ea7edceb17/ai-summary.json",
+      "sha256": "f3a60f87d8cd9876d208c3f3d5a7467ff855f0bd824f8289287c4ac450f6b8b1"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T091447.930920Z-f626602b67854d9ab24958ea7edceb17/independent-audit.json",
+      "sha256": "ff0c7f636a13417fc518f8e92ad49b52ef9664e42ddc83e4bde6b9677c2690f0"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T091447.930920Z-f626602b67854d9ab24958ea7edceb17/artifacts.sha256",
+      "sha256": "9afe4f996fb0b92ac765d81d3e94cf9bd51b766d34f598b95da9f08a84e57b3c"
+    }
+  ],
+  "comparison_with_run1": {
+    "current_complete_supported": {
+      "denominator": 1,
+      "numerator": 1
+    },
+    "current_conditions_covered": {
+      "denominator": 2,
+      "numerator": 2
+    },
+    "note": "保留第一次失败。两次是同一开发题、相同冻结预期的迭代诊断，不能据单次修复成功证明反复运行稳定性、全15题回归或新论文泛化质量。",
+    "previous_complete_supported": {
+      "denominator": 1,
+      "numerator": 0
+    },
+    "previous_conditions_covered": {
+      "denominator": 2,
+      "numerator": 0
+    },
+    "record": "evals/quality-v0.2/react-03-review-2026-09-05-run1.json"
+  },
+  "complete_supported_answers": {
+    "denominator": 1,
+    "numerator": 1,
+    "pending": 0
+  },
+  "diagnosis": [
+    {
+      "condition_id": "frozen-model",
+      "details": "物理第3页[3597,4993)进入实际12个selected chunks，包含冻结模型的主要设置段落；第一条正文明确写参数冻结的PaLM-540B并引用这一段。",
+      "finding": "covered_with_retrieved_support"
+    },
+    {
+      "condition_id": "manual-trajectories",
+      "details": "第4页数量与人工轨迹编写段落仍在实际检索和引用中，第二条正文明确写由人工编写ReAct格式few-shot轨迹。",
+      "finding": "covered_with_retrieved_support"
+    },
+    {
+      "details": "第三条新增的多步思维、动作、观察结构及分解问题、提取维基百科信息、常识/算术推理用途均可由其第4页实际引用核对。",
+      "finding": "additional_explanation_supported"
+    }
+  ],
+  "engineering_failure": {
+    "count": 0,
+    "denominator": 1
+  },
+  "false_refusal": {
+    "count": 0,
+    "denominator": 1
+  },
+  "human_review": {
+    "reviewed_at": null,
+    "reviewer": null,
+    "status": "pending"
+  },
+  "independent_atomic_fact_support": {
+    "atomization": [
+      "主要提示实验采用 PaLM-540B 基础模型。",
+      "主要提示设置的 PaLM-540B 参数保持冻结。",
+      "所选示例作为 few-shot 上下文提示，供模型生成任务轨迹。",
+      "模型通过上述提示生成任务相关动作。",
+      "模型通过上述提示生成自由形式的思维。",
+      "HotpotQA 选取6个案例。",
+      "FEVER 选取3个案例。",
+      "上述两组案例来自训练集。",
+      "上述案例随机选取。",
+      "所选案例的轨迹由人工编写。",
+      "这些人工轨迹使用 ReAct 格式。",
+      "这些轨迹由多个思维、动作、观察步骤组成。",
+      "轨迹中的自由形式思维用于分解问题。",
+      "轨迹中的自由形式思维用于提取维基百科观察中的信息。",
+      "轨迹中的自由形式思维用于常识推理。",
+      "轨迹中的自由形式思维用于算术推理。"
+    ],
+    "denominator": 16,
+    "note": "完整扫描三条正文并去重列出16个命题；不同输出的原子事实数量可不同，不能把16个原子事实当作16道测试题。",
+    "pending": 0,
+    "supported": 16
+  },
+  "independent_citation_source_check": {
+    "citations_checked": 3,
+    "errors": [],
+    "note": "在本次审查中从冻结原文和片段身份重新执行；不代替语义判断。",
+    "passed": true
+  },
+  "independent_quality": "complete_supported_original_points_and_conditions",
+  "main_finding": "此次正文完整写明冻结的PaLM-540B、HotpotQA六例、FEVER三例及人工编写轨迹；同一原题和冻结预期下，两个原遗漏均已在本次输出中修复。新增轨迹结构与思维用途均受实际引用支持，未发现新无据事实或冻结判据遗漏。",
+  "necessary_condition_coverage": {
+    "covered": 2,
+    "denominator": 2,
+    "pending": 0
+  },
+  "original_answer_points": {
+    "denominator": 2,
+    "fully_covered": 2,
+    "partially_covered": 0,
+    "pending": 0
+  },
+  "original_run_integrity": "All 19 entries in the original run artifacts.sha256 verified; no original run file was modified.",
+  "resource_observation": {
+    "actual_cost": null,
+    "additional_provider_calls_by_this_review": 0,
+    "application_elapsed_seconds": 32.196,
+    "completion_tokens": 1384,
+    "cost_note": "Sol费率未知；账本已知费用小计的0不能解释为实际零费用。",
+    "model_calls_in_actual_run": 3,
+    "prompt_tokens": 12065,
+    "runner_wall_elapsed_seconds": 32.444,
+    "total_tokens": 13449
+  },
+  "retrieval_sufficiency": {
+    "denominator": 1,
+    "pending": 0,
+    "sufficient": 1
+  },
+  "review_scope": "One original development regression question, react-03; not a held-out result and not a complete 15-question regression.",
+  "review_source": "ai",
+  "reviewed_at": "2026-09-05T09:19:52.146280+00:00",
+  "rubric": {
+    "frozen_before_run": true,
+    "path": "evals/quality-v0.2/react-03-conditions.json",
+    "sha256": "284769b50b9106d587b95d97a4a75044edf3a200eb43239c0cd9625194db1f4c"
+  },
+  "run_code_dirty": false,
+  "run_code_sha": "b785a9667a717fc99125a5e02c1eaa3209b86982",
+  "run_path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/runs/20260905T091447.930920Z-f626602b67854d9ab24958ea7edceb17",
+  "run_started_at": "2026-09-05T09:14:47.931452+00:00",
+  "schema_version": 1,
+  "source_read_scope": {
+    "actual_answer_claims": 3,
+    "attached_citations": 3,
+    "full_frozen_physical_pages_read": [
+      3,
+      4,
+      5,
+      10
+    ],
+    "note": "完整阅读上述实际材料与相关页上下文；不声称本次逐页阅读全文33页。",
+    "selected_retrieval_chunks": 12
+  },
+  "unjustified_answer_on_unanswerable": {
+    "count": 0,
+    "denominator": 0,
+    "note": "本次未选择不足题，不能报告该类题的通过率。",
+    "rate": null
+  }
+}
