@@ -70,8 +70,11 @@ class ModelConfig:
     def configured(self) -> bool:
         try:
             endpoint = urlsplit(self.base_url)
+            port = endpoint.port
             return bool(
                 endpoint.hostname
+                and (port is None or 1 <= port <= 65535)
+                and _safe_json(self.base_url)
                 and (
                     endpoint.scheme == "https"
                     or (
@@ -96,14 +99,25 @@ class ModelConfig:
 
     def public(self) -> dict:
         """No credentials, full URL, or provider error body is returned."""
+        endpoint = urlsplit(self.base_url) if self.configured else None
+        origin = (
+            f"{endpoint.scheme}://{endpoint.hostname}"
+            + (f":{endpoint.port}" if endpoint.port else "")
+            if endpoint
+            else None
+        )
         return {
             "configured": self.configured,
             "model_name": self.model_name if _safe_json(self.model_name) else None,
             "timeout_seconds": self.timeout if math.isfinite(self.timeout) else None,
             "max_output_tokens": self.max_output_tokens,
             "temperature": 0,
-            "thinking": self.thinking or "provider_default",
+            "thinking": self.thinking
+            if self.thinking in {"enabled", "disabled"}
+            else "provider_default",
             "response_format": "json_object",
+            "provider_origin": origin,
+            "endpoint_sha256": hashlib.sha256(self.base_url.encode(errors="replace")).hexdigest(),
         }
 
 

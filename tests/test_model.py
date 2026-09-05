@@ -162,3 +162,26 @@ def test_unsafe_returned_model_and_nonfinite_config_never_enter_trace():
     assert client.calls[0]["usage"]["total_tokens"] == 40
     assert config(timeout=float("nan")).public()["timeout_seconds"] is None
     assert config(timeout=float("inf")).public()["timeout_seconds"] is None
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    ["https://provider.test:bad/v1", "https://provider.test:0/v1", "https://[invalid/v1"],
+)
+def test_invalid_endpoint_is_safe_to_show_in_configuration_status(endpoint):
+    client_config = ModelConfig(base_url=endpoint, api_key="secret", model_name="model")
+    assert not client_config.configured
+    assert client_config.public()["provider_origin"] is None
+
+
+def test_provider_provenance_excludes_private_endpoint_path():
+    client_config = ModelConfig(
+        base_url="https://provider.test:443/private-route/v1",
+        api_key="secret",
+        model_name="model",
+    )
+    public = client_config.public()
+    assert public["provider_origin"] == "https://provider.test:443"
+    assert len(public["endpoint_sha256"]) == 64
+    assert "secret" not in json.dumps(public)
+    assert "private-route" not in json.dumps(public)
