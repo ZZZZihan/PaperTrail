@@ -1,0 +1,141 @@
+{
+  "actual_question_result_sha256": "940109309320e20a3376bbbaf95ca21451c8fe85d4e94b466941a581c1e941b0",
+  "application_question_id": "9e395404-dcea-40b2-84db-5f7d395b0686",
+  "application_self_check_used_as_quality_evidence": false,
+  "application_status": "partial_answer",
+  "artifacts": [
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T084326.951555Z-1606858a67d94301beb20e16b7a5e70c/ai-template.json",
+      "sha256": "6755fc833c5177ca92c59b1848ea4ffdb1c97a3075e57ee2bd300d51dd790939"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T084326.951555Z-1606858a67d94301beb20e16b7a5e70c/ai-review.json",
+      "sha256": "de9c93e178786a7b07526a0aa154ad99185d5a9cd2ecc9e7ef2b41aa6033fed2"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T084326.951555Z-1606858a67d94301beb20e16b7a5e70c/ai-summary.json",
+      "sha256": "0deef84e99bb4750f4ea08ea599ead9494e6f4d58b759f1a42754e88f57ad2fc"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T084326.951555Z-1606858a67d94301beb20e16b7a5e70c/independent-audit.json",
+      "sha256": "2778d181c18ee9aa1de5a5663969225ee25dd34329f636a15bfc3c5f9fc74d82"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T084326.951555Z-1606858a67d94301beb20e16b7a5e70c/artifacts.sha256",
+      "sha256": "03ac7ef390bd45c4f19ebf04e478118e5b85c90ec0d51cdb788815eac7449300"
+    }
+  ],
+  "complete_supported_answers": {
+    "denominator": 1,
+    "numerator": 0,
+    "pending": 0
+  },
+  "diagnosis": [
+    {
+      "cause": "retrieval_gap",
+      "condition_id": "frozen-model",
+      "details": "模型冻结条件位于物理第3页字符4381起的主设置段落；该页实际仅检索[0,1399)与[1199,2598)，没有提供该段落。",
+      "recommended_next_diagnostic": "在同一论文、题目、原预期与调用边界下验证必要上下文能否进入证据；不预设向量检索或Agent一定更好。"
+    },
+    {
+      "cause": "generation_coverage_omission",
+      "condition_id": "manual-trajectories",
+      "details": "人工编写轨迹条件位于已选中的第4页两个片段和第二条实际引用中，但正文只写案例数量等事实。",
+      "recommended_next_diagnostic": "先验证模型是否把已有的相关条件写入正文，不能仅增加召回或将引文中的文字当作正文覆盖。"
+    }
+  ],
+  "engineering_failure": {
+    "count": 0,
+    "denominator": 1
+  },
+  "false_refusal": {
+    "count": 0,
+    "denominator": 1
+  },
+  "human_review": {
+    "reviewed_at": null,
+    "reviewer": null,
+    "status": "pending"
+  },
+  "independent_atomic_fact_support": {
+    "atomization": [
+      "基础模型",
+      "HotpotQA案例数量",
+      "FEVER案例数量",
+      "训练集来源",
+      "随机选取方式",
+      "few-shot用途"
+    ],
+    "denominator": 6,
+    "pending": 0,
+    "supported": 6
+  },
+  "independent_citation_source_check": {
+    "citations_checked": 2,
+    "errors": [],
+    "note": "在本次审查中从冻结原文和片段身份重新执行；不代替语义判断。",
+    "passed": true
+  },
+  "independent_quality": "partial_coverage_original_conditions_still_missing",
+  "main_finding": "已写正文的6个原子事实均有引用支持，但原有冻结模型和人工编写轨迹两项条件均未在正文表达；没有新增的冻结判据遗漏，原遗漏仍未修复。",
+  "necessary_condition_coverage": {
+    "covered": 0,
+    "denominator": 2,
+    "pending": 0
+  },
+  "original_answer_points": {
+    "denominator": 2,
+    "fully_covered": 0,
+    "note": "两个冻结答案点各有部分事实正确，但各遗漏一项原有必要条件；0个完整要点不等于正文没有正确内容。",
+    "partially_covered": 2,
+    "pending": 0
+  },
+  "original_run_integrity": "All 19 entries in the original run artifacts.sha256 verified; no original run file was modified.",
+  "resource_observation": {
+    "actual_cost": null,
+    "additional_provider_calls_by_this_review": 0,
+    "application_elapsed_seconds": 25.374,
+    "completion_tokens": 1007,
+    "cost_note": "Sol费率未知；账本已知费用小计的0不能解释为实际零费用。",
+    "model_calls_in_actual_run": 3,
+    "prompt_tokens": 11110,
+    "runner_wall_elapsed_seconds": 25.666,
+    "total_tokens": 12117
+  },
+  "retrieval_sufficiency": {
+    "denominator": 1,
+    "pending": 0,
+    "sufficient": 0
+  },
+  "review_scope": "One original development regression question, react-03; not a held-out result and not a complete 15-question regression.",
+  "review_source": "ai",
+  "reviewed_at": "2026-09-05T08:48:47.581536+00:00",
+  "rubric": {
+    "frozen_before_run": true,
+    "path": "evals/quality-v0.2/react-03-conditions.json",
+    "sha256": "284769b50b9106d587b95d97a4a75044edf3a200eb43239c0cd9625194db1f4c"
+  },
+  "run_code_dirty": false,
+  "run_code_sha": "8fb80483c9103101ff8c0e8c4b5923cb95add10d",
+  "run_path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/runs/20260905T084326.951555Z-1606858a67d94301beb20e16b7a5e70c",
+  "run_started_at": "2026-09-05T08:43:26.951895+00:00",
+  "schema_version": 1,
+  "source_read_scope": {
+    "actual_answer_claims": 2,
+    "attached_citations": 2,
+    "full_frozen_physical_pages_read": [
+      3,
+      4,
+      5,
+      10
+    ],
+    "note": "完整阅读上述实际材料与相关页上下文；不声称本次逐页阅读全文33页。",
+    "selected_retrieval_chunks": 12
+  },
+  "unjustified_answer_on_unanswerable": {
+    "count": 0,
+    "denominator": 0,
+    "note": "本次未选择不足题，不能报告该类题的通过率。",
+    "rate": null
+  }
+}
