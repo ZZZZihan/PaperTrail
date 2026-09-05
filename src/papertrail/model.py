@@ -292,23 +292,52 @@ class ModelClient:
                     and value >= 0
                 }
             if not _safe_json(raw):
+                call["output_issue"] = "unsafe_response"
                 raise ModelError("invalid_output", "模型响应包含无法保存的字符或数值，请重试。")
             if isinstance(raw.get("model"), str):
                 call["returned_model"] = raw["model"][:200]
+            output_issue = "invalid_response_shape"
+            content = None
             try:
                 choice = raw["choices"][0]
+                output_issue = "invalid_choice"
                 if not isinstance(choice, dict) or not isinstance(choice.get("message"), dict):
                     raise ValueError("invalid choice")
+                output_issue = "incomplete_response"
                 if choice.get("finish_reason") != "stop":
                     raise ValueError("incomplete response")
+                output_issue = "missing_content"
                 content = choice["message"]["content"]
+                output_issue = "non_string_content"
                 if not isinstance(content, str):
                     raise ValueError("content is not a string")
                 call["response_sha256"] = hashlib.sha256(content.encode()).hexdigest()
+                output_issue = "invalid_json"
                 result = json.loads(content)
-                if not isinstance(result, dict) or not _safe_json(result):
+                output_issue = "non_object"
+                if not isinstance(result, dict):
                     raise ValueError("JSON object required")
+                output_issue = "unsafe_json_value"
+                if not _safe_json(result):
+                    raise ValueError("JSON value cannot be persisted")
             except (KeyError, IndexError, TypeError, ValueError) as exc:
+                call["output_issue"] = output_issue
+                if isinstance(content, str):
+                    stripped = content.strip()
+                    call["output_shape"] = {
+                        "content_chars": len(content),
+                        "first_nonspace_codepoint": ord(stripped[0]) if stripped else None,
+                        "last_nonspace_codepoint": ord(stripped[-1]) if stripped else None,
+                    }
+                if isinstance(exc, json.JSONDecodeError):
+                    # The standard decoder's msg is a fixed parser description. Never save
+                    # exc.doc, str(exc), snippets, or the provider's content in this record.
+                    call["json_error"] = {
+                        "lineno": exc.lineno,
+                        "colno": exc.colno,
+                        "pos": exc.pos,
+                        "msg": exc.msg,
+                    }
                 raise ModelError("invalid_output", "模型未返回完整的结构化结果，请重试。") from exc
             call["status"] = "succeeded"
             return result

@@ -43,7 +43,7 @@ def configure_fake_model(monkeypatch, *, cap=10):
             }
         else:
             passage = data["passages"][0]
-            result = introduction_output(passage["chunk_id"], quote=passage["text"].strip())
+            result = introduction_output(passage["chunk_id"])
         return httpx.Response(
             200,
             json={

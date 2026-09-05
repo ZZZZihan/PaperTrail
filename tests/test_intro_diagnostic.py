@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from papertrail.retrieval import build_chunks
+from papertrail.introduction import build_introduction_chunks
 
 
 @pytest.fixture
@@ -19,7 +19,9 @@ def introduction_fixture():
     paper = {"id": "current-paper", "sha256": "a" * 64}
     text = "Stored source evidence for this introduction."
     source = {"pages": [text]}
-    chunk = build_chunks(paper["id"], paper["sha256"], [{"page_index": 0, "text": text}])[0]
+    chunk = build_introduction_chunks(
+        paper["id"], paper["sha256"], [{"page_index": 0, "text": text}]
+    )[0]
     citation = {
         "paper_id": paper["id"],
         "page_index": 0,
@@ -50,6 +52,13 @@ def test_audit_detects_source_change_without_trusting_trace(runner):
     result, paper, source = introduction_fixture()
     result["trace"] = {"citation_validation": "passed"}
     source["pages"][0] = "Different source evidence."
+    assert runner.check_citations(result, paper, source)["status"] == "failed"
+
+
+def test_audit_requires_complete_program_supplied_span(runner):
+    result, paper, source = introduction_fixture()
+    citation = result["introduction"]["summary"]["citations"][0]
+    citation["quote"] = citation["quote"].replace(" ", "  ", 1)
     assert runner.check_citations(result, paper, source)["status"] == "failed"
 
 

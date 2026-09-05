@@ -27,8 +27,8 @@ from evaluate_development import (
     write_once,
 )
 
+from papertrail.introduction import build_introduction_chunks
 from papertrail.qa import normalize_quote
-from papertrail.retrieval import build_chunks
 
 
 def check_citations(result: dict, paper: dict, source: dict) -> dict:
@@ -36,7 +36,7 @@ def check_citations(result: dict, paper: dict, source: dict) -> dict:
     intro = result.get("introduction")
     if result.get("status") != "answered" or not isinstance(intro, dict):
         return {"status": "not_applicable", "citations_checked": 0, "errors": []}
-    chunks = build_chunks(
+    chunks = build_introduction_chunks(
         paper["id"],
         paper["sha256"],
         [{"page_index": i, "text": page} for i, page in enumerate(source["pages"])],
@@ -63,6 +63,7 @@ def check_citations(result: dict, paper: dict, source: dict) -> dict:
                 chunk is None
                 or citation.get("paper_id") != paper["id"]
                 or citation.get("page_index") != chunk["page_index"]
+                or quote != chunk["text"]
                 or not normalize_quote(quote)
                 or normalize_quote(quote) not in normalize_quote(chunk["text"])
             ):

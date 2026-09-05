@@ -6,7 +6,13 @@ from copy import deepcopy
 import httpx2 as httpx
 import pytest
 
-from papertrail.introduction import FIELDS, MAX_SOURCE_CHARS, introduce_paper
+from papertrail.introduction import (
+    FIELDS,
+    INTRODUCTION_CHUNK_VERSION,
+    MAX_SOURCE_CHARS,
+    build_introduction_chunks,
+    introduce_paper,
+)
 from papertrail.model import ModelClient, ModelConfig, ModelError
 from papertrail.qa import validate_claims
 from papertrail.retrieval import build_chunks
@@ -16,8 +22,8 @@ QUOTE = "A frozen model uses manually written trajectories and tool observations
 PAGES = [{"page_index": 0, "text": ""}, {"page_index": 1, "text": QUOTE}]
 
 
-def introduction_output(chunk_id, *, quote=QUOTE):
-    citation = {"chunk_id": chunk_id, "quote": quote}
+def introduction_output(chunk_id):
+    citation = {"chunk_id": chunk_id}
     return {
         "status": "answered",
         "introduction": {
@@ -115,7 +121,7 @@ def test_unknown_citation_blocks_entire_intro_before_semantic_call(location):
     def corrupt(result):
         intro = result["introduction"]
         claim = intro["terms"][0] if location == "term" else intro[location]
-        claim["citations"] = [{"chunk_id": "another-paper-chunk", "quote": QUOTE}]
+        claim["citations"] = [{"chunk_id": "another-paper-chunk"}]
         return result
 
     result = introduce_paper(PAPER, PAGES, client=introduction_client(generate=corrupt))
@@ -126,9 +132,9 @@ def test_unknown_citation_blocks_entire_intro_before_semantic_call(location):
 
 @pytest.mark.parametrize("mismatch", ["paper_id", "paper_sha256"])
 def test_actual_citation_with_wrong_paper_ownership_is_withheld(monkeypatch, mismatch):
-    chunks = build_chunks(PAPER["id"], PAPER["sha256"], PAGES)
+    chunks = build_introduction_chunks(PAPER["id"], PAPER["sha256"], PAGES)
     chunks[0][mismatch] = "other-source"
-    monkeypatch.setattr("papertrail.introduction.build_chunks", lambda *args: chunks)
+    monkeypatch.setattr("papertrail.introduction.build_introduction_chunks", lambda *args: chunks)
     result = introduce_paper(PAPER, PAGES, client=introduction_client())
     assert result["error_code"] == "invalid_citation"
     assert result["introduction"] is None and result["trace"]["call_count"] == 1
@@ -195,7 +201,7 @@ def test_too_long_source_fails_without_model_call_or_silent_truncation():
     assert result["trace"]["source"]["truncated"] is False
 
 
-def test_context_overlap_limit_is_checked_before_model_call(monkeypatch):
+def test_context_limit_is_checked_before_model_call(monkeypatch):
     monkeypatch.setattr("papertrail.introduction.MAX_CONTEXT_CHARS", len(QUOTE) - 1)
     result = introduce_paper(PAPER, PAGES, client=introduction_client())
     assert result["error_code"] == "introduction_too_long"
@@ -218,3 +224,79 @@ def test_empty_paper_and_model_insufficient_do_not_publish_model_explanation():
     )
     assert result["status"] == "insufficient_evidence" and result["trace"]["call_count"] == 1
     assert "Unsupported" not in result["message"] and result["introduction"] is None
+
+
+@pytest.mark.parametrize("length", [1, 7, 8, 999, 1000, 1001, 1007, 1999, 2000, 3007])
+def test_intro_spans_cover_entire_pages_once_and_fit_existing_quote_limit(length):
+    pages = [
+        {"page_index": 4, "text": "x" * length},
+        {"page_index": 0, "text": ""},
+        {"page_index": 2, "text": ("完整文字与空格。\nA complete sentence. " * 170) + "\t "},
+    ]
+    chunks = build_introduction_chunks(PAPER["id"], PAPER["sha256"], pages)
+    assert chunks == build_introduction_chunks(PAPER["id"], PAPER["sha256"], pages[::-1])
+    assert [chunk["page_index"] for chunk in chunks] == sorted(c["page_index"] for c in chunks)
+    for page in pages:
+        spans = [chunk for chunk in chunks if chunk["page_index"] == page["page_index"]]
+        assert "".join(span["text"] for span in spans) == page["text"]
+        position = 0
+        for span in spans:
+            assert span["start_char"] == position
+            position = span["end_char"]
+            assert span["text"] == page["text"][span["start_char"] : position]
+            assert 1 <= len(span["text"]) <= 1000
+            if len(page["text"]) >= 8:
+                assert len(span["text"]) >= 8
+            assert span["chunk_version"] == INTRODUCTION_CHUNK_VERSION
+
+
+def test_intro_span_ids_bind_paper_hash_page_offsets_and_exact_text():
+    pages = [{"page_index": 0, "text": "x" * 2000}]
+    original = build_introduction_chunks("paper-a", "hash-a", pages)
+    assert original[0]["text"] == original[1]["text"]
+    assert original[0]["chunk_id"] != original[1]["chunk_id"]
+    variants = [
+        build_introduction_chunks("paper-b", "hash-a", pages),
+        build_introduction_chunks("paper-a", "hash-b", pages),
+        build_introduction_chunks("paper-a", "hash-a", [{**pages[0], "page_index": 1}]),
+        build_introduction_chunks("paper-a", "hash-a", [{"page_index": 0, "text": "y" * 2000}]),
+    ]
+    assert all(variant[0]["chunk_id"] != original[0]["chunk_id"] for variant in variants)
+
+
+@pytest.mark.parametrize(
+    "extra", [{"quote": "A forged quote."}, {"page_index": 9}, {"paper_id": "other"}]
+)
+def test_model_cannot_override_program_owned_citation_content(extra):
+    def corrupt(result):
+        result["introduction"]["mechanism"]["citations"][0].update(extra)
+        return result
+
+    result = introduce_paper(PAPER, PAGES, client=introduction_client(generate=corrupt))
+    assert result["error_code"] == "invalid_citation"
+    assert result["claims"] == [] and result["introduction"] is None
+    assert result["trace"]["call_count"] == 1
+
+
+def test_every_published_quote_is_exact_program_supplied_span_including_symbols_and_whitespace():
+    text = '  The model uses "thoughts".\n\nContext c_t+1 includes \\ observations.  '
+    pages = [{"page_index": 3, "text": text}]
+    inputs = []
+    result = introduce_paper(PAPER, pages, client=introduction_client(observed=inputs))
+    assert result["status"] == "answered"
+    for claim in result["claims"]:
+        assert claim["citations"][0]["quote"] == text
+    for claim in inputs[1]["claims"]:
+        assert claim["citations"][0]["quote"] == text
+    for candidate in result["trace"]["generated_claims"]:
+        assert set(candidate["citations"][0]) == {"chunk_id"}
+    assert result["trace"]["source"]["selected"] == build_introduction_chunks(
+        PAPER["id"], PAPER["sha256"], pages
+    )
+
+
+def test_repeated_spaces_alone_are_not_treated_as_paper_evidence():
+    result = introduce_paper(
+        PAPER, [{"page_index": 0, "text": " \n\t" * 500}], client=introduction_client()
+    )
+    assert result["status"] == "insufficient_evidence" and result["trace"]["call_count"] == 0
