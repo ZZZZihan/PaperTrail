@@ -4,9 +4,9 @@
 
 单篇文本 PDF 支持上传、持久保存与逐页核对。问答采用问题要点整理、中文查询转换、BM25 检索、结构化生成、引用校验，以及同一次独立 AI 调用中的事实支持和覆盖检查；有据但不完整时保存 `partial_answer` 与缺失项。简介按需生成研读卡，解释术语、研究问题、方法输入/过程/输出和实验条件，区分论文陈述、作者解释、教学示意和系统推断。两条链路共用原文、引用跳页及原调用账本。
 
-当前分支 `codex/col-19-paper-introduction-demo`，任务为 In Progress，PR 为 draft、未合并。代码检查与效果验收分开：一次 `make check` 的 299 项后端测试通过；新 react-03 真实运行仍有模型冻结与人工轨迹条件遗漏，已标部分回答，修复继续。新 ReAct v5 简介运行因总期限内末次检查超时失败，旧卡继续可读。v6 仅为简介扩大来源引用容量与时间窗口，普通问答保持原限制，新卡待再验证。范围见 [质量规格](reading-quality-v02.md) 与 [研读卡规格](paper-introduction-demo.md)，实际版本、运行及用量见 [v0.2 验证记录](verification-quality-v02.md)。
+当前分支 `codex/col-19-paper-introduction-demo`，任务为 In Progress，PR 为 draft、未合并。原 react-03 已按冻结预期完成第二次真实回归，独立核对完整回答 1/1、必要条件 2/2、原子事实 16/16 有据；首次失败保留。ReAct v6 卡成功生成并保存，但独立核对发现结果段缺少本项少样本设置引文，7/8 输出单元完整支持，不能判为全部通过。v7 正在补强并列任务条件与本项引用的对应检查，并支持主动更新过时核对版本。 当前版本、实际检查和限制统一见 [v0.2 验证记录](verification-quality-v02.md)。
 
-本机已配置真实 `gpt-5.6-sol`，已获准的 provider_quota 原 scope 累计上限 160 次；本轮开始前快照 153/160 不代表实时余量，实际费用未知。优先按 [简短人工清单](manual-trial-v02.md) 核对已保存结果。旧 [问答 v0.1 规格](evidence-qa-v01.md)、[开发诊断](development-diagnostics.md)、[简介 v4 验证](verification-col-19.md)、COL-16 的 [PDF 行为](pdf-import.md) 和 [验证](verification-col-16.md) 保留历史证据，下方 COL-15 记录同样为历史。
+本机已配置真实 `gpt-5.6-sol`，已获准的 provider_quota 原 scope 累计上限 167 次（用户后续新增授权最多 7 次代表性测试）；本轮开始前快照 153/160 不代表实时余量，实际费用未知。优先按 [简短人工清单](manual-trial-v02.md) 核对已保存结果。旧 [问答 v0.1 规格](evidence-qa-v01.md)、[开发诊断](development-diagnostics.md)、[简介 v4 验证](verification-col-19.md)、COL-16 的 [PDF 行为](pdf-import.md) 和 [验证](verification-col-16.md) 保留历史证据，下方 COL-15 记录同样为历史。
 
 ### 准备与启动
 
