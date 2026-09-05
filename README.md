@@ -6,7 +6,7 @@ AI Native 论文研读 Agent：辅助论文理解、基于原文证据的问答�
 
 本地入口：[PaperTrail](http://127.0.0.1:8000/)，也可直接打开 [ReAct 阅读页](http://127.0.0.1:8000/#paper=acffff0b-0513-4b00-98d3-40567542eda9&page=0)。优先阅读已保存的简介与问答，查看和刷新不调用模型。旧回答不会被补写覆盖成绩；旧简介可以主动“补全为研读卡”，会调用模型，升级中或失败时仍可阅读原简介。当前任务 [COL-19](https://linear.app/colife/issue/COL-19) 为 In Progress，PR 仍为 draft、未合并，产品与学习认可待用户试读。
 
-本轮已通过一次 `make check`，其中 299 项后端测试通过。代码 `8fb80483c9103101ff8c0e8c4b5923cb95add10d`、问答提示 `evidence-qa-v4-coverage` 的新 `react-03` 真实运行仍遗漏模型冻结和人工编排轨迹两项条件，已正确返回 `partial_answer`：冻结模型条件存在检索缺口，人工轨迹存在生成覆盖缺口，修复继续进行。新 ReAct `paper-introduction-v5` 真实运行末次检查因总期限超时失败；旧成功卡继续可读。v6 对简介作了必要引用容量与时间窗口的最小调整，新卡待再验证。实际运行、后续改动、浏览器/重启证据和当前用量统一见 [v0.2 验证记录](docs/verification-quality-v02.md)，不能将工程检查通过等同于条件遗漏已修复。
+当前修复代码 `248a50d04d7ffa00ad75eab11de366d786510f72` 已通过 `make check`，其中 310 项后端测试通过；新版问答与研读卡的真实复验待新增额度授权。代码 `8fb80483c9103101ff8c0e8c4b5923cb95add10d`、问答提示 `evidence-qa-v4-coverage` 的新 `react-03` 真实运行仍遗漏模型冻结和人工编排轨迹两项条件，已正确返回 `partial_answer`：冻结模型条件存在检索缺口，人工轨迹存在生成覆盖缺口，修复继续进行。新 ReAct `paper-introduction-v5` 真实运行末次检查因总期限超时失败；旧成功卡继续可读。v6 对简介作了必要引用容量与时间窗口的最小调整，新卡待再验证。实际运行、后续改动、浏览器/重启证据和当前用量统一见 [v0.2 验证记录](docs/verification-quality-v02.md)，不能将工程检查通过等同于条件遗漏已修复。
 
 旧成绩保留为历史基线：简介 v4 的三篇真实开发样例中，一篇可展示、两篇因结果段引用不齐而提示不足，ReAct 术语易懂程度为部分满足；见 [旧简介结果](evals/introduction-v0.1/results-2026-09-05.json) 和 [旧简介验证](docs/verification-col-19.md)。问答 v3 核心 `314d9f182f90cf6e77a32c18340172091b4ee62e` 返回 10 个回答、5 个不足提示，独立 AI 核对为 9/10 可答题完整、1 题部分覆盖，5/5 不足提示恰当，17 处引用程序核对通过；见 [旧问答结果](evals/development-v0.1/results-2026-09-05.json) 和 [COL-18 验证](docs/verification-col-18.md)。新结果不会改写这些失败或评分。
 
