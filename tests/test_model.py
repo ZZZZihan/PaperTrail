@@ -185,3 +185,173 @@ def test_provider_provenance_excludes_private_endpoint_path():
     assert len(public["endpoint_sha256"]) == 64
     assert "secret" not in json.dumps(public)
     assert "private-route" not in json.dumps(public)
+
+
+@pytest.mark.parametrize(
+    ("base_url", "allowed_origin", "expected"),
+    [
+        ("http://192.168.1.2:8080/private/v1", "", False),
+        ("http://192.168.1.2:8080/private/v1", "http://192.168.1.2:8080", True),
+        ("http://192.168.1.2:8080/v1", "http://192.168.1.2:8080/", True),
+        ("http://relay.test/v1", "http://RELAY.test:80", True),
+        ("http://relay.test:80/v1", "http://relay.test", True),
+        ("http://192.168.1.2:8081/v1", "http://192.168.1.2:8080", False),
+        ("http://192.168.1.3:8080/v1", "http://192.168.1.2:8080", False),
+        ("http://relay.test.evil/v1", "http://relay.test", False),
+        ("http://relay.test/v1", "https://relay.test", False),
+        ("http://relay.test/v1", "http://*.test", False),
+        ("http://*.test/v1", "http://*.test", False),
+        ("http://relay.test/v1", "http://relay.test,http://other.test", False),
+        ("http://relay.test/v1", "http://relay.test/v1", False),
+        ("http://relay.test/v1", "http://relay.test//", False),
+        ("http://relay.test/v1", "http://user:password@relay.test", False),
+        ("http://relay.test/v1", "http://@relay.test", False),
+        ("http://relay.test/v1", "http://relay.test?", False),
+        ("http://relay.test/v1", "http://relay.test#", False),
+        ("http://relay.test/v1", "http://relay.test?key=secret", False),
+        ("http://relay.test/v1", "http://relay.test#fragment", False),
+        ("http://relay.test/v1", "http://relay.test:bad", False),
+        ("http://relay.test/v1", "http://relay.test:0", False),
+        ("http://relay.test/v1", "http://relay.test:65536", False),
+        ("http://relay.test/v1", "http://re\nlay.test", False),
+        ("http://relay.test/v1", "http://[invalid", False),
+        ("http://@relay.test/v1", "http://relay.test", False),
+        ("http://relay.test/v1?", "http://relay.test", False),
+        ("http://relay.test/v1#", "http://relay.test", False),
+        ("https://provider.test/v1", "", True),
+        ("https://provider.test/v1", "invalid optional origin", True),
+        ("http://127.0.0.1:8080/v1", "", True),
+        ("http://localhost:8080/v1", "", True),
+        ("http://localhost:8080/v1", "invalid optional origin", True),
+        ("http://[2001:db8::1]:8080/v1", "http://[2001:db8::1]:8080", True),
+        ("http://[2001:db8::2]:8080/v1", "http://[2001:db8::1]:8080", False),
+    ],
+)
+def test_http_requires_exact_explicit_origin_without_changing_existing_support(
+    base_url, allowed_origin, expected
+):
+    client_config = ModelConfig(
+        base_url=base_url,
+        api_key="local-test-secret",
+        model_name="model",
+        allow_http_origin=allowed_origin,
+    )
+    assert client_config.configured is expected
+    assert client_config.public()["configured"] is expected
+
+
+def test_http_origin_configuration_from_environment_is_safe_in_public_trace(monkeypatch):
+    monkeypatch.setenv("PAPERTRAIL_MODEL_BASE_URL", "http://192.168.1.2:8080/private-route/v1")
+    monkeypatch.setenv("PAPERTRAIL_MODEL_ALLOW_HTTP_ORIGIN", "http://192.168.1.2:8080")
+    monkeypatch.setenv("PAPERTRAIL_MODEL_API_KEY", "local-test-secret")
+    monkeypatch.setenv("PAPERTRAIL_MODEL_NAME", "relay-model")
+    client_config = ModelConfig.from_env()
+    assert client_config.configured
+    assert client_config.public()["provider_origin"] == "http://192.168.1.2:8080"
+    serialized = json.dumps(client_config.public()) + repr(client_config)
+    assert "private-route" not in serialized
+    assert "local-test-secret" not in serialized
+    assert "allow_http_origin" not in client_config.public()
+
+
+def test_unapproved_http_request_fails_before_transport_or_budget_reservation():
+    calls, reservations = [], []
+    client = ModelClient(
+        ModelConfig(
+            base_url="http://192.168.1.2:8080/v1",
+            api_key="secret",
+            model_name="model",
+            allow_http_origin="http://192.168.1.3:8080",
+        ),
+        transport=httpx.MockTransport(calls.append),
+        before_call=reservations.append,
+    )
+    with pytest.raises(ModelError) as error:
+        client.complete_json("query", MESSAGES)
+    assert error.value.code == "model_not_configured"
+    assert calls == reservations == client.calls == []
+
+
+def test_allowed_ipv6_origin_remains_bracketed_without_endpoint_path():
+    client_config = ModelConfig(
+        base_url="http://[2001:db8::1]:8080/private-route/v1",
+        api_key="secret",
+        model_name="model",
+        allow_http_origin="http://[2001:db8::1]:8080",
+    )
+    assert client_config.public()["provider_origin"] == "http://[2001:db8::1]:8080"
+    assert "private-route" not in json.dumps(client_config.public())
+
+
+@pytest.mark.parametrize("profile", ["compatible", "openai"])
+def test_explicit_profile_controls_payload_and_preserves_budget_upper_bound(profile):
+    reservations = []
+
+    def handler(request):
+        payload = json.loads(request.content)
+        assert payload["response_format"] == {"type": "json_object"}
+        assert payload["stream"] is False
+        if profile == "openai":
+            assert payload["max_completion_tokens"] == 1234
+            assert payload["reasoning_effort"] == "none"
+            assert "max_tokens" not in payload
+            assert "temperature" not in payload
+            assert "thinking" not in payload
+        else:
+            assert payload["max_tokens"] == 1234
+            assert payload["temperature"] == 0
+            assert "max_completion_tokens" not in payload
+            assert "reasoning_effort" not in payload
+        return response()
+
+    client_config = config(profile=profile, max_output_tokens=1234)
+    client = ModelClient(
+        client_config, transport=httpx.MockTransport(handler), before_call=reservations.append
+    )
+    assert client.complete_json("query", MESSAGES) == {"ok": True}
+    assert reservations[0]["max_output_tokens"] == 1234
+    assert client.calls[0]["profile"] == profile
+    public = client_config.public()
+    assert public["profile"] == profile
+    assert public["output_token_parameter"] == (
+        "max_completion_tokens" if profile == "openai" else "max_tokens"
+    )
+    assert public["temperature"] == (None if profile == "openai" else 0)
+    assert public["reasoning_effort"] == ("none" if profile == "openai" else None)
+    assert public["thinking"] == ("not_sent" if profile == "openai" else "provider_default")
+
+
+@pytest.mark.parametrize(
+    ("profile", "thinking"),
+    [
+        ("openai", "enabled"),
+        ("openai", "disabled"),
+        ("unknown", ""),
+        ("", ""),
+    ],
+)
+def test_conflicting_or_unknown_profile_fails_before_network(profile, thinking):
+    requests = []
+    client = ModelClient(
+        config(profile=profile, thinking=thinking), transport=httpx.MockTransport(requests.append)
+    )
+    assert client.config.configured is False
+    with pytest.raises(ModelError) as error:
+        client.complete_json("query", MESSAGES)
+    assert error.value.code == "model_not_configured"
+    assert requests == client.calls == []
+
+
+def test_profile_from_environment_and_default_do_not_guess_model_name(monkeypatch):
+    monkeypatch.setenv("PAPERTRAIL_MODEL_BASE_URL", "https://provider.test/v1")
+    monkeypatch.setenv("PAPERTRAIL_MODEL_API_KEY", "unit-test-secret")
+    monkeypatch.setenv("PAPERTRAIL_MODEL_NAME", "gpt-5.4-mini")
+    monkeypatch.setenv("PAPERTRAIL_MODEL_THINKING", "")
+    monkeypatch.delenv("PAPERTRAIL_MODEL_PROFILE", raising=False)
+    assert ModelConfig.from_env().profile == "compatible"
+    assert ModelConfig.from_env().public()["output_token_parameter"] == "max_tokens"
+    monkeypatch.setenv("PAPERTRAIL_MODEL_PROFILE", "openai")
+    selected = ModelConfig.from_env()
+    assert selected.configured
+    assert selected.profile == "openai"
+    assert selected.public()["output_token_parameter"] == "max_completion_tokens"

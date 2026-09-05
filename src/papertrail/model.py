@@ -8,7 +8,7 @@ import os
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from urllib.parse import urlsplit
+from urllib.parse import SplitResult, urlsplit
 
 import httpx2 as httpx
 
@@ -37,12 +37,14 @@ def _safe_json(value: object) -> bool:
 
 @dataclass(frozen=True)
 class ModelConfig:
-    base_url: str = ""
+    base_url: str = field(default="", repr=False)
     api_key: str = field(default="", repr=False)
     model_name: str = ""
     timeout: float = 45.0
     max_output_tokens: int = 1800
     thinking: str = ""
+    allow_http_origin: str = field(default="", repr=False)
+    profile: str = "compatible"
 
     @classmethod
     def from_env(cls) -> "ModelConfig":
@@ -60,11 +62,38 @@ class ModelConfig:
             timeout=timeout,
             max_output_tokens=maximum,
             thinking=os.getenv("PAPERTRAIL_MODEL_THINKING", "").strip().lower(),
+            allow_http_origin=os.getenv("PAPERTRAIL_MODEL_ALLOW_HTTP_ORIGIN", "").strip(),
+            profile=os.getenv("PAPERTRAIL_MODEL_PROFILE", "compatible").strip().lower(),
         )
 
     @property
     def model(self) -> str:
         return self.model_name
+
+    def _allows_http_endpoint(self, endpoint: SplitResult) -> bool:
+        """An explicit origin permits exactly one HTTP scheme/host/effective-port tuple."""
+        raw = self.allow_http_origin
+        if (
+            not raw
+            or not _safe_json(raw)
+            or any(ord(char) <= 32 or ord(char) == 127 for char in raw)
+            or "?" in raw
+            or "#" in raw
+        ):
+            return False
+        allowed = urlsplit(raw)
+        port = allowed.port
+        return bool(
+            allowed.scheme == endpoint.scheme == "http"
+            and allowed.hostname
+            and not any(char in allowed.hostname for char in "*,")
+            and allowed.username is None
+            and allowed.password is None
+            and allowed.path in {"", "/"}
+            and (port is None or 1 <= port <= 65535)
+            and allowed.hostname == endpoint.hostname
+            and (port or 80) == (endpoint.port or 80)
+        )
 
     @property
     def configured(self) -> bool:
@@ -75,17 +104,21 @@ class ModelConfig:
                 endpoint.hostname
                 and (port is None or 1 <= port <= 65535)
                 and _safe_json(self.base_url)
+                and not any(ord(char) <= 32 or ord(char) == 127 for char in self.base_url)
                 and (
                     endpoint.scheme == "https"
                     or (
                         endpoint.scheme == "http"
-                        and endpoint.hostname in {"127.0.0.1", "localhost"}
+                        and (
+                            endpoint.hostname in {"127.0.0.1", "localhost"}
+                            or self._allows_http_endpoint(endpoint)
+                        )
                     )
                 )
-                and not endpoint.username
-                and not endpoint.password
-                and not endpoint.query
-                and not endpoint.fragment
+                and endpoint.username is None
+                and endpoint.password is None
+                and "?" not in self.base_url
+                and "#" not in self.base_url
                 and self.api_key
                 and self.model_name
                 and _safe_json(self.model_name)
@@ -93,6 +126,8 @@ class ModelConfig:
                 and 0 < self.timeout <= 180
                 and 64 <= self.max_output_tokens <= 16_000
                 and self.thinking in {"", "enabled", "disabled"}
+                and self.profile in {"compatible", "openai"}
+                and (self.profile != "openai" or self.thinking == "")
             )
         except ValueError:
             return False
@@ -100,9 +135,15 @@ class ModelConfig:
     def public(self) -> dict:
         """No credentials, full URL, or provider error body is returned."""
         endpoint = urlsplit(self.base_url) if self.configured else None
+        host = (
+            f"[{endpoint.hostname}]"
+            if endpoint and ":" in endpoint.hostname
+            else endpoint.hostname
+            if endpoint
+            else None
+        )
         origin = (
-            f"{endpoint.scheme}://{endpoint.hostname}"
-            + (f":{endpoint.port}" if endpoint.port else "")
+            f"{endpoint.scheme}://{host}" + (f":{endpoint.port}" if endpoint.port else "")
             if endpoint
             else None
         )
@@ -111,8 +152,17 @@ class ModelConfig:
             "model_name": self.model_name if _safe_json(self.model_name) else None,
             "timeout_seconds": self.timeout if math.isfinite(self.timeout) else None,
             "max_output_tokens": self.max_output_tokens,
-            "temperature": 0,
-            "thinking": self.thinking
+            "profile": self.profile if self.profile in {"compatible", "openai"} else "invalid",
+            "output_token_parameter": "max_completion_tokens"
+            if self.profile == "openai"
+            else "max_tokens"
+            if self.profile == "compatible"
+            else None,
+            "reasoning_effort": "none" if self.profile == "openai" else None,
+            "temperature": 0 if self.profile == "compatible" else None,
+            "thinking": "not_sent"
+            if self.profile == "openai"
+            else self.thinking
             if self.thinking in {"enabled", "disabled"}
             else "provider_default",
             "response_format": "json_object",
@@ -186,13 +236,17 @@ class ModelClient:
         payload = {
             "model": self.config.model_name,
             "messages": messages,
-            "temperature": 0,
-            "max_tokens": self.config.max_output_tokens,
             "response_format": {"type": "json_object"},
             "stream": False,
         }
-        if self.config.thinking:
-            payload["thinking"] = {"type": self.config.thinking}
+        if self.config.profile == "openai":
+            payload["max_completion_tokens"] = self.config.max_output_tokens
+            payload["reasoning_effort"] = "none"
+        else:
+            payload["max_tokens"] = self.config.max_output_tokens
+            payload["temperature"] = 0
+            if self.config.thinking:
+                payload["thinking"] = {"type": self.config.thinking}
         encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True).encode()
         system = json.dumps(
             [m for m in messages if m["role"] == "system"], ensure_ascii=False, sort_keys=True
@@ -200,6 +254,10 @@ class ModelClient:
         call = {
             "stage": stage,
             "model": self.config.model_name,
+            "profile": self.config.profile,
+            "output_token_parameter": self.config.public()["output_token_parameter"],
+            "reasoning_effort": payload.get("reasoning_effort"),
+            "temperature": payload.get("temperature"),
             "request_sha256": hashlib.sha256(encoded).hexdigest(),
             "prompt_sha256": hashlib.sha256(system).hexdigest(),
             # UTF-8 bytes conservatively bound tokenizer tokens, plus framing space.

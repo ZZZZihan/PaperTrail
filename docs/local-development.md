@@ -36,12 +36,18 @@ make serve
 | 配置 | 含义 |
 | --- | --- |
 | `PAPERTRAIL_MODEL_BASE_URL` | OpenAI 兼容服务根路径，例如 `https://api.deepseek.com`；客户端追加 `/chat/completions` |
+| `PAPERTRAIL_MODEL_ALLOW_HTTP_ORIGIN` | 可选，明确允许一个 HTTP 中转入口，例如 `http://192.168.1.2:8080`；默认空，不自动开放其他 HTTP 地址 |
 | `PAPERTRAIL_MODEL_NAME` / `PAPERTRAIL_MODEL_API_KEY` | 获准的模型名称与本地密钥 |
+| `PAPERTRAIL_MODEL_PROFILE` | 显式请求参数方案：默认 `compatible`，或 `openai`；不按模型名称猜测 |
 | `PAPERTRAIL_MODEL_BUDGET` / `PAPERTRAIL_MODEL_CURRENCY` | 本轮获准额度与币种；未配置时拒绝调用 |
 | `PAPERTRAIL_MODEL_INPUT_PRICE_PER_MILLION` / `PAPERTRAIL_MODEL_OUTPUT_PRICE_PER_MILLION` | 同币种每百万 token 保守输入/输出单价，用于调用前预留及用量后估算 |
 | `PAPERTRAIL_MODEL_BUDGET_SCOPE` | 本轮账本范围，默认 `v01-development`；不要通过换值绕过已经消耗的额度 |
 
 每题最多三次固定调用，单次默认 45 秒，总期限 180 秒；输出默认限制 1800 tokens。`PAPERTRAIL_MODEL_THINKING` 默认空，仅在服务支持时设 `disabled` 或 `enabled`。本轮建议非推理模式，避免思考 token 占用结构化输出额度。服务必须支持 JSON 输出；未配置时可浏览 PDF 与历史，不生成模拟答案。
+
+`compatible` 请求使用 `max_tokens`、`temperature: 0`，并在配置非空时附带服务的 `thinking` 参数。`openai` 请求使用 `max_completion_tokens` 和 `reasoning_effort: "none"`，省略 `temperature` 与 `thinking`；此方案下 `PAPERTRAIL_MODEL_THINKING` 必须留空，否则视为配置无效。两种方案都使用 Chat Completions、JSON 对象输出及 `stream: false`，内部输出上限与预算预留仍使用同一个 `PAPERTRAIL_MODEL_MAX_OUTPUT_TOKENS`。配置必须与所选服务和模型的实际参数支持一致；程序不会根据模型前缀切换方案，也不会在请求失败后自动换参数重试。运行追踪保存所选方案、实际输出参数名、推理强度和温度；未发送的温度记录为 `null`。
+
+HTTPS 和 `http://127.0.0.1` / `http://localhost` 沿用默认支持。若用户指定局域网 HTTP 中转站，例如服务根路径为 `http://192.168.1.2:8080/private-route/v1`，则将 `PAPERTRAIL_MODEL_ALLOW_HTTP_ORIGIN` 设为 `http://192.168.1.2:8080`。允许项只接受单个 origin，不含用户信息、查询参数、片段或业务路径（末尾单个 `/` 可省略）；协议、主机和有效端口必须与服务根路径一致，未写 HTTP 端口时按 80 匹配。该设置只允许这个明确入口，不接受地址列表或通配符，也不因地址属于局域网而自动允许。运行追踪仅保存服务 origin 和完整根路径的哈希，不保存业务路径或密钥。
 
 每次调用前在持久账本预留输入保守上界及最大输出费用；成功返回用量后按配置单价估算，网络失败且用量未知则保留预留额。费用是配置单价计算的估算，不是供应商账单；特殊费用、不同计费规则或错误单价可能导致偏差。应使用普通文本 token 计费模型和供应商侧额度限制。服务、价格、额度得到用户授权后再运行真实诊断。
 
