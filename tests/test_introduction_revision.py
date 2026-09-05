@@ -6,7 +6,13 @@ from types import SimpleNamespace
 
 import httpx2 as httpx
 import pytest
-from test_introduction import PAGES, PAPER, introduction_client, introduction_output
+from test_introduction import (
+    PAGES,
+    PAPER,
+    complete_coverage,
+    introduction_client,
+    introduction_output,
+)
 from test_model import config, response
 
 from papertrail.introduction import introduce_paper
@@ -15,10 +21,11 @@ from papertrail.model import ModelClient
 
 def verdicts(data, *, supported):
     return {
+        **complete_coverage(),
         "verdicts": [
             {"claim_index": i, "supported": supported, "reason": "删除未被该段支持的额外断言。"}
             for i in range(len(data["claims"]))
-        ]
+        ],
     }
 
 

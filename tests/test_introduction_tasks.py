@@ -7,10 +7,11 @@ import httpx2 as httpx
 import pytest
 from fastapi.testclient import TestClient
 from test_import import upload
-from test_introduction import introduction_output
+from test_introduction import complete_coverage, introduction_output
 
 from papertrail.budget import Budget, CallLedger
 from papertrail.errors import ImportFailure
+from papertrail.introduction import INTRODUCTION_SCHEMA_VERSION
 from papertrail.main import create_app
 from papertrail.model import ModelClient, ModelConfig
 from papertrail.repository import Repository
@@ -36,10 +37,11 @@ def configure_fake_model(monkeypatch, *, cap=10, support_passed=True):
         data = json.loads(payload["messages"][1]["content"])
         if "claims" in data:
             result = {
+                **complete_coverage(),
                 "verdicts": [
                     {"claim_index": i, "supported": support_passed, "reason": "测试固定判定。"}
                     for i in range(len(data["claims"]))
-                ]
+                ],
             }
         else:
             passage = data["passages"][0]
@@ -72,6 +74,10 @@ def test_intro_persists_across_refresh_restart_and_never_enters_qa_history(
     row = client.get(path).json()
     assert row["status"] == "answered" and row["kind"] == "introduction"
     assert row["introduction"]["terms"][0]["citations"][0]["paper_id"] == paper["id"]
+    assert row["introduction"]["terms"][0]["basis"] == "paper_statement"
+    assert row["introduction"]["schema_version"] == INTRODUCTION_SCHEMA_VERSION
+    assert row["introduction"]["coverage"] == complete_coverage()["coverage"]
+    assert row["introduction"]["learning_aids"] == []
     assert len(row["claims"]) == 7 and len(requests) == 2
     assert row["trace"]["model_config"]["timeout_seconds"] == 90
     # The introduction adjusts its own runtime config; ordinary QA still reads the

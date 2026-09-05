@@ -7,8 +7,10 @@ import httpx2 as httpx
 import pytest
 
 from papertrail.introduction import (
+    COVERAGE_ASPECTS,
     FIELDS,
     INTRODUCTION_CHUNK_VERSION,
+    INTRODUCTION_SCHEMA_VERSION,
     MAX_SOURCE_CHARS,
     build_introduction_chunks,
     introduce_paper,
@@ -28,18 +30,32 @@ def introduction_output(chunk_id):
         "status": "answered",
         "introduction": {
             **{
-                field: {"text": "冻结模型参考人工编写的轨迹与工具观察。", "citations": [citation]}
+                field: {
+                    "text": "冻结模型参考人工编写的轨迹与工具观察。",
+                    "basis": "paper_statement",
+                    "citations": [citation],
+                }
                 for field in FIELDS
             },
             "terms": [
                 {
                     "term": term,
                     "explanation": "仅用于确定性测试的术语解释。",
+                    "basis": "paper_statement",
                     "citations": [citation],
                 }
                 for term in ("冻结模型", "轨迹")
             ],
         },
+    }
+
+
+def complete_coverage():
+    return {
+        "coverage": [
+            {"aspect": aspect, "covered": True, "reason": "测试固定覆盖判定，不代表产品质量。"}
+            for aspect in COVERAGE_ASPECTS
+        ]
     }
 
 
@@ -55,10 +71,11 @@ def introduction_client(*, generate=None, verify=None, observed=None, **kwargs):
                 else verify
                 if verify is not None
                 else {
+                    **complete_coverage(),
                     "verdicts": [
                         {"claim_index": i, "supported": True, "reason": "测试固定判定。"}
                         for i in range(len(data["claims"]))
-                    ]
+                    ],
                 }
             )
         else:
@@ -88,7 +105,11 @@ def test_complete_intro_uses_all_chunks_and_checks_every_body_field_and_term():
     )
     assert result["status"] == "answered"
     intro = result["introduction"]
-    assert set(intro) == {*FIELDS, "terms"}
+    assert set(intro) == {*FIELDS, "terms", "schema_version", "coverage", "learning_aids"}
+    assert intro["schema_version"] == INTRODUCTION_SCHEMA_VERSION
+    assert intro["coverage"] == complete_coverage()["coverage"]
+    assert intro["learning_aids"] == []
+    assert all(claim["basis"] == "paper_statement" for claim in result["claims"])
     assert len(result["claims"]) == len(inputs[1]["claims"]) == 7
     assert intro["problem"]["citations"][0]["page_index"] == 1
     assert intro["terms"][0]["citations"][0]["paper_id"] == PAPER["id"]
@@ -149,10 +170,11 @@ def test_semantic_rejection_of_any_field_or_term_withholds_everything(unsupporte
         PAGES,
         client=introduction_client(
             verify={
+                **complete_coverage(),
                 "verdicts": [
                     {"claim_index": i, "supported": i != unsupported_index, "reason": "测试判定。"}
                     for i in range(7)
-                ]
+                ],
             }
         ),
     )

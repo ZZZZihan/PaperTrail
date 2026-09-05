@@ -1,14 +1,38 @@
 import { useEffect, useRef, useState } from "react";
 import type { Citation } from "./QuestionPanel";
+import "./IntroductionPanel.css";
 
-type Claim = { text: string; citations: Citation[] };
+type Basis = "paper_statement" | "author_interpretation" | "teaching_example" | "system_inference";
+type Claim = { text: string; citations: Citation[]; basis?: Basis };
+const READING_CARD_SCHEMA = "paper-reading-card-v1";
+const basisLabels: Record<Basis, string> = {
+  paper_statement: "论文陈述",
+  author_interpretation: "作者解释",
+  teaching_example: "教学示意",
+  system_inference: "系统推断",
+};
+const coverageLabels: Record<string, string> = {
+  research_problem: "研究问题",
+  terms_in_context: "术语在本文中的含义",
+  method_flow_and_setup: "方法输入、过程、输出与条件",
+  evidence_and_conditions: "实验依据与必要条件",
+  conclusion_and_scope: "结论及适用范围",
+};
+function BasisLabel({ basis }: { basis?: Basis }) {
+  return basis && basisLabels[basis]
+    ? <span className={`reading-card-basis reading-card-basis-${basis}`}>{basisLabels[basis]}</span>
+    : null;
+}
 type Introduction = {
+  schema_version?: string | null;
+  coverage?: { aspect: string; covered: boolean; reason: string }[] | null;
+  learning_aids?: Claim[];
   summary: Claim;
   problem: Claim;
   contribution: Claim;
   mechanism: Claim;
   evidence_and_limits: Claim;
-  terms: { term: string; explanation: string; citations: Citation[] }[];
+  terms: { term: string; explanation: string; citations: Citation[]; basis?: Basis }[];
 };
 type IntroductionTask = {
   id: string;
@@ -21,6 +45,8 @@ type IntroductionTask = {
   created_at: string;
   completed_at: string | null;
   introduction: Introduction | null;
+  previous_introduction?: Introduction | null;
+  previous_introduction_id?: string | null;
 };
 type ModelConfig = { configured: boolean; model: string | null; reason: string | null };
 
@@ -53,7 +79,7 @@ const stages: Record<string, string> = {
   validating: "正在校验引用是否来自当前论文…",
   citation_validation: "正在校验引用是否来自当前论文…",
   checking_support: "正在检查原文是否支持简介中的说法…",
-  verifying: "正在检查原文是否支持简介中的说法…",
+  verifying: "正在核对原文支持、来源类别和必要要点…",
   support_check: "正在检查原文是否支持简介中的说法…",
 };
 
@@ -108,7 +134,9 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
   const pendingRequest = useRef<string | null>(null);
   const submission = useRef<AbortController | null>(null);
   const active = inProgress(task);
-  const introduction = task?.status === "answered" ? task.introduction : null;
+  const introduction = task?.introduction || task?.previous_introduction || null;
+  const showingPrevious = !!introduction && !task?.introduction;
+  const outdated = !!introduction && introduction.schema_version !== READING_CARD_SCHEMA;
 
   useEffect(() => {
     mounted.current = true;
@@ -165,7 +193,7 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
   }, [paperId, revision]);
 
   async function generate() {
-    if (sending.current || active || introduction || loading || loadError || !config?.configured || configError) return;
+    if (sending.current || active || (introduction && !outdated) || loading || loadError || !config?.configured || configError) return;
     sending.current = true;
     setSubmitting(true);
     setSubmitError("");
@@ -177,7 +205,7 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
       const result = await request<IntroductionTask>(`/api/papers/${paperId}/introduction`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ request_id: pendingRequest.current }),
+        body: JSON.stringify({ request_id: pendingRequest.current, refresh_if_outdated: outdated }),
         signal: controller.signal,
       });
       if (!mounted.current || controller.signal.aborted) return;
@@ -208,8 +236,8 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
   const sections: { key: "problem" | "contribution" | "mechanism" | "evidence_and_limits"; number: string; title: string }[] = [
     { key: "problem", number: "01", title: "它试图解决什么问题" },
     { key: "contribution", number: "02", title: "作者提出了什么" },
-    { key: "mechanism", number: "03", title: "核心原理是怎样的" },
-    { key: "evidence_and_limits", number: "04", title: "结果与适用边界" },
+    { key: "mechanism", number: "03", title: "方法的输入、过程与输出" },
+    { key: "evidence_and_limits", number: "04", title: "实验依据、条件与结论边界" },
   ];
 
   return (
@@ -230,9 +258,39 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
 
       {!loading && introduction && (
         <>
-          <div className="introduction-status"><span className="ai-label">AI 生成 · 待你核对</span><span>已保存</span></div>
+          <div className="introduction-status"><span className="ai-label">AI 生成 · 待你核对</span><span>{showingPrevious ? "此前已保存" : "已保存"}</span></div>
+          {showingPrevious && active && (
+            <div className="introduction-progress" role="status">
+              <span className="spinner" />
+              <div><strong>{stages[task?.stage || ""] || "正在补全研读卡…"}</strong><p>可以继续阅读下面的已保存简介，完成后会自动更新。</p></div>
+            </div>
+          )}
+          {showingPrevious && (task?.status === "failed" || task?.status === "insufficient_evidence") && (
+            <div className="introduction-failure" role="alert">
+              <h3>本次研读卡尚未完成</h3>
+              <p>{task.message || "本次结果未通过检查，失败记录已保存。"}</p>
+              <p>下面保留此前的简介，可以继续核对原文或主动重试补全。</p>
+            </div>
+          )}
+          {outdated ? (
+            <div className="reading-card-legacy" role="status">
+              <p>这是已保存的旧版简介，尚未按研读卡规则核对必要要点，也未区分内容来源类别。</p>
+              <button type="button" className="text-button" onClick={() => void generate()}
+                disabled={submitting || active || !!loadError || !config?.configured || !!configError}>
+                {active ? "正在补全研读卡…" : submitting ? "正在提交…" : confirmingSubmission ? "确认上次提交结果 →" : "补全为研读卡 →"}
+              </button>
+              {(configError || (config && !config.configured)) && <p>{configError || config?.reason || "请先完成模型配置。"}</p>}
+            </div>
+          ) : (
+            <details className="reading-card-guide">
+              <summary>怎样区分论文结论与辅助解释</summary>
+              <p><strong>论文陈述</strong>是论文提出或报告的内容；<strong>作者解释</strong>是作者的解释、理由或假设，不能当作已证实的因果。</p>
+              <p><strong>教学示意</strong>是根据所引机制构造的假设例子；<strong>系统推断</strong>是基于所引证据的谨慎推导，两者均不代表论文报告的实验或作者结论。</p>
+            </details>
+          )}
           <div className="introduction-summary">
             <span className="introduction-eyebrow">一句话概览</span>
+            <BasisLabel basis={introduction.summary.basis} />
             <p>{introduction.summary.text}</p>
             <Sources citations={introduction.summary.citations} paperId={paperId} onCitation={onCitation} />
           </div>
@@ -244,6 +302,7 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
                 <div key={`${term.term}-${index}`}>
                   <dt>{term.term}</dt>
                   <dd>
+                    <BasisLabel basis={term.basis} />
                     <p>{term.explanation}</p>
                     <Sources citations={term.citations} paperId={paperId} onCitation={onCitation} />
                   </dd>
@@ -255,13 +314,37 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
             {sections.map((section) => (
               <section className={`introduction-section introduction-${section.key}`} key={section.key}>
                 <h3><span aria-hidden="true">{section.number}</span>{section.title}</h3>
+                <BasisLabel basis={introduction[section.key].basis} />
                 <p>{introduction[section.key].text}</p>
                 <Sources citations={introduction[section.key].citations} paperId={paperId} onCitation={onCitation} />
               </section>
             ))}
           </div>
+          {!!introduction.learning_aids?.length && (
+            <section className="reading-card-aids" aria-label="辅助理解">
+              <h3>辅助理解</h3>
+              {introduction.learning_aids.map((aid, index) => (
+                <div key={index}>
+                  <BasisLabel basis={aid.basis} />
+                  <p>{aid.text}</p>
+                  <Sources citations={aid.citations} paperId={paperId} onCitation={onCitation} />
+                </div>
+              ))}
+            </section>
+          )}
+          {!outdated && introduction.coverage && (
+            <details className="reading-card-coverage">
+              <summary>AI 已检查的必要要点 · 仍待你核对</summary>
+              <ul>{introduction.coverage.map((entry) => (
+                <li key={entry.aspect}>
+                  <span>{coverageLabels[entry.aspect] || entry.aspect}</span>
+                  <span>{entry.covered ? "已检查覆盖" : "仍有遗漏"}</span>
+                </li>
+              ))}</ul>
+            </details>
+          )}
           <div className="introduction-footer">
-            <p>引用来自当前论文，已通过来源校验。{task?.support_status === "ai_checked" ? "AI 已检查原文支持关系；" : ""}简介仍待你对照原文核对。页码按 PDF 文件顺序计算。</p>
+            <p>引用来自当前论文，已通过来源校验。{task?.support_status === "ai_checked" && !showingPrevious ? "AI 已检查原文支持关系；" : ""}简介仍待你对照原文核对。页码按 PDF 文件顺序计算。</p>
             <button type="button" className="text-button" onClick={onAsk}>还有不明白的地方？继续向论文提问 →</button>
           </div>
         </>
@@ -276,10 +359,10 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
             </div>
           ) : task?.status === "failed" || task?.status === "insufficient_evidence" ? (
             <div className="introduction-failure" role="alert">
-              <h3>{task.status === "failed" ? "这次简介未能完成" : task.support_status === "ai_checked" ? "这次简介还有未核实的说法" : "当前提取文字尚不足以形成简介"}</h3>
+              <h3>{task.status === "failed" ? "这次简介未能完成" : task.support_status === "ai_checked" ? "这次简介还有待补全或核对之处" : "当前提取文字尚不足以形成简介"}</h3>
               <p>{task.message || "本次结果已保留，请检查服务状态后主动重试。"}</p>
               {task.status === "insufficient_evidence" && <p>{task.support_status === "ai_checked"
-                ? "简介未通过本次原文支持检查，可以重试生成。你也可以对照原文，或切换到证据问答，先问一个具体问题。"
+                ? "简介尚未通过本次原文支持或必要要点检查，可以重试生成。你也可以对照原文，或切换到证据问答，先问一个具体问题。"
                 : "请对照 PDF 原文和提取文字确认内容是否完整。你也可以重试生成，或切换到证据问答，先问一个具体问题。"}</p>}
             </div>
           ) : (
