@@ -2,17 +2,15 @@
 
 AI Native 论文研读 Agent：辅助论文理解、基于原文证据的问答与阅读笔记，作为 Agent 全栈开发学习与求职实践项目。
 
-**当前新增：论文简介 demo。** 打开论文后，先看一句话概览和关键术语解释，再了解研究问题、主要贡献、核心原理及结果边界。点击后由本机已配置的 `gpt-5.6-sol` 根据全文生成，成功结果保存；每部分附有可回到 PDF 的原文依据。入口在阅读页“论文简介”，旁边保留“证据问答”。实际结果和限制见 [COL-19 验证记录](docs/verification-col-19.md)，行为与固定内容判据见 [简介规格](docs/paper-introduction-demo.md)。
+**当前迭代：单篇论文研读质量 v0.2，仍在开发验证。** 研读卡解释研究问题、术语、方法输入与输出、实验依据和必要条件，区分论文陈述、作者解释、教学示意和系统推断。证据问答分别检查事实支持与要点覆盖；有依据但不完整时保留部分回答，并显示缺失项。行为与验收见 [本轮质量规格](docs/reading-quality-v02.md) 和 [研读卡规格](docs/paper-introduction-demo.md)。
 
-本地运行入口：[PaperTrail](http://127.0.0.1:8000/)。本轮任务 [COL-19](https://linear.app/colife/issue/COL-19)，自动 Tag、分类和筛选留待后续；用户易懂程度与产品认可仍待试读。
+本地入口：[PaperTrail](http://127.0.0.1:8000/)，也可直接打开 [ReAct 阅读页](http://127.0.0.1:8000/#paper=acffff0b-0513-4b00-98d3-40567542eda9&page=0)。优先阅读已保存的简介与问答，查看和刷新不调用模型。旧回答不会被补写覆盖成绩；旧简介可以主动“补全为研读卡”，会调用模型，升级中或失败时仍可阅读原简介。当前任务 [COL-19](https://linear.app/colife/issue/COL-19) 为 In Progress，PR 仍为 draft、未合并，产品与学习认可待用户试读。
 
-可直接打开 [ReAct 简介 demo](http://127.0.0.1:8000/#paper=acffff0b-0513-4b00-98d3-40567542eda9&page=0)，查看缓存无需调用模型。当前三篇真实开发样例中一篇形成可展示简介、两篇因结果段引用未配齐而提示不足；ReAct 的术语易懂程度仍为部分满足。逐轮失败、独立 AI 核对及实际正文见 [简介诊断结果](evals/introduction-v0.1/results-2026-09-05.json)，不将可展示状态记成用户认可。
+本轮已通过一次 `make check`，其中 299 项后端测试通过。代码 `8fb80483c9103101ff8c0e8c4b5923cb95add10d`、问答提示 `evidence-qa-v4-coverage` 的新 `react-03` 真实运行仍遗漏模型冻结和人工编排轨迹两项条件，已正确返回 `partial_answer`：冻结模型条件存在检索缺口，人工轨迹存在生成覆盖缺口，修复继续进行。新 ReAct `paper-introduction-v5` 真实运行末次检查因总期限超时失败；旧成功卡继续可读，新卡待再验证。实际运行、后续改动、浏览器/重启证据和当前用量统一见 [v0.2 验证记录](docs/verification-quality-v02.md)，不能将工程检查通过等同于条件遗漏已修复。
 
-前置的单篇证据问答 v0.1 已完成工程与开发诊断：中文提问、固定检索、模型生成、引用来源校验、AI 支持检查及持久问答历史继续可用。
+旧成绩保留为历史基线：简介 v4 的三篇真实开发样例中，一篇可展示、两篇因结果段引用不齐而提示不足，ReAct 术语易懂程度为部分满足；见 [旧简介结果](evals/introduction-v0.1/results-2026-09-05.json) 和 [旧简介验证](docs/verification-col-19.md)。问答 v3 核心 `314d9f182f90cf6e77a32c18340172091b4ee62e` 返回 10 个回答、5 个不足提示，独立 AI 核对为 9/10 可答题完整、1 题部分覆盖，5/5 不足提示恰当，17 处引用程序核对通过；见 [旧问答结果](evals/development-v0.1/results-2026-09-05.json) 和 [COL-18 验证](docs/verification-col-18.md)。新结果不会改写这些失败或评分。
 
-核心代码提交 `314d9f182f90cf6e77a32c18340172091b4ee62e` 的最终 v3 真实诊断返回 10 个回答、5 个证据不足提示。独立 AI 核对确认可答题 9/10 完整、1 题部分覆盖，5/5 不足提示恰当；17 处实际引用均通过存在与当前论文归属校验。部分覆盖题遗漏了冻结模型与人工编写轨迹的实验条件，仍需人工核对。逐题结果见 [诊断结果记录](evals/development-v0.1/results-2026-09-05.json)，`make check`、浏览器操作、重启验证及历史失败证据见 [本轮验证记录](docs/verification-col-18.md)。开发诊断成绩不等于用户人工验收。
-
-前置任务 [COL-18](https://linear.app/colife/issue/COL-18)；[行为规格与数据流](docs/evidence-qa-v01.md)、[3 篇 15 题开发诊断](docs/development-diagnostics.md)、[约 25 分钟人工清单与反馈模板](docs/manual-trial-v01.md)。AI 准备样例与用户人工核对分别记录，P0 真实阅读需求和人工样例、产品效果及学习验收继续待完成。
+[简短人工试读与反馈](docs/manual-trial-v02.md) 优先使用已保存结果。AI 准备样例、模型自检、独立评测、人工原文核对、产品认可和学习掌握分别记录；P0 的真实需求与人工样例继续 pending。4 篇新论文、20 道候选留出题的来源与规则已冻结，完整模型评测尚未执行，不能把准备完成写成评测通过。自动找论文、Tag/分类、多篇比较、公网部署与 PR 合并不属于本轮。
 
 ## 本地启动
 
@@ -34,7 +32,7 @@ make serve
 - 开发接口文档：<http://127.0.0.1:8000/docs>。
 - OpenAPI：<http://127.0.0.1:8000/openapi.json>。
 
-`/health` 仅表示存活。模型配置状态可在论文问答区查看；密钥和服务配置只保存在忽略的 `.env.local`。本轮已获准使用现有中转额度，采用 `provider_quota` 模式和持久累计 160 次调用上限；重启不重置额度。所选模型费率未知，费用记录为未知，不能套用其他模型价格。其他机器可按已获准金额与真实单价选择 `priced`，或按已获准供应商额度与调用上限选择 `provider_quota`，详见 [本地开发说明](docs/local-development.md) 与 [人工试用准备](docs/manual-trial-v01.md)。缺少有效配置时仍可上传和阅读 PDF、查看历史，不生成模拟答案。
+`/health` 仅表示存活。模型配置状态可在论文问答区查看；密钥和服务配置只保存在忽略的 `.env.local`。本轮已获准使用现有中转额度，采用 `provider_quota` 模式和持久累计 160 次调用上限；重启不重置额度。所选模型费率未知，费用记录为未知，不能套用其他模型价格。其他机器可按已获准金额与真实单价选择 `priced`，或按已获准供应商额度与调用上限选择 `provider_quota`，详见 [本地开发说明](docs/local-development.md) 与 [人工试用准备](docs/manual-trial-v02.md)。缺少有效配置时仍可上传和阅读 PDF、查看历史，不生成模拟答案。
 
 原导入证据见 [COL-16 验证记录](docs/verification-col-16.md)；它不代表问答或模型质量已经通过。
 
@@ -42,7 +40,7 @@ make serve
 
 围绕本人阅读 LLM / Agent 论文的真实需求，做出能使用、能核对、能评测、能部署的应用，同时掌握并解释全栈开发的核心实现。
 
-第一版用户任务：上传一篇可提取正文的 PDF → 查看简介、理解术语与问题 → 提出问题 → 获得答案、原文证据与 PDF 页码 → 核对引用；证据不足和处理失败均有明确状态。先完成固定检索问答，再按实际收益引入受控 Agent，之后扩展 2—5 篇论文比较。
+第一版用户任务：上传一篇可提取正文的 PDF → 查看简介、理解术语与问题 → 提出问题 → 获得完整或部分回答、缺失要点、原文证据与 PDF 页码 → 核对事实及条件；证据不足和处理失败均有明确状态。先完成固定检索问答，再按实际收益引入受控 Agent，之后扩展 2—5 篇论文比较。
 
 PaperTrail 是独立的产品与求职项目；学术选题、开题和发表研究由 mypaper 承载，RepoPilot 也独立维护。
 
@@ -51,7 +49,7 @@ PaperTrail 是独立的产品与求职项目；学术选题、开题和发表研
 1. 阅读 [AGENTS.md](AGENTS.md) 和 [交接状态](docs/handoff.md)。
 2. 阅读 [项目与学习基线](docs/project-baseline.md)、[开发流程](docs/development-workflow.md)。
 3. 连接 [Linear 项目](https://linear.app/colife/project/papertrail-论文研读-agent-93a0ba2ee811)，核对当前任务和依赖；[任务快照](docs/linear-snapshot.md)仅作交接参考。
-4. 首个功能关联 [COL-16](https://linear.app/colife/issue/COL-16)。用户提出的自动查找、下载论文已记录 [COL-17](https://linear.app/colife/issue/COL-17)，尚未实现。[COL-10](https://linear.app/colife/issue/COL-10)真实阅读需求与人工样例仍待补充。
+4. 当前按 [v0.2 质量规格](docs/reading-quality-v02.md) 与 [验证记录](docs/verification-quality-v02.md) 继续 COL-19；首个功能关联 [COL-16](https://linear.app/colife/issue/COL-16)。用户提出的自动查找、下载论文已记录 [COL-17](https://linear.app/colife/issue/COL-17)，尚未实现。[COL-10](https://linear.app/colife/issue/COL-10)真实阅读需求与人工样例仍待补充。
 
 ## 开发路线
 

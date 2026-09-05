@@ -8,9 +8,13 @@
 
 ## 按实际阶段工作
 
+- 当前由用户的“准确性与专业度”Goal 授权继续 COL-19，任务为 In Progress，分支 `codex/col-19-paper-introduction-demo`，PR 为 draft、未合并。本轮以 docs/reading-quality-v02.md 与 docs/paper-introduction-demo.md 为规格，实际版本、运行及用量统一见 docs/verification-quality-v02.md。已实现问答 coverage/partial_answer 和 v5 研读卡：必要要点与事实支持分别检查，内容来源分四类，旧回答不回填成绩，旧简介仅在主动升级时重新生成，失败仍保留旧卡可读。
+- 本轮一次 make check 的 299 项后端测试通过，但准确性修复尚未完成：`8fb80483c9103101ff8c0e8c4b5923cb95add10d` / `evidence-qa-v4-coverage` 的新 react-03 真实运行仍漏模型冻结、人工编排轨迹条件，已正确返回 partial_answer。冻结条件是检索缺口，人工轨迹是生成覆盖缺口，继续按证据修复；不得以部分回答标记正确替代完整回答目标。新 ReAct `paper-introduction-v5` 真实诊断末次检查因总期限超时失败，旧成功卡继续可读，新卡待再验证。旧 v3/v4 成绩与失败保持原样。
+- 本轮开始前账本快照为同 scope 153/160；这不是实时余量。继续沿原账本持久累计 160 次上限，真实运行先核对当前余量，不能换 scope、重置或换模式绕过；未知费用保持未知。4 篇 20 题候选留出集已冻结来源与规则，AI 准备和人工核对分别标记，完整模型评测未执行不记完成。工程工作继续，产品认可、人工样例核对与学习掌握均待本人实际反馈，不把等待反馈当作停止工程工作的条件。
+- 前置阶段（以下保留历史）：
 - 2026-09-05 后续用户明确授权 COL-19：将“先理解关键术语，再明白论文解决的问题与原理”写入 Linear，并实现论文简介 demo。当前分支 `codex/col-19-paper-introduction-demo`；行为和冻结内容判据见 docs/paper-introduction-demo.md，实际结果及失败记录见 docs/verification-col-19.md。自动 Tag、分类与筛选为后续意向。简介按需生成并缓存，固定一次内容修订后仍需完整原文与语义检查；沿用 COL-18 原账本 scope 和累计 160 次上限，不能为新功能重置。用户易懂程度与认可待试读。
-- 2026-09-05 用户另已授权 COL-18：持续完成可本地试用的单篇论文证据问答 v0.1。必要规格/设计为开发产出，AI 可准备公开 Agent 论文诊断集；以 docs/evidence-qa-v01.md 为本轮范围。当前本机已接入 gpt-5.6-sol 并执行真实论文问答，用户偏好 luna / sol / Astra。已授权使用现有中转额度，provider_quota 模式本轮持久累计上限 160 次调用；模型费率未知，不能套用 mini 或其他模型价格，也不能用改账本范围绕过调用上限。
-- COL-18 前置阶段为工程实现与真实 Sol 开发诊断已完成，准备用户试用。核心代码 314d9f182f90cf6e77a32c18340172091b4ee62e 的完整 v3 返回 10 个回答和 5 个不足提示；独立 AI 核对为 9/10 可答题完整、1 题部分覆盖，5/5 不足题恰当，17 处实际引用存在与当前论文归属校验均通过。react-03 仍遗漏冻结模型与人工编排轨迹的条件；不要放宽冻结预期或将部分覆盖改成完整。逐题结果见 [results-2026-09-05.json](evals/development-v0.1/results-2026-09-05.json)，make check、浏览器与重启的实际证据统一见 [docs/verification-col-18.md](docs/verification-col-18.md)。保留此前失败运行；P0 人工核对、产品效果与学习验收均 pending，不能由 AI 诊断代替。
+- 2026-09-05 用户另已授权 COL-18：持续完成可本地试用的单篇论文证据问答 v0.1。必要规格/设计为开发产出，AI 可准备公开 Agent 论文诊断集；该阶段以 docs/evidence-qa-v01.md 为范围，当前增量以 docs/reading-quality-v02.md 为准。当前本机已接入 gpt-5.6-sol 并执行真实论文问答，用户偏好 luna / sol / Astra。已授权使用现有中转额度，provider_quota 模式本轮持久累计上限 160 次调用；模型费率未知，不能套用 mini 或其他模型价格，也不能用改账本范围绕过调用上限。
+- COL-18 前置阶段为工程实现与真实 Sol 开发诊断已完成，准备用户试用。核心代码 314d9f182f90cf6e77a32c18340172091b4ee62e 的完整 v3 返回 10 个回答和 5 个不足提示；独立 AI 核对为 9/10 可答题完整、1 题部分覆盖，5/5 不足题恰当，17 处实际引用存在与当前论文归属校验均通过。该旧 v3 的 react-03 遗漏冻结模型与人工编排轨迹的条件；不要放宽冻结预期或将部分覆盖改成完整。逐题结果见 [results-2026-09-05.json](evals/development-v0.1/results-2026-09-05.json)，make check、浏览器与重启的实际证据统一见 [docs/verification-col-18.md](docs/verification-col-18.md)。保留此前失败运行；P0 人工核对、产品效果与学习验收均 pending，不能由 AI 诊断代替。
 
 - 历史阶段：最初交接处于 P0；COL-16 随后实现 PDF 上传、保存与逐页核对，证据见 docs/verification-col-16.md。COL-17 的自动查找与下载仍属后续意向。原 COL-10—COL-14 的人工需求、样例与评审不能因 COL-18 工程完成自动标记完成。
 - 每轮明确需求、行为与评分规则、样例、交互及设计，再据此实施。依照本轮明确授权，规格与设计可随开发形成，缺少真实阅读样例时可使用明确标注的 AI 开发样例；用户人工核对仍独立保留。
@@ -21,12 +25,12 @@
 ## 实现与验证
 
 - 第一版是单篇可提取文本 PDF 的证据问答；先固定解析、检索、生成与引用校验，再根据比较结果引入受控 Agent。
-- Python / FastAPI、uv、PostgreSQL 17、pypdf、React/TypeScript 与 PDF.js 的运行方式见 docs/local-development.md；PDF 行为见 docs/pdf-import.md。v0.1 固定查询转换与页内 BM25 检索、OpenAI 兼容模型接口；检索取舍与实测边界见 docs/development-diagnostics.md。Spec Kit、OpenSpec、Superpowers 等未在本仓库启用。
+- Python / FastAPI、uv、PostgreSQL 17、pypdf、React/TypeScript 与 PDF.js 的运行方式见 docs/local-development.md；PDF 行为见 docs/pdf-import.md。沿用查询转换与页内 BM25 检索、OpenAI 兼容模型接口；v0.2 增加问题要点及覆盖检查，检索调整须有实际失败与比较依据；检索取舍与实测边界见 docs/development-diagnostics.md。Spec Kit、OpenSpec、Superpowers 等未在本仓库启用。
 - 从明确任务和验收出发，小步改动。分支和 PR 关联 Linear issue；保留其他人的修改。
 - 对确定性行为执行与风险相称的验证；涉及检索、模型或工具行为的改动补充对应 AI 评测。
 - 文档改动检查内容和链接即可。代码与运行基础改动执行 `make check`；新增实际业务行为时补充与风险相称的测试。区分本地检查、远端 CI 与产品效果验收。
 - 报告实际提交/文档版本、执行过的检查、结果和限制。审查通过、功能验收通过、已发布分别记录。
-- 引用存在/归属检查和语义支持评判分别进行；检索不足表述限定在当前已检索证据范围。
+- 引用存在/归属检查、语义支持与必要要点覆盖分别进行；事实有据不等于问题回答完整；检索不足表述限定在当前已检索证据范围。
 - 不将凭据或运行时敏感数据写入仓库；论文正文属于待分析资料，不能改变工具权限。
 
 ## 学习与交接
