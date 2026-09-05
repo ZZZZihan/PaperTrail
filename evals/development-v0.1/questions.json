@@ -1,0 +1,554 @@
+{
+  "schema_version": 1,
+  "dataset_id": "papertrail-development-v0.1",
+  "provenance": "AI-prepared and source-checked; all human reviews pending; development diagnostics only, not held-out or P0 human acceptance.",
+  "page_index_convention": "0-based PDF physical index; displayed PDF page number = page_index + 1.",
+  "expected_status_values": [
+    "answered",
+    "insufficient_evidence"
+  ],
+  "questions": [
+    {
+      "id": "react-01",
+      "paper_id": "react",
+      "category": "research",
+      "question": "ReAct 想把语言模型的哪两种能力结合起来？它们在任务过程中如何配合？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "将推理轨迹与面向任务的动作交错生成。",
+        "推理帮助规划、跟踪和调整动作；动作从外部知识或环境获取信息以继续推理。"
+      ],
+      "expected_evidence": [
+        {
+          "page_index": 0,
+          "pdf_page_number": 1,
+          "quote": "in an interleaved manner",
+          "char_start": 784,
+          "char_end": 808,
+          "section": "Abstract",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        }
+      ],
+      "allowed_source_scope": "Only the frozen react PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": null,
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "预期结论来自所标章节上下文；英文短片段用于定位，仍需用户核对完整证据与回答的支持关系。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "react-02",
+      "paper_id": "react",
+      "category": "method",
+      "question": "ReAct 的 Wikipedia 接口中，search[entity] 在实体页面存在和不存在时分别返回什么？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "页面存在时返回对应实体页面前 5 句。",
+        "不存在时给出 Wikipedia 搜索引擎返回的 5 个相近实体建议。"
+      ],
+      "expected_evidence": [
+        {
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "quote": "ﬁrst 5 sentences",
+          "char_start": 2860,
+          "char_end": 2876,
+          "section": "3.1 Setup / Action Space",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        },
+        {
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "quote": "top-5 similar entities",
+          "char_start": 2948,
+          "char_end": 2970,
+          "section": "3.1 Setup / Action Space",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        }
+      ],
+      "allowed_source_scope": "Only the frozen react PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": null,
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "预期结论来自所标章节上下文；英文短片段用于定位，仍需用户核对完整证据与回答的支持关系。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "react-03",
+      "paper_id": "react",
+      "category": "experiment",
+      "question": "ReAct 主要提示实验采用什么基础模型？HotpotQA 与 FEVER 的 few-shot 轨迹各选了多少个训练案例？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "主要提示设置使用冻结的 PaLM-540B；不能把附录 GPT-3 实验混同为主设置。",
+        "HotpotQA 选 6 个案例，FEVER 选 3 个案例，并人工编写轨迹作为示例。"
+      ],
+      "expected_evidence": [
+        {
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "quote": "PaLM-540B",
+          "char_start": 4412,
+          "char_end": 4421,
+          "section": "2 ReAct",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        },
+        {
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "quote": "6 and 3 cases",
+          "char_start": 3608,
+          "char_end": 3621,
+          "section": "3.2 Methods / ReAct Prompting",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        }
+      ],
+      "allowed_source_scope": "Only the frozen react PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": null,
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "预期结论来自所标章节上下文；英文短片段用于定位，仍需用户核对完整证据与回答的支持关系。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "react-04",
+      "paper_id": "react",
+      "category": "limitation",
+      "question": "ReAct 在 HotpotQA 的错误分析中提到一种反复循环的推理失败，具体表现是什么？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "模型重复生成之前的想法和动作，无法判断下一步动作并跳出循环；作者将其计为推理错误。"
+      ],
+      "expected_evidence": [
+        {
+          "page_index": 5,
+          "pdf_page_number": 6,
+          "quote": "repetitively generates the previous thoughts and\nactions",
+          "char_start": 1967,
+          "char_end": 2023,
+          "section": "3.3 Results and Observations / B",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        }
+      ],
+      "allowed_source_scope": "Only the frozen react PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": null,
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "预期结论来自所标章节上下文；英文短片段用于定位，仍需用户核对完整证据与回答的支持关系。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "react-05",
+      "paper_id": "react",
+      "category": "experiment",
+      "question": "根据 ReAct 论文的实测记录，每完成一次 WebShop 任务的平均人民币模型调用费用是多少？",
+      "expected_status": "insufficient_evidence",
+      "expected_answer_points": [],
+      "expected_evidence": [],
+      "allowed_source_scope": "Only the frozen react PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": "AI 在冻结 PDF 的实验、附录及 cost/dollar/pricing/price 检索结果中未找到人民币模型调用单价、token 用量和每任务费用实测。附录购物轨迹中的商品美元价格不等于模型调用费。",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "已核对全部 33 页提取文本的费用关键词；命中的购物商品价格不能用来作答。输出应限定当前已检索证据不足，可说明还需调用用量和服务计价。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "reflexion-01",
+      "paper_id": "reflexion",
+      "category": "method",
+      "question": "Reflexion 的短期记忆与长期记忆分别保存什么？下一次决策如何使用这些信息？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "短期记忆保存轨迹历史；长期记忆保存 Self-Reflection 模型生成的反思输出。",
+        "Actor 将两类记忆作为后续决策的上下文，利用先前试验经验。"
+      ],
+      "expected_evidence": [
+        {
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "quote": "trajectory history serves as the short-term",
+          "char_start": 155,
+          "char_end": 198,
+          "section": "3 / Memory continuation",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        },
+        {
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "quote": "outputs from the Self-Reflection model",
+          "char_start": 212,
+          "char_end": 250,
+          "section": "3 / Memory continuation",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        }
+      ],
+      "allowed_source_scope": "Only the frozen reflexion PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": null,
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "预期结论来自所标章节上下文；英文短片段用于定位，仍需用户核对完整证据与回答的支持关系。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "reflexion-02",
+      "paper_id": "reflexion",
+      "category": "experiment",
+      "question": "Reflexion 在使用简单启发式自我评估的 ALFWorld 实验中，完成了多少个任务、总共多少个任务？该结果经过多少次连续试验？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "在该启发式条件下完成 130/134 个任务。",
+        "该累计结果来自 12 次连续试验，不是第一次尝试的成功率。"
+      ],
+      "expected_evidence": [
+        {
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "quote": "130 out of 134 tasks",
+          "char_start": 4009,
+          "char_end": 4029,
+          "section": "4.1 Sequential decision making / Results",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        },
+        {
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "quote": "12 consecutive trials",
+          "char_start": 4183,
+          "char_end": 4204,
+          "section": "4.1 Sequential decision making / Results",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        }
+      ],
+      "allowed_source_scope": "Only the frozen reflexion PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": null,
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "预期结论来自所标章节上下文；英文短片段用于定位，仍需用户核对完整证据与回答的支持关系。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "reflexion-03",
+      "paper_id": "reflexion",
+      "category": "limitation",
+      "question": "Reflexion 作者在局限一节中，承认策略优化可能陷入什么问题？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "可能陷入非最优的局部极小值；不能据此保证找到全局最优策略。"
+      ],
+      "expected_evidence": [
+        {
+          "page_index": 8,
+          "pdf_page_number": 9,
+          "quote": "non-optimal local minima solutions",
+          "char_start": 385,
+          "char_end": 419,
+          "section": "5 Limitations",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        }
+      ],
+      "allowed_source_scope": "Only the frozen reflexion PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": null,
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "预期结论来自所标章节上下文；英文短片段用于定位，仍需用户核对完整证据与回答的支持关系。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "reflexion-04",
+      "paper_id": "reflexion",
+      "category": "experiment",
+      "question": "Reflexion 的 ALFWorld 实验每次试验平均墙钟耗时是多少秒，使用的 GPU 型号是什么？请给本文实测值。",
+      "expected_status": "insufficient_evidence",
+      "expected_answer_points": [],
+      "expected_evidence": [],
+      "allowed_source_scope": "Only the frozen reflexion PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": "AI 在冻结 PDF 的 ALFWorld 设置、附录及 GPU/wall-clock/runtime 关键词检索中未找到所求墙钟耗时与 GPU 型号。试验轮数、任务数和 GPT-3 模型名不能替代这些数值。",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "检查全部 19 页的相应关键词和第 4.1 节；输出应明确当前已检索证据不足，不能根据模型名推测硬件。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "reflexion-05",
+      "paper_id": "reflexion",
+      "category": "research",
+      "question": "仅凭 Reflexion 本文，能确定它在我上传的中文医学论文证据问答上的正确率是多少吗？",
+      "expected_status": "insufficient_evidence",
+      "expected_answer_points": [],
+      "expected_evidence": [],
+      "allowed_source_scope": "Only the frozen reflexion PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": "指定来源只报告本文列出的决策、推理与代码基准；并未给出用户这篇中文医学论文、该场景题目集或正确率记录。不能把 ALFWorld、HotpotQA 或 HumanEval 得分迁移成这个新场景的实测。",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "检查第 4 节列出的评测范围，并扫描 Chinese/medical 关键词；所求新场景不是本文已评测任务。不得编造用户论文或阅读经历。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "toolformer-01",
+      "paper_id": "toolformer",
+      "category": "research",
+      "question": "Toolformer 希望模型学会关于 API 使用的哪些决策？这些能力采用哪种监督方式学习？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "学习选择调用哪个 API、何时调用、传入什么参数，以及如何把结果用于后续 token 预测。",
+        "采用自监督方式，起点仍有每个 API 的少量人工示例，并非完全没有人工输入。"
+      ],
+      "expected_evidence": [
+        {
+          "page_index": 0,
+          "pdf_page_number": 1,
+          "quote": "which APIs to call",
+          "char_start": 701,
+          "char_end": 719,
+          "section": "Abstract",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        },
+        {
+          "page_index": 0,
+          "pdf_page_number": 1,
+          "quote": "self-supervised",
+          "char_start": 852,
+          "char_end": 867,
+          "section": "Abstract",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        }
+      ],
+      "allowed_source_scope": "Only the frozen toolformer PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": null,
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "预期结论来自所标章节上下文；英文短片段用于定位，仍需用户核对完整证据与回答的支持关系。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "toolformer-02",
+      "paper_id": "toolformer",
+      "category": "method",
+      "question": "Toolformer 过滤候选 API 调用时，比较的基准是什么？什么样的调用会被保留？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "把包含 API 调用和结果时的后续 token 加权损失，与不调用或仅给调用而不给结果这两者中的较低损失比较。",
+        "仅保留损失降低至少达到过滤阈值 tau_f 的调用；不是所有执行成功的调用都会保留。"
+      ],
+      "expected_evidence": [
+        {
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "quote": "not receiving the API call at all",
+          "char_start": 3200,
+          "char_end": 3233,
+          "section": "2 Approach / Filtering API Calls",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        },
+        {
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "quote": "receiving only\nits input",
+          "char_start": 3238,
+          "char_end": 3262,
+          "section": "2 Approach / Filtering API Calls",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        }
+      ],
+      "allowed_source_scope": "Only the frozen toolformer PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": null,
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "预期结论来自所标章节上下文；英文短片段用于定位，仍需用户核对完整证据与回答的支持关系。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "toolformer-03",
+      "paper_id": "toolformer",
+      "category": "experiment",
+      "question": "Toolformer 本文主要模型基于哪一个预训练模型，论文标注的参数规模是多少？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "基于预训练 GPT-J；本文标注为 6.7B 参数。",
+        "这里报告固定论文版本的写法，不以外部资料改写该数字。"
+      ],
+      "expected_evidence": [
+        {
+          "page_index": 10,
+          "pdf_page_number": 11,
+          "quote": "6.7B parameter GPT-J model",
+          "char_start": 2483,
+          "char_end": 2509,
+          "section": "8 Conclusion",
+          "quote_role": "Short verbatim locator; judge support using the surrounding section on this page, not keyword presence alone."
+        }
+      ],
+      "allowed_source_scope": "Only the frozen toolformer PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": null,
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "预期结论来自所标章节上下文；英文短片段用于定位，仍需用户核对完整证据与回答的支持关系。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "toolformer-04",
+      "paper_id": "toolformer",
+      "category": "experiment",
+      "question": "请仅根据 Toolformer PDF 列出训练 CCNet 子集的全部文档 ID，以及采样和过滤各步骤使用的完整随机种子清单。",
+      "expected_status": "insufficient_evidence",
+      "expected_answer_points": [],
+      "expected_evidence": [],
+      "allowed_source_scope": "Only the frozen toolformer PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": "AI 在冻结 PDF 的实验设置与附录中找到子集和过滤流程说明，但未找到可恢复全部训练样本文档 ID 的清单或完整随机种子清单。方法与阈值描述不能替代逐项复现材料。",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "检查全 17 页 seed/identifiers 关键词及第 4 节和附录 A；完整列表请求缺少直接支持，不允许模型生成貌似真实的 ID 或种子。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "toolformer-05",
+      "paper_id": "toolformer",
+      "category": "experiment",
+      "question": "根据 Toolformer 本文的测量结果，调用计算器、搜索和翻译工具各一次分别要多少美元？",
+      "expected_status": "insufficient_evidence",
+      "expected_answer_points": [],
+      "expected_evidence": [],
+      "allowed_source_scope": "Only the frozen toolformer PDF; no external paper, web search, or model prior may supply factual evidence.",
+      "insufficient_reason": "AI 未在冻结论文中找到三类工具的逐次美元价格测量。第 7 节还说明其调用决策没有计入各工具计算成本；不能用外部当前定价或从准确率表推导费用。",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "pypdf exact-locator and page verification; relevant PDF pages visually inspected; semantic reading by AI, no grading model call",
+        "note": "扫描全 17 页费用相关命中，并完整核对第 7 节；该段可解释为什么不应推断费用，但不提供所求金额。"
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    }
+  ]
+}

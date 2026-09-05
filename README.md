@@ -2,7 +2,35 @@
 
 AI Native 论文研读 Agent：辅助论文理解、基于原文证据的问答与阅读笔记，作为 Agent 全栈开发学习与求职实践项目。
 
-**当前阶段：P0 需求、样例与设计。** 已有方向、流程、Linear 项目和任务；应用代码、人工评测集、实测结果与部署尚未完成。此仓库目前承载规划和交接文档。
+**当前阶段：单篇论文证据问答 v0.1 的工程实现与真实模型开发诊断已完成，准备用户试用。** 在原 PDF 导入上增加中文提问、固定检索与模型生成、引用来源校验、AI 支持检查及持久问答历史。页面保留原文与逐页文字，点击引用可回到对应 PDF 物理页。当前本机已配置 `gpt-5.6-sol`，可以直接打开 [本地页面](http://127.0.0.1:8000/) 开始试用。
+
+核心代码提交 `314d9f182f90cf6e77a32c18340172091b4ee62e` 的最终 v3 真实诊断返回 10 个回答、5 个证据不足提示。独立 AI 核对确认可答题 9/10 完整、1 题部分覆盖，5/5 不足提示恰当；17 处实际引用均通过存在与当前论文归属校验。部分覆盖题遗漏了冻结模型与人工编写轨迹的实验条件，仍需人工核对。逐题结果见 [诊断结果记录](evals/development-v0.1/results-2026-09-05.json)，`make check`、浏览器操作、重启验证及历史失败证据见 [本轮验证记录](docs/verification-col-18.md)。开发诊断成绩不等于用户人工验收。
+
+本轮主任务 [COL-18](https://linear.app/colife/issue/COL-18)；[行为规格与数据流](docs/evidence-qa-v01.md)、[3 篇 15 题开发诊断](docs/development-diagnostics.md)、[约 25 分钟人工清单与反馈模板](docs/manual-trial-v01.md)。AI 准备样例与用户人工核对分别记录，P0 真实阅读需求和人工样例、产品效果及学习验收继续待完成。
+
+## 本地启动
+
+需要 uv、Make、Node.js 22.13+ 与 PostgreSQL 17。macOS 可执行 `brew install postgresql@17`；数据库由项目脚本管理，不需要启用 Homebrew 登录服务。Python 版本由 `.python-version` 固定。
+
+```bash
+make setup
+make check
+make serve
+```
+
+`make setup` 安装锁定的 Python 与网页依赖，在不存在时复制 `.env.example` 为 `.env.local`。`make serve` 构建网页、启动专用本地 PostgreSQL（127.0.0.1:55432），再启动无自动重载的试用服务；开发时可用 `make dev`。
+
+- **网页：<http://127.0.0.1:8000/>**，上传 PDF 后进入逐页核对。
+- 数据保存于忽略目录 `data/library/` 和 `data/postgres/`；刷新或重启后保留。
+- 在运行终端按 Ctrl+C 停止应用，`make db-stop` 停止项目数据库；下次 `make serve` 继续使用原有论文和问答历史。
+
+- 存活检查：<http://127.0.0.1:8000/health>，返回 `{"status":"ok"}`。
+- 开发接口文档：<http://127.0.0.1:8000/docs>。
+- OpenAPI：<http://127.0.0.1:8000/openapi.json>。
+
+`/health` 仅表示存活。模型配置状态可在论文问答区查看；密钥和服务配置只保存在忽略的 `.env.local`。本轮已获准使用现有中转额度，采用 `provider_quota` 模式和持久累计 160 次调用上限；重启不重置额度。所选模型费率未知，费用记录为未知，不能套用其他模型价格。其他机器可按已获准金额与真实单价选择 `priced`，或按已获准供应商额度与调用上限选择 `provider_quota`，详见 [本地开发说明](docs/local-development.md) 与 [人工试用准备](docs/manual-trial-v01.md)。缺少有效配置时仍可上传和阅读 PDF、查看历史，不生成模拟答案。
+
+原导入证据见 [COL-16 验证记录](docs/verification-col-16.md)；它不代表问答或模型质量已经通过。
 
 ## 目标与第一版
 
@@ -17,7 +45,7 @@ PaperTrail 是独立的产品与求职项目；学术选题、开题和发表研
 1. 阅读 [AGENTS.md](AGENTS.md) 和 [交接状态](docs/handoff.md)。
 2. 阅读 [项目与学习基线](docs/project-baseline.md)、[开发流程](docs/development-workflow.md)。
 3. 连接 [Linear 项目](https://linear.app/colife/project/papertrail-论文研读-agent-93a0ba2ee811)，核对当前任务和依赖；[任务快照](docs/linear-snapshot.md)仅作交接参考。
-4. 本次核实时下一项是 [COL-10：核实真实阅读需求](https://linear.app/colife/issue/COL-10/用一次真实阅读经历核实首版产品需求)。按最新任务状态继续 P0，完成验收与首轮拆分后推进 P1。
+4. 首个功能关联 [COL-16](https://linear.app/colife/issue/COL-16)。用户提出的自动查找、下载论文已记录 [COL-17](https://linear.app/colife/issue/COL-17)，尚未实现。[COL-10](https://linear.app/colife/issue/COL-10)真实阅读需求与人工样例仍待补充。
 
 ## 开发路线
 
@@ -30,6 +58,6 @@ PaperTrail 是独立的产品与求职项目；学术选题、开题和发表研
 | P4 多篇比较与恢复 | 2—5 篇比较、持久任务、重试、取消与恢复 |
 | P5 试用与求职交付 | 身份与数据隔离、部署、独立展示评测、试用反馈和演示 |
 
-技术建议起点为 Python / FastAPI、PostgreSQL，逐步加入 pgvector 和 TypeScript / React。具体版本、模型、预算与运行环境尚未落定。详细引入条件见项目基线。
+已落实 Python / FastAPI、PostgreSQL、pypdf、TypeScript / React 与 PDF.js。v0.1 采用页内分块、查询转换和 BM25 固定检索；模型为可配置的 OpenAI 兼容接口。本集 16 个证据定位片段的命中数从原中文问题的 10 个增至查询转换后的 15 个；本轮没有做向量检索对比，不能据此认定 BM25 更优。向量检索与公网部署留待后续。原文件来源与物理页码用于引用归属校验。
 
 GitHub 保存规格、设计、代码、PR 和验证记录；Linear 维护任务状态、依赖与验收证据。更新时间：2026-09-05。

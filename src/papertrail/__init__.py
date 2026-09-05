@@ -1,0 +1,1 @@
+"""PaperTrail application package."""

@@ -1,0 +1,1945 @@
+{
+  "schema_version": 1,
+  "dataset_id": "papertrail-development-v0.1",
+  "report_date": "2026-09-05",
+  "generated_at_utc": "2026-09-05T06:15:20.162310+00:00",
+  "purpose": "AI-prepared development diagnostics for local single-paper evidence QA v0.1; not product acceptance, learning acceptance, or a held-out benchmark.",
+  "path_base": "repository_root",
+  "artifact_availability": "Raw run directories and AI review files are local ignored artifacts. Their complete contents are bound by the hashes below; this committed summary intentionally contains no paper quotations or private provider configuration.",
+  "provenance_scope": "Code SHA, clean-tree status and file hashes identify the frozen diagnostic runner working tree. They are not an independent attestation of the running server build.",
+  "source_manifest": {
+    "path": "evals/development-v0.1/manifest.json",
+    "sha256": "876b348732b4047202f24e355f33b196ddbfde38841d03de6e51799abb7def82"
+  },
+  "source_questions": {
+    "path": "evals/development-v0.1/questions.json",
+    "sha256": "f1265203baa095d321d5cc413c5d52e98c740ca95de6db05e1c38f68f7a82112"
+  },
+  "statistics_artifact": {
+    "path": "output/model-gateway/diagnostic-statistics.json",
+    "sha256": "88b2989128c0cbc7844de42554c6889a09d7a1863b0220394790c2dce1b217fe"
+  },
+  "sources": [
+    {
+      "paper_id": "react",
+      "version_id": "2210.03629v3",
+      "source_url": "https://arxiv.org/abs/2210.03629v3",
+      "pdf": {
+        "path": "data/diagnostics/sources/react-2210.03629v3.pdf",
+        "sha256": "f285b0971ae4a790e402fb93966bed3adde2cf0a04977d08b2b40d6ab0cace69"
+      },
+      "page_count": 33,
+      "frozen_pages": {
+        "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/sources/react.pages.json",
+        "sha256": "6e4c7b00dc4633b09f58d06f2dc5b6efe74696c7d956c4788f81a42698466809"
+      }
+    },
+    {
+      "paper_id": "reflexion",
+      "version_id": "2303.11366v4",
+      "source_url": "https://arxiv.org/abs/2303.11366v4",
+      "pdf": {
+        "path": "data/diagnostics/sources/reflexion-2303.11366v4.pdf",
+        "sha256": "6059b6f89fea9959bd3dab553fbb97756a3dfb1b15e3cbab2fbf3ab6664333bd"
+      },
+      "page_count": 19,
+      "frozen_pages": {
+        "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/sources/reflexion.pages.json",
+        "sha256": "ad3319862b4c31367402c0d09507bd2b0ff613cd5262df75540b9d5be8f8d067"
+      }
+    },
+    {
+      "paper_id": "toolformer",
+      "version_id": "2302.04761v1",
+      "source_url": "https://arxiv.org/abs/2302.04761v1",
+      "pdf": {
+        "path": "data/diagnostics/sources/toolformer-2302.04761v1.pdf",
+        "sha256": "6d7483d94653008e40c2058a1c22441c92e3713dae278b6361e8efc447c99522"
+      },
+      "page_count": 17,
+      "frozen_pages": {
+        "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/sources/toolformer.pages.json",
+        "sha256": "06ad4920e0e12f30cc6a6af8d48dbc9afa54ed160bef14a7594bda2829e7ab2a"
+      }
+    }
+  ],
+  "metric_rules": {
+    "citation_count": "Citation occurrences attached to delivered claims; the same source may occur in multiple claims.",
+    "programmatic_check": "Citation presence, current-paper/page ownership and retrieved chunk identity; separate from semantic support.",
+    "semantic_review": "Existing AI source reviews, separate from the application model verification. Full expected-point coverage is required for complete_supported_answer.",
+    "retrieval": "Micro recall over each selected answerable question’s frozen expected_evidence anchors. Full runs cover 10 questions and 16 anchors; smoke runs cover only one question and one anchor. Five insufficient questions have no reference anchors and are excluded, not counted as recall 1.",
+    "latency": "Per-question wall includes API submission/polling. Application processing and full-run wall are reported separately. P95 uses linear interpolation at rank (n-1)*0.95.",
+    "fees": "Configured-price estimates are not invoices. Sol provider rates are unknown, so its estimated totals stay null. A known subtotal does not price unknown calls or mean free usage. Mini rates are never reused for Sol.",
+    "scope": "Aggregate calls/tokens cover only these five runs, excluding browser tests and any other calls. This is not the global budget ledger or remaining allowance."
+  },
+  "history": [
+    {
+      "label": "mini_smoke",
+      "run_id": "20260905T053543.673335Z-f00fc4d7cd564e149d77d486889236d8",
+      "code_sha": "249b6761a7ec3eb5f613de35a90debb8abf20278",
+      "code_dirty": false,
+      "pipeline_versions": [
+        "evidence-qa-v1"
+      ],
+      "prompt_versions": [
+        {
+          "generate": "evidence-qa-v1",
+          "query": "evidence-qa-v1",
+          "verify": "evidence-qa-v1"
+        }
+      ],
+      "model_configuration": [
+        {
+          "model_name": "gpt-5.4-mini",
+          "profile": "openai",
+          "max_output_tokens": 4096,
+          "output_token_parameter": "max_completion_tokens",
+          "reasoning_effort": "none",
+          "response_format": "json_object",
+          "temperature": null,
+          "thinking": "not_sent",
+          "timeout_seconds": 45.0
+        }
+      ],
+      "code_file_sha256": {
+        "scripts/evaluate_development.py": "8492a33cdfa46bc7e90803e862d0f26ed0ffb66b4c76456583fc41cef627d1b0",
+        "src/papertrail/qa.py": "eb0a66ef4bf21aadf3779da9a81354f2d677ebd533abd614feb1ac5fdc043a68",
+        "src/papertrail/model.py": "32c486c2fc09b136edf24a4bc92d7f998f23069c01d6366b5a58e2d1cbcedfa8",
+        "src/papertrail/retrieval.py": "57708baa48750616789886d31b1cd0389bd324d1c8f058a6931b283df1aaa962",
+        "src/papertrail/budget.py": "1308da5fcae4a734184148dd5b16d45c7f9a9246a171ae2ef5fffa300a68f71f"
+      },
+      "retrieval_versions": [
+        "bm25-v1-k1-1.5-b-0.75"
+      ],
+      "chunk_versions": [
+        "page-char-v1-1400-200"
+      ],
+      "retrieval_parameters": [
+        {
+          "max_chars": 20000,
+          "top_k": 12
+        }
+      ],
+      "budget_modes_recorded": [
+        null
+      ],
+      "question_count": 1,
+      "application_statuses": {
+        "failed": 1
+      },
+      "status_matches_expected": 0,
+      "expected_answerable_results": {
+        "failed": 1
+      },
+      "expected_insufficient_results": {},
+      "question_statuses": {
+        "react-01": "failed"
+      },
+      "returned_citations": 0,
+      "returned_claims": 0,
+      "returned_citations_pass_existence_and_ownership": null,
+      "questions_with_returned_citations": 0,
+      "elapsed_seconds": {
+        "per_question_wall": {
+          "count": 1,
+          "sum": 17.851,
+          "median": 17.851,
+          "p95": 17.851,
+          "min": 17.851,
+          "max": 17.851
+        },
+        "application_processing": {
+          "count": 1,
+          "sum": 17.502,
+          "median": 17.502,
+          "p95": 17.502,
+          "min": 17.502,
+          "max": 17.502
+        },
+        "model_call_elapsed_sum": 17.418,
+        "run_wall_including_preparation_uploads": 19.082,
+        "p95_method": "Linear interpolation, rank (n-1)*0.95"
+      },
+      "model_calls": 2,
+      "tokens": {
+        "prompt_tokens": 5360,
+        "completion_tokens": 833,
+        "total_tokens": 6193
+      },
+      "unknown_usage_calls": 0,
+      "fees": {
+        "known_priced_call_count": 2,
+        "unknown_cost_calls": 0,
+        "known_cost_subtotals": {
+          "USD": "0.00776850"
+        },
+        "estimated_total": {
+          "USD": "0.00776850"
+        },
+        "status": "configured_rate_estimate_only"
+      },
+      "retrieval_anchor_comparison": {
+        "dataset_answerable_questions": 10,
+        "dataset_reference_anchors": 16,
+        "selected_answerable_questions": 1,
+        "selected_reference_anchors": 1,
+        "insufficient_questions_excluded": 0,
+        "raw_chinese": {
+          "measured_questions": 1,
+          "anchor_hits": 0,
+          "reference_anchors": 1,
+          "micro_anchor_recall": 0.0,
+          "questions_with_any_anchor_hit": 0,
+          "questions_with_all_anchors_hit": 0
+        },
+        "query_expanded": {
+          "measured_questions": 1,
+          "anchor_hits": 1,
+          "reference_anchors": 1,
+          "micro_anchor_recall": 1.0,
+          "questions_with_any_anchor_hit": 1,
+          "questions_with_all_anchors_hit": 1
+        }
+      },
+      "raw_artifacts": {
+        "directory": "data/diagnostics/runs/20260905T053543.673335Z-f00fc4d7cd564e149d77d486889236d8",
+        "checksum_manifest": {
+          "path": "data/diagnostics/runs/20260905T053543.673335Z-f00fc4d7cd564e149d77d486889236d8/artifacts.sha256",
+          "sha256": "8453a16c22e065d2a26ce75e3bfce236c3db10c9a808d793be7afa92c6bf7633",
+          "entries_verified": 19,
+          "all_match": true
+        },
+        "summary": {
+          "path": "data/diagnostics/runs/20260905T053543.673335Z-f00fc4d7cd564e149d77d486889236d8/summary.json",
+          "sha256": "bf7f6e08ae17c6dfcbf9be4acfbde7ab207030bb02c6ef6f7357a8f567e3cd82"
+        },
+        "invocation": {
+          "path": "data/diagnostics/runs/20260905T053543.673335Z-f00fc4d7cd564e149d77d486889236d8/invocation.json",
+          "sha256": "b24aff3d0078047a81d436fbe4b39ceaeac10697cba1eababed37e691f00ca8c"
+        },
+        "source_manifest": {
+          "path": "data/diagnostics/runs/20260905T053543.673335Z-f00fc4d7cd564e149d77d486889236d8/dataset/manifest.json",
+          "sha256": "876b348732b4047202f24e355f33b196ddbfde38841d03de6e51799abb7def82"
+        },
+        "questions": {
+          "path": "data/diagnostics/runs/20260905T053543.673335Z-f00fc4d7cd564e149d77d486889236d8/dataset/questions.json",
+          "sha256": "f1265203baa095d321d5cc413c5d52e98c740ca95de6db05e1c38f68f7a82112"
+        }
+      },
+      "human_review": "pending"
+    },
+    {
+      "label": "sol_smoke",
+      "run_id": "20260905T054330.959099Z-29382dea8325415290aaaa0bd0ef2627",
+      "code_sha": "882a38578fbd7931506ca890b40bed2825653934",
+      "code_dirty": false,
+      "pipeline_versions": [
+        "evidence-qa-v1"
+      ],
+      "prompt_versions": [
+        {
+          "generate": "evidence-qa-v1",
+          "query": "evidence-qa-v1",
+          "verify": "evidence-qa-v1"
+        }
+      ],
+      "model_configuration": [
+        {
+          "model_name": "gpt-5.6-sol",
+          "profile": "openai",
+          "max_output_tokens": 4096,
+          "output_token_parameter": "max_completion_tokens",
+          "reasoning_effort": "none",
+          "response_format": "json_object",
+          "temperature": null,
+          "thinking": "not_sent",
+          "timeout_seconds": 45.0
+        }
+      ],
+      "code_file_sha256": {
+        "scripts/evaluate_development.py": "3254d30073afc1172c1f52a9134ec3922510a99338c8f0d900f301964f75a112",
+        "src/papertrail/qa.py": "5d2d71ab07b2ded541382f6b1ee422349558b32d1703ee8e90c8d8ec680be873",
+        "src/papertrail/model.py": "32c486c2fc09b136edf24a4bc92d7f998f23069c01d6366b5a58e2d1cbcedfa8",
+        "src/papertrail/retrieval.py": "57708baa48750616789886d31b1cd0389bd324d1c8f058a6931b283df1aaa962",
+        "src/papertrail/budget.py": "083bb35c50f68696adb2e3c03db43fcaf5e74e75fdd00673aab94a4951b66180"
+      },
+      "retrieval_versions": [
+        "bm25-v1-k1-1.5-b-0.75"
+      ],
+      "chunk_versions": [
+        "page-char-v1-1400-200"
+      ],
+      "retrieval_parameters": [
+        {
+          "max_chars": 20000,
+          "top_k": 12
+        }
+      ],
+      "budget_modes_recorded": [
+        "provider_quota"
+      ],
+      "question_count": 1,
+      "application_statuses": {
+        "answered": 1
+      },
+      "status_matches_expected": 1,
+      "expected_answerable_results": {
+        "answered": 1
+      },
+      "expected_insufficient_results": {},
+      "question_statuses": {
+        "react-01": "answered"
+      },
+      "returned_citations": 4,
+      "returned_claims": 2,
+      "returned_citations_pass_existence_and_ownership": true,
+      "questions_with_returned_citations": 1,
+      "elapsed_seconds": {
+        "per_question_wall": {
+          "count": 1,
+          "sum": 20.767,
+          "median": 20.767,
+          "p95": 20.767,
+          "min": 20.767,
+          "max": 20.767
+        },
+        "application_processing": {
+          "count": 1,
+          "sum": 20.47,
+          "median": 20.47,
+          "p95": 20.47,
+          "min": 20.47,
+          "max": 20.47
+        },
+        "model_call_elapsed_sum": 20.386,
+        "run_wall_including_preparation_uploads": 22.027,
+        "p95_method": "Linear interpolation, rank (n-1)*0.95"
+      },
+      "model_calls": 3,
+      "tokens": {
+        "prompt_tokens": 6475,
+        "completion_tokens": 639,
+        "total_tokens": 7114
+      },
+      "unknown_usage_calls": 0,
+      "fees": {
+        "known_priced_call_count": 0,
+        "unknown_cost_calls": 3,
+        "known_cost_subtotals": {},
+        "estimated_total": null,
+        "status": "unknown_total"
+      },
+      "retrieval_anchor_comparison": {
+        "dataset_answerable_questions": 10,
+        "dataset_reference_anchors": 16,
+        "selected_answerable_questions": 1,
+        "selected_reference_anchors": 1,
+        "insufficient_questions_excluded": 0,
+        "raw_chinese": {
+          "measured_questions": 1,
+          "anchor_hits": 0,
+          "reference_anchors": 1,
+          "micro_anchor_recall": 0.0,
+          "questions_with_any_anchor_hit": 0,
+          "questions_with_all_anchors_hit": 0
+        },
+        "query_expanded": {
+          "measured_questions": 1,
+          "anchor_hits": 1,
+          "reference_anchors": 1,
+          "micro_anchor_recall": 1.0,
+          "questions_with_any_anchor_hit": 1,
+          "questions_with_all_anchors_hit": 1
+        }
+      },
+      "raw_artifacts": {
+        "directory": "data/diagnostics/runs/20260905T054330.959099Z-29382dea8325415290aaaa0bd0ef2627",
+        "checksum_manifest": {
+          "path": "data/diagnostics/runs/20260905T054330.959099Z-29382dea8325415290aaaa0bd0ef2627/artifacts.sha256",
+          "sha256": "116c1d4b4e348eae32659d61d19a7d8505e5d3f253d897b50f03cb6d665cc1dd",
+          "entries_verified": 19,
+          "all_match": true
+        },
+        "summary": {
+          "path": "data/diagnostics/runs/20260905T054330.959099Z-29382dea8325415290aaaa0bd0ef2627/summary.json",
+          "sha256": "5e354f6e8e34b3451ef5b3713eeeb5638e4bef0bddca3f0d16d281ed1eaabbf0"
+        },
+        "invocation": {
+          "path": "data/diagnostics/runs/20260905T054330.959099Z-29382dea8325415290aaaa0bd0ef2627/invocation.json",
+          "sha256": "945e72ad43f175720afbf16a0ec11fa0c9c80cddc5eef07c4af85b318fdd2750"
+        },
+        "source_manifest": {
+          "path": "data/diagnostics/runs/20260905T054330.959099Z-29382dea8325415290aaaa0bd0ef2627/dataset/manifest.json",
+          "sha256": "876b348732b4047202f24e355f33b196ddbfde38841d03de6e51799abb7def82"
+        },
+        "questions": {
+          "path": "data/diagnostics/runs/20260905T054330.959099Z-29382dea8325415290aaaa0bd0ef2627/dataset/questions.json",
+          "sha256": "f1265203baa095d321d5cc413c5d52e98c740ca95de6db05e1c38f68f7a82112"
+        }
+      },
+      "human_review": "pending"
+    },
+    {
+      "label": "sol_full_v1",
+      "run_id": "20260905T054410.733675Z-f89d6cd3e52b468fa46510c25d923f15",
+      "code_sha": "882a38578fbd7931506ca890b40bed2825653934",
+      "code_dirty": false,
+      "pipeline_versions": [
+        "evidence-qa-v1"
+      ],
+      "prompt_versions": [
+        {
+          "generate": "evidence-qa-v1",
+          "query": "evidence-qa-v1",
+          "verify": "evidence-qa-v1"
+        }
+      ],
+      "model_configuration": [
+        {
+          "model_name": "gpt-5.6-sol",
+          "profile": "openai",
+          "max_output_tokens": 4096,
+          "output_token_parameter": "max_completion_tokens",
+          "reasoning_effort": "none",
+          "response_format": "json_object",
+          "temperature": null,
+          "thinking": "not_sent",
+          "timeout_seconds": 45.0
+        }
+      ],
+      "code_file_sha256": {
+        "scripts/evaluate_development.py": "3254d30073afc1172c1f52a9134ec3922510a99338c8f0d900f301964f75a112",
+        "src/papertrail/qa.py": "5d2d71ab07b2ded541382f6b1ee422349558b32d1703ee8e90c8d8ec680be873",
+        "src/papertrail/model.py": "32c486c2fc09b136edf24a4bc92d7f998f23069c01d6366b5a58e2d1cbcedfa8",
+        "src/papertrail/retrieval.py": "57708baa48750616789886d31b1cd0389bd324d1c8f058a6931b283df1aaa962",
+        "src/papertrail/budget.py": "083bb35c50f68696adb2e3c03db43fcaf5e74e75fdd00673aab94a4951b66180"
+      },
+      "retrieval_versions": [
+        "bm25-v1-k1-1.5-b-0.75"
+      ],
+      "chunk_versions": [
+        "page-char-v1-1400-200"
+      ],
+      "retrieval_parameters": [
+        {
+          "max_chars": 20000,
+          "top_k": 12
+        }
+      ],
+      "budget_modes_recorded": [
+        "provider_quota"
+      ],
+      "question_count": 15,
+      "application_statuses": {
+        "answered": 7,
+        "failed": 3,
+        "insufficient_evidence": 5
+      },
+      "status_matches_expected": 12,
+      "expected_answerable_results": {
+        "answered": 7,
+        "failed": 3
+      },
+      "expected_insufficient_results": {
+        "insufficient_evidence": 5
+      },
+      "question_statuses": {
+        "react-01": "answered",
+        "react-02": "answered",
+        "react-03": "failed",
+        "react-04": "answered",
+        "react-05": "insufficient_evidence",
+        "reflexion-01": "answered",
+        "reflexion-02": "answered",
+        "reflexion-03": "answered",
+        "reflexion-04": "insufficient_evidence",
+        "reflexion-05": "insufficient_evidence",
+        "toolformer-01": "failed",
+        "toolformer-02": "answered",
+        "toolformer-03": "failed",
+        "toolformer-04": "insufficient_evidence",
+        "toolformer-05": "insufficient_evidence"
+      },
+      "returned_citations": 16,
+      "returned_claims": 12,
+      "returned_citations_pass_existence_and_ownership": true,
+      "questions_with_returned_citations": 7,
+      "elapsed_seconds": {
+        "per_question_wall": {
+          "count": 15,
+          "sum": 247.02,
+          "median": 14.182,
+          "p95": 25.325,
+          "min": 9.496,
+          "max": 30.431
+        },
+        "application_processing": {
+          "count": 15,
+          "sum": 242.842,
+          "median": 13.709,
+          "p95": 25.248,
+          "min": 9.087,
+          "max": 30.297
+        },
+        "model_call_elapsed_sum": 241.727,
+        "run_wall_including_preparation_uploads": 248.454,
+        "p95_method": "Linear interpolation, rank (n-1)*0.95"
+      },
+      "model_calls": 37,
+      "tokens": {
+        "prompt_tokens": 88359,
+        "completion_tokens": 5366,
+        "total_tokens": 93725
+      },
+      "unknown_usage_calls": 0,
+      "fees": {
+        "known_priced_call_count": 0,
+        "unknown_cost_calls": 37,
+        "known_cost_subtotals": {},
+        "estimated_total": null,
+        "status": "unknown_total"
+      },
+      "retrieval_anchor_comparison": {
+        "dataset_answerable_questions": 10,
+        "dataset_reference_anchors": 16,
+        "selected_answerable_questions": 10,
+        "selected_reference_anchors": 16,
+        "insufficient_questions_excluded": 5,
+        "raw_chinese": {
+          "measured_questions": 10,
+          "anchor_hits": 10,
+          "reference_anchors": 16,
+          "micro_anchor_recall": 0.625,
+          "questions_with_any_anchor_hit": 6,
+          "questions_with_all_anchors_hit": 5
+        },
+        "query_expanded": {
+          "measured_questions": 10,
+          "anchor_hits": 15,
+          "reference_anchors": 16,
+          "micro_anchor_recall": 0.9375,
+          "questions_with_any_anchor_hit": 10,
+          "questions_with_all_anchors_hit": 9
+        }
+      },
+      "raw_artifacts": {
+        "directory": "data/diagnostics/runs/20260905T054410.733675Z-f89d6cd3e52b468fa46510c25d923f15",
+        "checksum_manifest": {
+          "path": "data/diagnostics/runs/20260905T054410.733675Z-f89d6cd3e52b468fa46510c25d923f15/artifacts.sha256",
+          "sha256": "42e9817a85d52ffac2139fa20380dedd3602c3e74f9bdf9c384d8f2241d8181a",
+          "entries_verified": 77,
+          "all_match": true
+        },
+        "summary": {
+          "path": "data/diagnostics/runs/20260905T054410.733675Z-f89d6cd3e52b468fa46510c25d923f15/summary.json",
+          "sha256": "97bad2d5c00155e382b080cfb1462d15db43a250933912cbf07a844faf7c1464"
+        },
+        "invocation": {
+          "path": "data/diagnostics/runs/20260905T054410.733675Z-f89d6cd3e52b468fa46510c25d923f15/invocation.json",
+          "sha256": "6af772b9ae32440aa1c212e840257e5b6dd83674435f7886a00781ec3e3c8f88"
+        },
+        "source_manifest": {
+          "path": "data/diagnostics/runs/20260905T054410.733675Z-f89d6cd3e52b468fa46510c25d923f15/dataset/manifest.json",
+          "sha256": "876b348732b4047202f24e355f33b196ddbfde38841d03de6e51799abb7def82"
+        },
+        "questions": {
+          "path": "data/diagnostics/runs/20260905T054410.733675Z-f89d6cd3e52b468fa46510c25d923f15/dataset/questions.json",
+          "sha256": "f1265203baa095d321d5cc413c5d52e98c740ca95de6db05e1c38f68f7a82112"
+        }
+      },
+      "human_review": "pending"
+    },
+    {
+      "label": "sol_full_v2",
+      "run_id": "20260905T055331.257280Z-2f26db5794a945f7b3be884f4a05da2b",
+      "code_sha": "7714554c149cd5a436f07e2364a5a53727ad7d0d",
+      "code_dirty": false,
+      "pipeline_versions": [
+        "evidence-qa-v2"
+      ],
+      "prompt_versions": [
+        {
+          "generate": "evidence-qa-v2",
+          "query": "evidence-qa-v2",
+          "verify": "evidence-qa-v2"
+        }
+      ],
+      "model_configuration": [
+        {
+          "model_name": "gpt-5.6-sol",
+          "profile": "openai",
+          "max_output_tokens": 4096,
+          "output_token_parameter": "max_completion_tokens",
+          "reasoning_effort": "none",
+          "response_format": "json_object",
+          "temperature": null,
+          "thinking": "not_sent",
+          "timeout_seconds": 45.0
+        }
+      ],
+      "code_file_sha256": {
+        "scripts/evaluate_development.py": "3254d30073afc1172c1f52a9134ec3922510a99338c8f0d900f301964f75a112",
+        "src/papertrail/qa.py": "97b8e133171801fe841d54449b75ed1b993ce6b77ecec5f91580413c9b8c1c44",
+        "src/papertrail/model.py": "32c486c2fc09b136edf24a4bc92d7f998f23069c01d6366b5a58e2d1cbcedfa8",
+        "src/papertrail/retrieval.py": "57708baa48750616789886d31b1cd0389bd324d1c8f058a6931b283df1aaa962",
+        "src/papertrail/budget.py": "3027fa92e3a4327ae61c28042e2d1001cc75e89a316c10d19a9b327ac9a78c73"
+      },
+      "retrieval_versions": [
+        "bm25-v1-k1-1.5-b-0.75"
+      ],
+      "chunk_versions": [
+        "page-char-v1-1400-200"
+      ],
+      "retrieval_parameters": [
+        {
+          "max_chars": 20000,
+          "top_k": 12
+        }
+      ],
+      "budget_modes_recorded": [
+        "provider_quota"
+      ],
+      "question_count": 15,
+      "application_statuses": {
+        "answered": 7,
+        "insufficient_evidence": 7,
+        "failed": 1
+      },
+      "status_matches_expected": 12,
+      "expected_answerable_results": {
+        "answered": 7,
+        "failed": 1,
+        "insufficient_evidence": 2
+      },
+      "expected_insufficient_results": {
+        "insufficient_evidence": 5
+      },
+      "question_statuses": {
+        "react-01": "answered",
+        "react-02": "answered",
+        "react-03": "answered",
+        "react-04": "answered",
+        "react-05": "insufficient_evidence",
+        "reflexion-01": "failed",
+        "reflexion-02": "answered",
+        "reflexion-03": "answered",
+        "reflexion-04": "insufficient_evidence",
+        "reflexion-05": "insufficient_evidence",
+        "toolformer-01": "insufficient_evidence",
+        "toolformer-02": "insufficient_evidence",
+        "toolformer-03": "answered",
+        "toolformer-04": "insufficient_evidence",
+        "toolformer-05": "insufficient_evidence"
+      },
+      "returned_citations": 10,
+      "returned_claims": 10,
+      "returned_citations_pass_existence_and_ownership": true,
+      "questions_with_returned_citations": 7,
+      "elapsed_seconds": {
+        "per_question_wall": {
+          "count": 15,
+          "sum": 220.144,
+          "median": 13.575,
+          "p95": 22.613,
+          "min": 7.85,
+          "max": 27.957
+        },
+        "application_processing": {
+          "count": 15,
+          "sum": 216.268,
+          "median": 13.31,
+          "p95": 22.428,
+          "min": 7.736,
+          "max": 27.775
+        },
+        "model_call_elapsed_sum": 215.104,
+        "run_wall_including_preparation_uploads": 221.632,
+        "p95_method": "Linear interpolation, rank (n-1)*0.95"
+      },
+      "model_calls": 39,
+      "tokens": {
+        "prompt_tokens": 89692,
+        "completion_tokens": 5786,
+        "total_tokens": 95478
+      },
+      "unknown_usage_calls": 0,
+      "fees": {
+        "known_priced_call_count": 0,
+        "unknown_cost_calls": 39,
+        "known_cost_subtotals": {},
+        "estimated_total": null,
+        "status": "unknown_total"
+      },
+      "retrieval_anchor_comparison": {
+        "dataset_answerable_questions": 10,
+        "dataset_reference_anchors": 16,
+        "selected_answerable_questions": 10,
+        "selected_reference_anchors": 16,
+        "insufficient_questions_excluded": 5,
+        "raw_chinese": {
+          "measured_questions": 10,
+          "anchor_hits": 10,
+          "reference_anchors": 16,
+          "micro_anchor_recall": 0.625,
+          "questions_with_any_anchor_hit": 6,
+          "questions_with_all_anchors_hit": 5
+        },
+        "query_expanded": {
+          "measured_questions": 10,
+          "anchor_hits": 15,
+          "reference_anchors": 16,
+          "micro_anchor_recall": 0.9375,
+          "questions_with_any_anchor_hit": 10,
+          "questions_with_all_anchors_hit": 9
+        }
+      },
+      "raw_artifacts": {
+        "directory": "data/diagnostics/runs/20260905T055331.257280Z-2f26db5794a945f7b3be884f4a05da2b",
+        "checksum_manifest": {
+          "path": "data/diagnostics/runs/20260905T055331.257280Z-2f26db5794a945f7b3be884f4a05da2b/artifacts.sha256",
+          "sha256": "682fb46c8fe95f33135f1a83c940bff0909b7b0c7126f98fc8e2fb3625594b4d",
+          "entries_verified": 77,
+          "all_match": true
+        },
+        "summary": {
+          "path": "data/diagnostics/runs/20260905T055331.257280Z-2f26db5794a945f7b3be884f4a05da2b/summary.json",
+          "sha256": "caa65f6c5b2fe7829fd6350da7aec11960ee2087ada60a37ad2fc11dac3abab7"
+        },
+        "invocation": {
+          "path": "data/diagnostics/runs/20260905T055331.257280Z-2f26db5794a945f7b3be884f4a05da2b/invocation.json",
+          "sha256": "69d6b5c8f56b3d7c3673c7ec5b26b92c95129c7fb208a1b2be0f6c0d6ce75872"
+        },
+        "source_manifest": {
+          "path": "data/diagnostics/runs/20260905T055331.257280Z-2f26db5794a945f7b3be884f4a05da2b/dataset/manifest.json",
+          "sha256": "876b348732b4047202f24e355f33b196ddbfde38841d03de6e51799abb7def82"
+        },
+        "questions": {
+          "path": "data/diagnostics/runs/20260905T055331.257280Z-2f26db5794a945f7b3be884f4a05da2b/dataset/questions.json",
+          "sha256": "f1265203baa095d321d5cc413c5d52e98c740ca95de6db05e1c38f68f7a82112"
+        }
+      },
+      "human_review": "pending"
+    },
+    {
+      "label": "sol_full_v3",
+      "run_id": "20260905T060149.314665Z-cda725c451624134b44e29bcd1251694",
+      "code_sha": "314d9f182f90cf6e77a32c18340172091b4ee62e",
+      "code_dirty": false,
+      "pipeline_versions": [
+        "evidence-qa-v3"
+      ],
+      "prompt_versions": [
+        {
+          "generate": "evidence-qa-v3",
+          "query": "evidence-qa-v3",
+          "verify": "evidence-qa-v3"
+        }
+      ],
+      "model_configuration": [
+        {
+          "model_name": "gpt-5.6-sol",
+          "profile": "openai",
+          "max_output_tokens": 4096,
+          "output_token_parameter": "max_completion_tokens",
+          "reasoning_effort": "none",
+          "response_format": "json_object",
+          "temperature": null,
+          "thinking": "not_sent",
+          "timeout_seconds": 45.0
+        }
+      ],
+      "code_file_sha256": {
+        "scripts/evaluate_development.py": "3254d30073afc1172c1f52a9134ec3922510a99338c8f0d900f301964f75a112",
+        "src/papertrail/qa.py": "630647a6ab216372e638a6b1b31af379a016399d067e7c8b9a6ab342796e44f2",
+        "src/papertrail/model.py": "32c486c2fc09b136edf24a4bc92d7f998f23069c01d6366b5a58e2d1cbcedfa8",
+        "src/papertrail/retrieval.py": "57708baa48750616789886d31b1cd0389bd324d1c8f058a6931b283df1aaa962",
+        "src/papertrail/budget.py": "3027fa92e3a4327ae61c28042e2d1001cc75e89a316c10d19a9b327ac9a78c73"
+      },
+      "retrieval_versions": [
+        "bm25-v1-k1-1.5-b-0.75"
+      ],
+      "chunk_versions": [
+        "page-char-v1-1400-200"
+      ],
+      "retrieval_parameters": [
+        {
+          "max_chars": 20000,
+          "top_k": 12
+        }
+      ],
+      "budget_modes_recorded": [
+        "provider_quota"
+      ],
+      "question_count": 15,
+      "application_statuses": {
+        "answered": 10,
+        "insufficient_evidence": 5
+      },
+      "status_matches_expected": 15,
+      "expected_answerable_results": {
+        "answered": 10
+      },
+      "expected_insufficient_results": {
+        "insufficient_evidence": 5
+      },
+      "question_statuses": {
+        "react-01": "answered",
+        "react-02": "answered",
+        "react-03": "answered",
+        "react-04": "answered",
+        "react-05": "insufficient_evidence",
+        "reflexion-01": "answered",
+        "reflexion-02": "answered",
+        "reflexion-03": "answered",
+        "reflexion-04": "insufficient_evidence",
+        "reflexion-05": "insufficient_evidence",
+        "toolformer-01": "answered",
+        "toolformer-02": "answered",
+        "toolformer-03": "answered",
+        "toolformer-04": "insufficient_evidence",
+        "toolformer-05": "insufficient_evidence"
+      },
+      "returned_citations": 17,
+      "returned_claims": 15,
+      "returned_citations_pass_existence_and_ownership": true,
+      "questions_with_returned_citations": 10,
+      "elapsed_seconds": {
+        "per_question_wall": {
+          "count": 15,
+          "sum": 234.982,
+          "median": 15.045,
+          "p95": 26.197,
+          "min": 6.782,
+          "max": 26.481
+        },
+        "application_processing": {
+          "count": 15,
+          "sum": 230.249,
+          "median": 14.638,
+          "p95": 25.991,
+          "min": 6.366,
+          "max": 25.996
+        },
+        "model_call_elapsed_sum": 229.172,
+        "run_wall_including_preparation_uploads": 236.434,
+        "p95_method": "Linear interpolation, rank (n-1)*0.95"
+      },
+      "model_calls": 40,
+      "tokens": {
+        "prompt_tokens": 93521,
+        "completion_tokens": 4449,
+        "total_tokens": 97970
+      },
+      "unknown_usage_calls": 0,
+      "fees": {
+        "known_priced_call_count": 0,
+        "unknown_cost_calls": 40,
+        "known_cost_subtotals": {},
+        "estimated_total": null,
+        "status": "unknown_total"
+      },
+      "retrieval_anchor_comparison": {
+        "dataset_answerable_questions": 10,
+        "dataset_reference_anchors": 16,
+        "selected_answerable_questions": 10,
+        "selected_reference_anchors": 16,
+        "insufficient_questions_excluded": 5,
+        "raw_chinese": {
+          "measured_questions": 10,
+          "anchor_hits": 10,
+          "reference_anchors": 16,
+          "micro_anchor_recall": 0.625,
+          "questions_with_any_anchor_hit": 6,
+          "questions_with_all_anchors_hit": 5
+        },
+        "query_expanded": {
+          "measured_questions": 10,
+          "anchor_hits": 15,
+          "reference_anchors": 16,
+          "micro_anchor_recall": 0.9375,
+          "questions_with_any_anchor_hit": 10,
+          "questions_with_all_anchors_hit": 9
+        }
+      },
+      "raw_artifacts": {
+        "directory": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694",
+        "checksum_manifest": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/artifacts.sha256",
+          "sha256": "935e7d87dca5466cb034edef24020176e376c2441fe511e148ecefe37ca02353",
+          "entries_verified": 77,
+          "all_match": true
+        },
+        "summary": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/summary.json",
+          "sha256": "5013f2f4ebeb0be8be89b526c39a81e60785ba2587190d09cb0ea2f141eee8c5"
+        },
+        "invocation": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/invocation.json",
+          "sha256": "9b3dba70e3adb7e1333ec036fc7704ce7d29f213b993cb7f20536508c3a8652a"
+        },
+        "source_manifest": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/dataset/manifest.json",
+          "sha256": "876b348732b4047202f24e355f33b196ddbfde38841d03de6e51799abb7def82"
+        },
+        "questions": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/dataset/questions.json",
+          "sha256": "f1265203baa095d321d5cc413c5d52e98c740ca95de6db05e1c38f68f7a82112"
+        }
+      },
+      "human_review": "pending"
+    }
+  ],
+  "current_v3": {
+    "run_id": "20260905T060149.314665Z-cda725c451624134b44e29bcd1251694",
+    "core_code_sha": "314d9f182f90cf6e77a32c18340172091b4ee62e",
+    "pipeline_version": "evidence-qa-v3",
+    "question_count": 15,
+    "application_statuses": {
+      "answered": 10,
+      "insufficient_evidence": 5
+    },
+    "ai_review_summary": {
+      "complete_supported_answers": 9,
+      "partial_expected_point_coverage": 1,
+      "appropriate_insufficiency": 5,
+      "delivered_claims_supported": 15,
+      "delivered_claims_reviewed": 15,
+      "citation_occurrences_reviewed": 17,
+      "strict_questions_passed": 14,
+      "strict_questions_total": 15,
+      "partial_question_id": "react-03",
+      "not_a_general_accuracy_estimate": true
+    },
+    "ai_review_limitations": [
+      "Reviews are AI checks, not user acceptance.",
+      "The ReAct reviewer previously prepared AI gold, so its review is not blinded.",
+      "The same development questions informed improvements; results are not held-out performance.",
+      "ReAct-03 delivered claims are supported, but the answer omits the frozen-model and manually composed trajectory conditions."
+    ],
+    "review_artifacts": {
+      "react": {
+        "path": "output/model-gateway/review-react-v3.json",
+        "sha256": "802c9807fae511a7c25c4b593d79a2154e478f2623ffda439c92be58c5f35d59"
+      },
+      "reflexion": {
+        "path": "output/model-gateway/review-reflexion-v3.json",
+        "sha256": "e47a0bca9cbf929dc605b772bbb92deebb439cf0e9c835d53af9ce777ef5ec6a"
+      },
+      "toolformer": {
+        "path": "output/model-gateway/review-toolformer-v3.json",
+        "sha256": "5fad603c23f2adfae640340016613e97b8ba42efbb0741b13f525da8bee00120"
+      }
+    },
+    "questions": [
+      {
+        "question_id": "react-01",
+        "paper_id": "react",
+        "expected_status": "answered",
+        "status": "answered",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 26.075,
+          "application": 25.996
+        },
+        "model_calls": 3,
+        "tokens": {
+          "prompt_tokens": 6508,
+          "completion_tokens": 489,
+          "total_tokens": 6997
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 3,
+        "returned_citations": 2,
+        "returned_claims": 2,
+        "citation_pages_1_based": [
+          1,
+          2
+        ],
+        "existence_and_ownership_check": "passed",
+        "pipeline_support_status": "ai_checked",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "measured",
+            "hit_count": 0,
+            "reference_count": 1,
+            "anchor_recall": 0.0
+          },
+          "query_expanded": {
+            "status": "measured",
+            "hit_count": 1,
+            "reference_count": 1,
+            "anchor_recall": 1.0
+          }
+        },
+        "ai_source_review": {
+          "result": "complete_supported_answer",
+          "artifact_paper_id": "react",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          },
+          {
+            "stage": "verify",
+            "prompt_sha256": "b3a0eec92326d01efffd917c371f91ca0c4638d00ea6edec8f492a8330d1f86c"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/react-01.result.json",
+          "sha256": "3453a72ade2d05d5e384a98509b47c15c2efd1287dbc09fb9ae59b229845a0c2"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "react-02",
+        "paper_id": "react",
+        "expected_status": "answered",
+        "status": "answered",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 13.96,
+          "application": 13.74
+        },
+        "model_calls": 3,
+        "tokens": {
+          "prompt_tokens": 6015,
+          "completion_tokens": 264,
+          "total_tokens": 6279
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 3,
+        "returned_citations": 1,
+        "returned_claims": 1,
+        "citation_pages_1_based": [
+          4
+        ],
+        "existence_and_ownership_check": "passed",
+        "pipeline_support_status": "ai_checked",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "measured",
+            "hit_count": 2,
+            "reference_count": 2,
+            "anchor_recall": 1.0
+          },
+          "query_expanded": {
+            "status": "measured",
+            "hit_count": 2,
+            "reference_count": 2,
+            "anchor_recall": 1.0
+          }
+        },
+        "ai_source_review": {
+          "result": "complete_supported_answer",
+          "artifact_paper_id": "react",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          },
+          {
+            "stage": "verify",
+            "prompt_sha256": "b3a0eec92326d01efffd917c371f91ca0c4638d00ea6edec8f492a8330d1f86c"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/react-02.result.json",
+          "sha256": "747a5c67de6ce97e92c9ec2e9b5b69db5389d9a076fe37dca9e0ec18020027fc"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "react-03",
+        "paper_id": "react",
+        "expected_status": "answered",
+        "status": "answered",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 17.171,
+          "application": 16.712
+        },
+        "model_calls": 3,
+        "tokens": {
+          "prompt_tokens": 6405,
+          "completion_tokens": 387,
+          "total_tokens": 6792
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 3,
+        "returned_citations": 2,
+        "returned_claims": 2,
+        "citation_pages_1_based": [
+          4,
+          5
+        ],
+        "existence_and_ownership_check": "passed",
+        "pipeline_support_status": "ai_checked",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "measured",
+            "hit_count": 1,
+            "reference_count": 2,
+            "anchor_recall": 0.5
+          },
+          "query_expanded": {
+            "status": "measured",
+            "hit_count": 1,
+            "reference_count": 2,
+            "anchor_recall": 0.5
+          }
+        },
+        "ai_source_review": {
+          "result": "partial_expected_point_coverage",
+          "artifact_paper_id": "react",
+          "human_review": "pending",
+          "remaining_omissions": [
+            "Model is frozen in main prompting setup, not explicitly stated in delivered answer.",
+            "Few-shot trajectories are manually composed; stated in actual quote but omitted from delivered claim text."
+          ]
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          },
+          {
+            "stage": "verify",
+            "prompt_sha256": "b3a0eec92326d01efffd917c371f91ca0c4638d00ea6edec8f492a8330d1f86c"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/react-03.result.json",
+          "sha256": "ea32779265707d643b2c30bb403f6724c9156d9cd90855decc30e5bdd3804407"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "react-04",
+        "paper_id": "react",
+        "expected_status": "answered",
+        "status": "answered",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 18.283,
+          "application": 17.931
+        },
+        "model_calls": 3,
+        "tokens": {
+          "prompt_tokens": 6937,
+          "completion_tokens": 291,
+          "total_tokens": 7228
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 3,
+        "returned_citations": 1,
+        "returned_claims": 1,
+        "citation_pages_1_based": [
+          6
+        ],
+        "existence_and_ownership_check": "passed",
+        "pipeline_support_status": "ai_checked",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "measured",
+            "hit_count": 0,
+            "reference_count": 1,
+            "anchor_recall": 0.0
+          },
+          "query_expanded": {
+            "status": "measured",
+            "hit_count": 1,
+            "reference_count": 1,
+            "anchor_recall": 1.0
+          }
+        },
+        "ai_source_review": {
+          "result": "complete_supported_answer",
+          "artifact_paper_id": "react",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          },
+          {
+            "stage": "verify",
+            "prompt_sha256": "b3a0eec92326d01efffd917c371f91ca0c4638d00ea6edec8f492a8330d1f86c"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/react-04.result.json",
+          "sha256": "612e53bc906a93a6b732706a5a12fc78375c60b39a79d287ec59ea60e8328801"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "react-05",
+        "paper_id": "react",
+        "expected_status": "insufficient_evidence",
+        "status": "insufficient_evidence",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 10.39,
+          "application": 9.825
+        },
+        "model_calls": 2,
+        "tokens": {
+          "prompt_tokens": 5414,
+          "completion_tokens": 154,
+          "total_tokens": 5568
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 2,
+        "returned_citations": 0,
+        "returned_claims": 0,
+        "citation_pages_1_based": [],
+        "existence_and_ownership_check": "not_applicable_no_returned_citations",
+        "pipeline_support_status": "not_applicable",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "not_applicable_no_reference_evidence",
+            "hit_count": null,
+            "reference_count": 0,
+            "anchor_recall": null
+          },
+          "query_expanded": {
+            "status": "not_applicable_no_reference_evidence",
+            "hit_count": null,
+            "reference_count": 0,
+            "anchor_recall": null
+          }
+        },
+        "ai_source_review": {
+          "result": "appropriate_insufficiency",
+          "artifact_paper_id": "react",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/react-05.result.json",
+          "sha256": "9454bdfd7233a3f5bb6a9fd46dd1abfe54fa4723951aeb296ce374472397bc9c"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "reflexion-01",
+        "paper_id": "reflexion",
+        "expected_status": "answered",
+        "status": "answered",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 23.35,
+          "application": 22.993
+        },
+        "model_calls": 3,
+        "tokens": {
+          "prompt_tokens": 6153,
+          "completion_tokens": 538,
+          "total_tokens": 6691
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 3,
+        "returned_citations": 4,
+        "returned_claims": 2,
+        "citation_pages_1_based": [
+          4,
+          5
+        ],
+        "existence_and_ownership_check": "passed",
+        "pipeline_support_status": "ai_checked",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "measured",
+            "hit_count": 2,
+            "reference_count": 2,
+            "anchor_recall": 1.0
+          },
+          "query_expanded": {
+            "status": "measured",
+            "hit_count": 2,
+            "reference_count": 2,
+            "anchor_recall": 1.0
+          }
+        },
+        "ai_source_review": {
+          "result": "complete_supported_answer",
+          "artifact_paper_id": "reflexion",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          },
+          {
+            "stage": "verify",
+            "prompt_sha256": "b3a0eec92326d01efffd917c371f91ca0c4638d00ea6edec8f492a8330d1f86c"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/reflexion-01.result.json",
+          "sha256": "d367783d9e89fa5e841af94e421222e2fb3c53f6c0c6fb10655ead9f10562aac"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "reflexion-02",
+        "paper_id": "reflexion",
+        "expected_status": "answered",
+        "status": "answered",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 14.56,
+          "application": 14.203
+        },
+        "model_calls": 3,
+        "tokens": {
+          "prompt_tokens": 6262,
+          "completion_tokens": 305,
+          "total_tokens": 6567
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 3,
+        "returned_citations": 1,
+        "returned_claims": 1,
+        "citation_pages_1_based": [
+          5
+        ],
+        "existence_and_ownership_check": "passed",
+        "pipeline_support_status": "ai_checked",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "measured",
+            "hit_count": 2,
+            "reference_count": 2,
+            "anchor_recall": 1.0
+          },
+          "query_expanded": {
+            "status": "measured",
+            "hit_count": 2,
+            "reference_count": 2,
+            "anchor_recall": 1.0
+          }
+        },
+        "ai_source_review": {
+          "result": "complete_supported_answer",
+          "artifact_paper_id": "reflexion",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          },
+          {
+            "stage": "verify",
+            "prompt_sha256": "b3a0eec92326d01efffd917c371f91ca0c4638d00ea6edec8f492a8330d1f86c"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/reflexion-02.result.json",
+          "sha256": "d6a64f18e2c7e9f7f1c9c89a6ad7c0338ff4c86ea79c0046ed7fc82da11d0111"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "reflexion-03",
+        "paper_id": "reflexion",
+        "expected_status": "answered",
+        "status": "answered",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 15.58,
+          "application": 15.283
+        },
+        "model_calls": 3,
+        "tokens": {
+          "prompt_tokens": 5603,
+          "completion_tokens": 287,
+          "total_tokens": 5890
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 3,
+        "returned_citations": 1,
+        "returned_claims": 1,
+        "citation_pages_1_based": [
+          9
+        ],
+        "existence_and_ownership_check": "passed",
+        "pipeline_support_status": "ai_checked",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "measured",
+            "hit_count": 0,
+            "reference_count": 1,
+            "anchor_recall": 0.0
+          },
+          "query_expanded": {
+            "status": "measured",
+            "hit_count": 1,
+            "reference_count": 1,
+            "anchor_recall": 1.0
+          }
+        },
+        "ai_source_review": {
+          "result": "complete_supported_answer",
+          "artifact_paper_id": "reflexion",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          },
+          {
+            "stage": "verify",
+            "prompt_sha256": "b3a0eec92326d01efffd917c371f91ca0c4638d00ea6edec8f492a8330d1f86c"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/reflexion-03.result.json",
+          "sha256": "07122b016f651456f896c968329b48d9eb12948fe2cbea7892ea2d7cae9c1eda"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "reflexion-04",
+        "paper_id": "reflexion",
+        "expected_status": "insufficient_evidence",
+        "status": "insufficient_evidence",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 7.8,
+          "application": 7.694
+        },
+        "model_calls": 2,
+        "tokens": {
+          "prompt_tokens": 5142,
+          "completion_tokens": 128,
+          "total_tokens": 5270
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 2,
+        "returned_citations": 0,
+        "returned_claims": 0,
+        "citation_pages_1_based": [],
+        "existence_and_ownership_check": "not_applicable_no_returned_citations",
+        "pipeline_support_status": "not_applicable",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "not_applicable_no_reference_evidence",
+            "hit_count": null,
+            "reference_count": 0,
+            "anchor_recall": null
+          },
+          "query_expanded": {
+            "status": "not_applicable_no_reference_evidence",
+            "hit_count": null,
+            "reference_count": 0,
+            "anchor_recall": null
+          }
+        },
+        "ai_source_review": {
+          "result": "appropriate_insufficiency",
+          "artifact_paper_id": "reflexion",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/reflexion-04.result.json",
+          "sha256": "24b2ebccc7e78564eca2937670aa08a104407403f5c0320a126eac453dfdfc76"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "reflexion-05",
+        "paper_id": "reflexion",
+        "expected_status": "insufficient_evidence",
+        "status": "insufficient_evidence",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 6.782,
+          "application": 6.366
+        },
+        "model_calls": 2,
+        "tokens": {
+          "prompt_tokens": 5555,
+          "completion_tokens": 78,
+          "total_tokens": 5633
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 2,
+        "returned_citations": 0,
+        "returned_claims": 0,
+        "citation_pages_1_based": [],
+        "existence_and_ownership_check": "not_applicable_no_returned_citations",
+        "pipeline_support_status": "not_applicable",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "not_applicable_no_reference_evidence",
+            "hit_count": null,
+            "reference_count": 0,
+            "anchor_recall": null
+          },
+          "query_expanded": {
+            "status": "not_applicable_no_reference_evidence",
+            "hit_count": null,
+            "reference_count": 0,
+            "anchor_recall": null
+          }
+        },
+        "ai_source_review": {
+          "result": "appropriate_insufficiency",
+          "artifact_paper_id": "reflexion",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/reflexion-05.result.json",
+          "sha256": "bb7bbec3f3261bbbb4dbbb7172ef7a2d06c8c7e41adf3903b9c58eb6ad190875"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "toolformer-01",
+        "paper_id": "toolformer",
+        "expected_status": "answered",
+        "status": "answered",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 21.816,
+          "application": 21.462
+        },
+        "model_calls": 3,
+        "tokens": {
+          "prompt_tokens": 6843,
+          "completion_tokens": 526,
+          "total_tokens": 7369
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 3,
+        "returned_citations": 2,
+        "returned_claims": 2,
+        "citation_pages_1_based": [
+          1,
+          2
+        ],
+        "existence_and_ownership_check": "passed",
+        "pipeline_support_status": "ai_checked",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "measured",
+            "hit_count": 2,
+            "reference_count": 2,
+            "anchor_recall": 1.0
+          },
+          "query_expanded": {
+            "status": "measured",
+            "hit_count": 2,
+            "reference_count": 2,
+            "anchor_recall": 1.0
+          }
+        },
+        "ai_source_review": {
+          "result": "complete_supported_answer",
+          "artifact_paper_id": "toolformer",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          },
+          {
+            "stage": "verify",
+            "prompt_sha256": "b3a0eec92326d01efffd917c371f91ca0c4638d00ea6edec8f492a8330d1f86c"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/toolformer-01.result.json",
+          "sha256": "600b2d0e4a922e9058e234ba64e5bdbe9dd3c69820579a8a307d1c205c3e4adf"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "toolformer-02",
+        "paper_id": "toolformer",
+        "expected_status": "answered",
+        "status": "answered",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 26.481,
+          "application": 25.989
+        },
+        "model_calls": 3,
+        "tokens": {
+          "prompt_tokens": 7374,
+          "completion_tokens": 543,
+          "total_tokens": 7917
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 3,
+        "returned_citations": 2,
+        "returned_claims": 2,
+        "citation_pages_1_based": [
+          3
+        ],
+        "existence_and_ownership_check": "passed",
+        "pipeline_support_status": "ai_checked",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "measured",
+            "hit_count": 0,
+            "reference_count": 2,
+            "anchor_recall": 0.0
+          },
+          "query_expanded": {
+            "status": "measured",
+            "hit_count": 2,
+            "reference_count": 2,
+            "anchor_recall": 1.0
+          }
+        },
+        "ai_source_review": {
+          "result": "complete_supported_answer",
+          "artifact_paper_id": "toolformer",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          },
+          {
+            "stage": "verify",
+            "prompt_sha256": "b3a0eec92326d01efffd917c371f91ca0c4638d00ea6edec8f492a8330d1f86c"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/toolformer-02.result.json",
+          "sha256": "40924df18d85600b9a37ab05e6971203b45a6f68540d9cda3f058faa576a2763"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "toolformer-03",
+        "paper_id": "toolformer",
+        "expected_status": "answered",
+        "status": "answered",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 15.045,
+          "application": 14.638
+        },
+        "model_calls": 3,
+        "tokens": {
+          "prompt_tokens": 6777,
+          "completion_tokens": 225,
+          "total_tokens": 7002
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 3,
+        "returned_citations": 1,
+        "returned_claims": 1,
+        "citation_pages_1_based": [
+          2
+        ],
+        "existence_and_ownership_check": "passed",
+        "pipeline_support_status": "ai_checked",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "measured",
+            "hit_count": 1,
+            "reference_count": 1,
+            "anchor_recall": 1.0
+          },
+          "query_expanded": {
+            "status": "measured",
+            "hit_count": 1,
+            "reference_count": 1,
+            "anchor_recall": 1.0
+          }
+        },
+        "ai_source_review": {
+          "result": "complete_supported_answer",
+          "artifact_paper_id": "toolformer",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          },
+          {
+            "stage": "verify",
+            "prompt_sha256": "b3a0eec92326d01efffd917c371f91ca0c4638d00ea6edec8f492a8330d1f86c"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/toolformer-03.result.json",
+          "sha256": "d49182aa0f85bf44751f69184c6f2b3479c37b18e03a370ce3f465d88195d75f"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "toolformer-04",
+        "paper_id": "toolformer",
+        "expected_status": "insufficient_evidence",
+        "status": "insufficient_evidence",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 8.31,
+          "application": 8.252
+        },
+        "model_calls": 2,
+        "tokens": {
+          "prompt_tokens": 6408,
+          "completion_tokens": 111,
+          "total_tokens": 6519
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 2,
+        "returned_citations": 0,
+        "returned_claims": 0,
+        "citation_pages_1_based": [],
+        "existence_and_ownership_check": "not_applicable_no_returned_citations",
+        "pipeline_support_status": "not_applicable",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "not_applicable_no_reference_evidence",
+            "hit_count": null,
+            "reference_count": 0,
+            "anchor_recall": null
+          },
+          "query_expanded": {
+            "status": "not_applicable_no_reference_evidence",
+            "hit_count": null,
+            "reference_count": 0,
+            "anchor_recall": null
+          }
+        },
+        "ai_source_review": {
+          "result": "appropriate_insufficiency",
+          "artifact_paper_id": "toolformer",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/toolformer-04.result.json",
+          "sha256": "27e3e77a25a79415beee186a81f9e5b7c14c06cb783d9f4f3f5cef48fbf9ef41"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      },
+      {
+        "question_id": "toolformer-05",
+        "paper_id": "toolformer",
+        "expected_status": "insufficient_evidence",
+        "status": "insufficient_evidence",
+        "status_matches_expected": true,
+        "error_code": null,
+        "elapsed_seconds": {
+          "wall": 9.379,
+          "application": 9.165
+        },
+        "model_calls": 2,
+        "tokens": {
+          "prompt_tokens": 6125,
+          "completion_tokens": 123,
+          "total_tokens": 6248
+        },
+        "unknown_usage_calls": 0,
+        "estimated_cost_total": null,
+        "unknown_cost_calls": 2,
+        "returned_citations": 0,
+        "returned_claims": 0,
+        "citation_pages_1_based": [],
+        "existence_and_ownership_check": "not_applicable_no_returned_citations",
+        "pipeline_support_status": "not_applicable",
+        "retrieval_anchors": {
+          "raw_chinese": {
+            "status": "not_applicable_no_reference_evidence",
+            "hit_count": null,
+            "reference_count": 0,
+            "anchor_recall": null
+          },
+          "query_expanded": {
+            "status": "not_applicable_no_reference_evidence",
+            "hit_count": null,
+            "reference_count": 0,
+            "anchor_recall": null
+          }
+        },
+        "ai_source_review": {
+          "result": "appropriate_insufficiency",
+          "artifact_paper_id": "toolformer",
+          "human_review": "pending"
+        },
+        "call_prompt_sha256": [
+          {
+            "stage": "query",
+            "prompt_sha256": "04f8b35f1fb4c00bc52537640b6120a43b0cf269bf660330dc84983ec81ca970"
+          },
+          {
+            "stage": "generate",
+            "prompt_sha256": "2634e9cdc2630f3a132f1cda034b7dead8948ffc14e0c59995a705f7bc569eba"
+          }
+        ],
+        "raw_result": {
+          "path": "data/diagnostics/runs/20260905T060149.314665Z-cda725c451624134b44e29bcd1251694/questions/toolformer-05.result.json",
+          "sha256": "a9e7efb9e9b8696145d8256a707ab19fcf5dcb5cac969f578e37765fb8388a0f"
+        },
+        "history_identical_to_saved_result": true,
+        "human_review": "pending"
+      }
+    ],
+    "human_review": "pending",
+    "product_acceptance": "pending",
+    "learning_acceptance": "pending",
+    "original_P0_human_acceptance": "pending"
+  },
+  "listed_runs_totals": {
+    "model_calls": 121,
+    "tokens_known_subtotals": {
+      "prompt_tokens": 283407,
+      "completion_tokens": 17073,
+      "total_tokens": 300480
+    },
+    "unknown_usage_calls": 0,
+    "unknown_cost_calls": 119,
+    "known_cost_subtotals": {
+      "USD": "0.00776850"
+    },
+    "estimated_total": null,
+    "scope_note": "Only the five named diagnostic runs; excludes browser and other model calls, and is not the global ledger or remaining allowance."
+  },
+  "validation": {
+    "all_five_run_checksum_manifests_reverified": true,
+    "checksum_entries_verified": 269,
+    "per_run_status_call_token_citation_latency_sums_match": true,
+    "v3_review_result_hashes_and_statuses_match": true,
+    "linked_artifact_hashes_match_at_generation": true
+  }
+}
