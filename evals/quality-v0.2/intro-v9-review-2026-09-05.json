@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "review_source": "independent_ai",
+  "reviewed_at": "2026-09-05T13:04:13.283457+00:00",
+  "run_name": "20260905T124405.178139Z-7c29dee713ed4d6391866997512da523",
+  "run_path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/introduction-runs/20260905T124405.178139Z-7c29dee713ed4d6391866997512da523",
+  "run_code_sha": "a8398965132a495db48f26212e15c082f5fb5c98",
+  "core_code_sha": "a7914c71ec1ce21bd1cd631932ba732854cd3898",
+  "pipeline_version": "paper-introduction-v9",
+  "invocation_worktree_note": {
+    "dirty": true,
+    "status_porcelain": [
+      "?? evals/quality-v0.2/intro-v8-review-2026-09-05.json"
+    ],
+    "explanation": "Invocation recorded one untracked v8 review summary; no application-code change is listed in its status. Current worktree changes are not treated as the tested source."
+  },
+  "records": [
+    {
+      "paper": "react",
+      "task_id": "c01f8182-ae73-49f7-a0d2-ae3cff87e43a",
+      "application_status": "insufficient_evidence",
+      "published_introduction_present": false,
+      "scored_material": "attempt_2_unpublished_revised_candidate",
+      "candidate_units": 8,
+      "own_quote_complete": 7,
+      "own_quote_partial": 1,
+      "basis_appropriate": 8,
+      "own_quote_and_basis_both_complete": 7,
+      "independent_coverage_complete": 4,
+      "coverage_aspects": 5,
+      "blind_own_quote_complete": 8,
+      "blind_coverage_complete": 5,
+      "judgment_history_note": "盲评 8/8 支持、5/5 覆盖；对照后重核少样本术语施事范围，承认初判补进了未写出的“结构/格式”，修正为 7/8 支持、4/5 正确覆盖。旧盲评文件和 hash 保留。",
+      "all_basis_categories_used": {
+        "paper_statement": 8,
+        "author_interpretation": 0,
+        "teaching_example": 0,
+        "system_inference": 0
+      },
+      "unused_basis_branches_unexercised": true,
+      "application_final_support_true": 6,
+      "application_final_coverage_true": 5,
+      "final_citation_occurrences": 26,
+      "final_unique_chunks": 15,
+      "all_citation_identity_checks_passed": true,
+      "published_matches_final_candidate": null,
+      "necessary_issues": [
+        "少样本术语将环境观察纳入模型模仿对象，模仿谓词的施事范围缺乏支持，且影响术语角色的正确覆盖。初稿有“格式”，末稿删去；该术语并非首轮反馈要求修改的字段。",
+        "机制“逐步行动及任务结果”是任务层级概括，原句未声称所有任务统一结果形式。应用据此判 false，独立维持有据；不把这一分歧并入真实术语错误。",
+        "結果段自己的冻结/少样本/人工示例来源已补齐，任务和比较收窄至 ALFWorld/WebShop；密集/稀疏思考与思考或行动产物有明确自有来源。"
+      ],
+      "full_semantic_acceptance": false,
+      "model_calls": 4,
+      "elapsed_seconds": 165.386,
+      "prompt_tokens": 196264,
+      "completion_tokens": 7677,
+      "cost": null,
+      "cost_status": "unknown",
+      "terminal_sha256": "24e8459f2158e66b250c5e849db3c85f8f37db23519b7c3a1fe5ea1b5bd31c42",
+      "source_pages_sha256": "6e4c7b00dc4633b09f58d06f2dc5b6efe74696c7d956c4788f81a42698466809"
+    },
+    {
+      "paper": "reflexion",
+      "task_id": "ac23fefd-6c1f-43a9-bc75-1cf831c7c5f8",
+      "application_status": "answered",
+      "published_introduction_present": true,
+      "scored_material": "attempt_2_published_card",
+      "candidate_units": 8,
+      "own_quote_complete": 5,
+      "own_quote_partial": 3,
+      "basis_appropriate": 8,
+      "own_quote_and_basis_both_complete": 5,
+      "independent_coverage_complete": 5,
+      "coverage_aspects": 5,
+      "blind_own_quote_complete": 5,
+      "blind_coverage_complete": 5,
+      "judgment_history_note": "盲评与对照后均 5/8 支持、8/8 basis、5/5 覆盖；应用发布并判 8/8 支持，三处独立缺口保留。",
+      "all_basis_categories_used": {
+        "paper_statement": 8,
+        "author_interpretation": 0,
+        "teaching_example": 0,
+        "system_inference": 0
+      },
+      "unused_basis_branches_unexercised": true,
+      "application_final_support_true": 8,
+      "application_final_coverage_true": 5,
+      "final_citation_occurrences": 26,
+      "final_unique_chunks": 19,
+      "all_citation_identity_checks_passed": true,
+      "published_matches_final_candidate": true,
+      "necessary_issues": [
+        "problem 的“长过程中的”是较小措辞扩写，本项三块只支持错误归因，没有长轨迹限定；删除该限定或补自己的长轨迹来源。",
+        "Actor 的“根据当前状态观察”缺自己的明确定义来源 pti_79e1da242d36498f7a12433253c74e3c（物理第 4 页）；已附到机制不能借给术语。",
+        "记忆术语的“最近 1 至 3 条”本项只引用容量 1–3，不证明最近窗口；可删最近或附第 9 页 sliding-window 来源。此缺口相对 v8 为新增，但在 v9 初稿已存在，不误记为 v9 修订新增。",
+        "结果已写连续 12 次尝试中累计 130/134、模型/示例/规则和比较，旧作者解释混用已移除；停止条件分述正文与歧义 OR 算法，独立接受，未强制修正原文逻辑。"
+      ],
+      "full_semantic_acceptance": false,
+      "model_calls": 4,
+      "elapsed_seconds": 157.249,
+      "prompt_tokens": 102313,
+      "completion_tokens": 7896,
+      "cost": null,
+      "cost_status": "unknown",
+      "terminal_sha256": "317d7802ff11afcda82bed511cb93fc4cf2652464d5b537c40c0fed13e6a255c",
+      "source_pages_sha256": "ad3319862b4c31367402c0d09507bd2b0ff613cd5262df75540b9d5be8f8d067"
+    },
+    {
+      "paper": "toolformer",
+      "task_id": "40e78dc5-7884-467e-855a-f5d4c2edf925",
+      "application_status": "insufficient_evidence",
+      "published_introduction_present": false,
+      "scored_material": "attempt_2_unpublished_revised_candidate",
+      "candidate_units": 8,
+      "own_quote_complete": 6,
+      "own_quote_partial": 2,
+      "basis_appropriate": 8,
+      "own_quote_and_basis_both_complete": 6,
+      "independent_coverage_complete": 4,
+      "coverage_aspects": 5,
+      "blind_own_quote_complete": 7,
+      "blind_coverage_complete": 4,
+      "judgment_history_note": "盲评 7/8 支持；对照后重核 API tuple 定义，接受另一处 partial 为 6/8。先验 7/8 与改判理由均保留，覆盖 4/5 不变。",
+      "all_basis_categories_used": {
+        "paper_statement": 8,
+        "author_interpretation": 0,
+        "teaching_example": 0,
+        "system_inference": 0
+      },
+      "unused_basis_branches_unexercised": true,
+      "application_final_support_true": 7,
+      "application_final_coverage_true": 4,
+      "final_citation_occurrences": 23,
+      "final_unique_chunks": 15,
+      "all_citation_identity_checks_passed": true,
+      "published_matches_final_candidate": null,
+      "necessary_issues": [
+        "problem 的“预先指定工具”缺本项 known-a-priori 直接来源 pti_dafbcbd799c3fd69a0c98fe3757622b9（物理第 10 页）；task-specific 本身不足以推出预先指定。",
+        "API 调用术语末稿将文本结果必然计入调用定义；自己的形式定义 c=(name,input) 区分 e(c) 与 e(c,r)。修订把初稿“可选返回结果”改成无条件包含结果，未被首轮反馈要求。",
+        "结果泛称多项下游任务，未明确选择一个具体任务及其比较条件；PPL 对照虽有 API 关闭及普通文本微调条件，正文仍缺 WikiText/CCNet 观测范围。",
+        "不机械要求没有被本卡选作主结果的 LAMA 条件或精确 k=10；先明确代表性实验，再核对它的实质条件。自监督筛选术语的降损阈值已修复。"
+      ],
+      "full_semantic_acceptance": false,
+      "model_calls": 4,
+      "elapsed_seconds": 189.866,
+      "prompt_tokens": 119516,
+      "completion_tokens": 7242,
+      "cost": null,
+      "cost_status": "unknown",
+      "terminal_sha256": "40537301c52e3c3298e35cbcdf41804dcb16e46a421b6cdaabed960c80ff3ddf",
+      "source_pages_sha256": "06ad4920e0e12f30cc6a6af8d48dbc9afa54ed160bef14a7594bda2829e7ab2a"
+    }
+  ],
+  "aggregate": {
+    "papers_reviewed": 3,
+    "published_new_cards": 1,
+    "fully_supported_published_cards": 0,
+    "published_card_denominator": 1,
+    "independently_complete_delivered_cards": 0,
+    "preselected_paper_denominator": 3,
+    "final_candidate_or_published_units": 24,
+    "own_quote_complete_units": 18,
+    "own_quote_partial_units": 6,
+    "basis_appropriate_units": 24,
+    "own_quote_and_basis_both_complete_units": 18,
+    "independent_coverage_complete": 13,
+    "coverage_aspects": 15,
+    "citation_occurrences_checked_in_final_outputs": 75,
+    "citation_occurrences_checked_across_two_attempts": 146,
+    "all_citation_identity_checks_passed": true,
+    "model_calls_in_run": 12,
+    "prompt_tokens": 418093,
+    "completion_tokens": 22815,
+    "unknown_cost_calls": 12,
+    "cost": null,
+    "full_semantic_acceptance": false,
+    "counts_are_development_diagnostics_not_accuracy_on_unseen_papers": true
+  },
+  "historical_scores_unchanged": true,
+  "v8_comparison": {
+    "previous_tracked_summary": "evals/quality-v0.2/intro-v8-review-2026-09-05.json",
+    "previous_own_quote_complete": 19,
+    "previous_basis_appropriate": 23,
+    "previous_coverage_complete": 12,
+    "previous_published_new_cards": 0,
+    "interpretation": "v9 improves some result conditions, basis attribution and threshold explanations but introduces or retains local citation/definition gaps. Unit wording and evidence selection differ, so count changes are not matched atomic-fact accuracy estimates."
+  },
+  "human_review": {
+    "status": "pending",
+    "reviewer": null
+  },
+  "product_acceptance": "pending",
+  "learning_acceptance": "pending",
+  "protocol": "Final candidate/card texts were independently assessed before direct application support/coverage reasons. Initial blind ratings and later source-based adjudications are retained as separate phases; publication visibility exceptions and reading scope are stated per paper. Own quotes, basis and necessary body coverage are independent axes. Original RUN and earlier ratings remain unchanged.",
+  "original_run_integrity": {
+    "manifest_entries_verified": 27,
+    "manifest_sha256": "d275de3c0fb031606cc1aeb25e5af20c79a63dad23d4c67ead3c1325d87b1dc9",
+    "all_match": true,
+    "run_modified": false
+  },
+  "no_new_provider_calls_tests_holdout_or_application_edits_by_review": true,
+  "artifacts": [
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T124405.178139Z-7c29dee713ed4d6391866997512da523/react-blind-review.json",
+      "sha256": "9dd538809d9b41ddda165ea1d9a7a676e4ff66adb89bcaa4a9c3eb98c2d78fe2"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T124405.178139Z-7c29dee713ed4d6391866997512da523/react-adjudicated-review.json",
+      "sha256": "efd42291985f0f0bd80f4310382ec7fa58c7a9e17dbf34b3472d500ec4b46b37"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T124405.178139Z-7c29dee713ed4d6391866997512da523/reflexion-independent-review.json",
+      "sha256": "00c57af2f449a6a6a07252a62c2c88e5b414464bf7cc642e428e0a7159fe82be"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T124405.178139Z-7c29dee713ed4d6391866997512da523/toolformer-independent-review.json",
+      "sha256": "882a4b6210556f97b5cc223a463265486bb8369469732806fa6265f7a4ff0412"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T124405.178139Z-7c29dee713ed4d6391866997512da523/citation-and-run-integrity.json",
+      "sha256": "b0906de222ab5f695473266cd1fc74f861aa2749d2b66c7728c380d2948e0362"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T124405.178139Z-7c29dee713ed4d6391866997512da523/introduction-v9-independent-review.json",
+      "sha256": "7f53c054c3b318229e3a0b458c343ef3c24b8754e037d25fd0f91e5361ed699f"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T124405.178139Z-7c29dee713ed4d6391866997512da523/introduction-v9-review.sha256",
+      "sha256": "ff43ceb7f49fd67c7a8e94ec2677e8c3648ec0fe362e7ed9629c04db12a0a7c8"
+    }
+  ]
+}
