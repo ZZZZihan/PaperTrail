@@ -30,7 +30,7 @@
 3. 在应用关闭后停止 PostgreSQL，再使用 `make serve` 重启数据库和应用。
 4. 比较重启前后两篇论文的元数据、文件 SHA-256、第一页文字和空问答历史，全部相同；网页刷新后继续显示 Reflexion。
 
-ReAct 论文 ID：`acffff0b-0513-4b00-98d3-40567542eda9`；Reflexion：`c48760cc-266c-4d27-b677-592f2a743bbe`。当时真实库共两篇、问答记录为 0；因此这里证明论文数据恢复，不声称真实模型问答历史已完成验证。
+ReAct 论文 ID：`acffff0b-0513-4b00-98d3-40567542eda9`；Reflexion：`c48760cc-266c-4d27-b677-592f2a743bbe`。重启对比时真实库共两篇、问答记录为 0；因此这里证明论文数据恢复，不声称真实模型问答历史已完成验证。随后从浏览器导入 Toolformer v1（17 页，ID `3148eb83-07b1-4e61-84fa-c5681283971d`），最终真实库可直接选择三篇固定论文，逐个原文件 SHA 检查通过，问答历史仍为空。最终清单和截图为 `output/playwright/v01/real-library-final.json`、`real-library-three-papers.png`。
 
 本机证据（被 Git 忽略）：
 
@@ -70,6 +70,10 @@ ReAct 论文 ID：`acffff0b-0513-4b00-98d3-40567542eda9`；Reflexion：`c48760cc
 - 运行中原数据库 session 丢失后旧应用仍可执行问答：接受问题及每次模型调用前检查原 guard，失效后拒绝并要求重启应用，不重新取得资格；历史/原文仍可读。独立临时库回归证明第一调用后断线时不会发出第二调用。
 - 最终账本快照读取失败导致终态未保存：隔离快照异常，并补安全终态写入；不可恢复的数据库故障由启动/5 分钟过期恢复处理。
 - 非有限配置、NUL、未配对 Unicode 字符进入 JSONB：配置、请求及模型输出校验，保留已知用量但拒绝不安全结果。
+
+## 远端 CI 与依赖来源
+
+当前 Draft PR：[PaperTrail #1](https://github.com/ZZZZihan/PaperTrail/pull/1)。第一次远端运行在 `6661036` 上下载 Pygments 时被清华镜像返回 HTTP 403，未进入测试；[原失败记录](https://github.com/ZZZZihan/PaperTrail/actions/runs/33946522402)保留。随后用 `uv lock` 将默认源改为官方 PyPI，30 个包的版本、依赖边及分发文件哈希/大小均保持，仅来源地址改变。当前运行状态以 PR 的 Checks 和本机 `output/playwright/v01/remote-ci-final.json` 为准，不把旧失败或旧 SHA 的通过当作新提交结果。
 
 ## 3 篇 15 题的真实诊断依赖
 

@@ -35,7 +35,7 @@ make serve
 
 | 配置 | 含义 |
 | --- | --- |
-| `PAPERTRAIL_MODEL_BASE_URL` | OpenAI 兼容服务根路径，例如 `https://api.deepseek.com/v1`；客户端追加 `/chat/completions` |
+| `PAPERTRAIL_MODEL_BASE_URL` | OpenAI 兼容服务根路径，例如 `https://api.deepseek.com`；客户端追加 `/chat/completions` |
 | `PAPERTRAIL_MODEL_NAME` / `PAPERTRAIL_MODEL_API_KEY` | 获准的模型名称与本地密钥 |
 | `PAPERTRAIL_MODEL_BUDGET` / `PAPERTRAIL_MODEL_CURRENCY` | 本轮获准额度与币种；未配置时拒绝调用 |
 | `PAPERTRAIL_MODEL_INPUT_PRICE_PER_MILLION` / `PAPERTRAIL_MODEL_OUTPUT_PRICE_PER_MILLION` | 同币种每百万 token 保守输入/输出单价，用于调用前预留及用量后估算 |
@@ -76,7 +76,7 @@ uv run --locked python scripts/evaluate_development.py --prepare-only
 - Python 3.12.12：本机已有，使用项目独立虚拟环境，避免依赖系统默认 Python 3.14。
 - FastAPI：沿用项目既有建议，提供带响应结构和 OpenAPI 文档的 HTTP 入口。
 - uv 与 `uv.lock`：固定实际依赖及哈希，安装、启动、检查统一使用 `--locked`。
-- 包索引在 `pyproject.toml` 显式配置为清华镜像，与本机已有使用习惯一致，使锁文件来源不依赖个人全局配置；CI 需能访问该镜像。
+- COL-15 最初在 `pyproject.toml` 显式使用清华镜像。COL-18 远端 CI 下载被镜像返回 403 后，已改为官方 PyPI；包版本和文件哈希保持不变，避免运行环境依赖区域镜像的访问策略。
 - `src/papertrail`：按可安装的 Python 包组织，为后续业务模块提供入口。
 - 本地使用 `127.0.0.1`；配置只包含监听地址和端口。当前没有数据库连接或模型调用。
 
