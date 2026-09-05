@@ -11,7 +11,7 @@ type Question = {
   id: string;
   paper_id: string;
   question: string;
-  status: "pending" | "running" | "answered" | "insufficient_evidence" | "failed";
+  status: "pending" | "running" | "answered" | "partial_answer" | "insufficient_evidence" | "failed";
   stage: string;
   claims: { text: string; citations: Citation[] }[];
   message: string;
@@ -19,6 +19,11 @@ type Question = {
   created_at: string;
   completed_at: string | null;
   support_status?: string;
+  coverage?: {
+    status: "complete" | "partial" | "unanswered";
+    review_source: "ai" | "not_checked";
+    items: { requirement: string; covered: boolean; claim_indices: number[] }[];
+  } | null;
   trace?: Record<string, unknown>;
 };
 
@@ -54,6 +59,7 @@ const statusLabels: Record<Question["status"], string> = {
   pending: "等待处理",
   running: "正在查找与核对证据",
   answered: "回答已保存",
+  partial_answer: "部分回答 · 仍有要点待核对",
   insufficient_evidence: "当前已检索证据不足",
   failed: "本次问答未完成",
 };
@@ -129,11 +135,12 @@ function QuestionCard({
             </div>
           </div>
         )}
-        {question.status === "answered" && (
+        {(question.status === "answered" || question.status === "partial_answer") && (
           <>
             <div className="evidence-verification">
               来源已校验 · AI 已检查支持关系 · 待你核对
             </div>
+            {!question.coverage && <p className="review-note">这条历史回答尚未检查要点与必要条件是否完整。</p>}
             {question.claims.map((claim, index) => (
               <div className="answer-claim" key={index}>
                 <p>{claim.text}</p>
@@ -163,6 +170,19 @@ function QuestionCard({
             </p>
           </>
         )}
+        {question.coverage && (
+          <div className="answer-coverage" aria-label="回答要点核对">
+            <strong>{question.coverage.status === "complete" ? "回答要点已由 AI 核对" : "已回答与待核对的要点"}</strong>
+            <ul>
+              {question.coverage.items.map((item, index) => (
+                <li key={index}>
+                  <span>{item.covered ? "已回答" : "待核对"}</span>：{item.requirement}
+                </li>
+              ))}
+            </ul>
+            <small>核对范围是本次问题与已检索内容。AI 仍可能遗漏条件，请结合原文判断。</small>
+          </div>
+        )}
         {question.status === "insufficient_evidence" && (
           <div className="answer-insufficient">
             <p>{question.message || "在当前已检索证据中未找到足以支持回答的内容。"}</p>
@@ -175,7 +195,7 @@ function QuestionCard({
             {question.error_code && <small>错误标识：{question.error_code}</small>}
           </div>
         )}
-        {(question.status === "failed" || question.status === "insufficient_evidence") && (
+        {(question.status === "failed" || question.status === "insufficient_evidence" || question.status === "partial_answer") && (
           <button
             type="button"
             className="text-button retry-question"
@@ -193,9 +213,13 @@ function QuestionCard({
 export function QuestionPanel({
   paperId,
   onCitation,
+  embedded = false,
+  focusRequest = 0,
 }: {
   paperId: string;
   onCitation: (citation: Citation) => void;
+  embedded?: boolean;
+  focusRequest?: number;
 }) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [draft, setDraft] = useState("");
@@ -215,6 +239,13 @@ export function QuestionPanel({
   const textarea = useRef<HTMLTextAreaElement>(null);
   const form = useRef<HTMLFormElement>(null);
   const active = questions.some(inProgress);
+
+  useEffect(() => {
+    if (!focusRequest) return;
+    // The parent has committed the tab change, so the composer is no longer hidden.
+    textarea.current?.focus({ preventScroll: true });
+    textarea.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [focusRequest]);
 
   useEffect(() => {
     mounted.current = true;
@@ -318,10 +349,10 @@ export function QuestionPanel({
 
   return (
     <section className="reader-panel question-panel" aria-label="论文证据问答">
-      <div className="panel-heading">
-        <span>证据问答 <span className="version-badge">v0.1</span></span>
+      {!embedded && <div className="panel-heading">
+        <span>证据问答 <span className="version-badge">v0.2</span></span>
         <small>仅基于当前论文</small>
-      </div>
+      </div>}
       <div className="question-panel-content">
         <form className="question-composer" ref={form} onSubmit={(event) => void submit(event)}>
           <label htmlFor="paper-question">从你想理解的问题开始</label>

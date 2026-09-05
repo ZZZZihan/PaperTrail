@@ -45,6 +45,7 @@ class ModelConfig:
     thinking: str = ""
     allow_http_origin: str = field(default="", repr=False)
     profile: str = "compatible"
+    reasoning_effort: str = "none"
 
     @classmethod
     def from_env(cls) -> "ModelConfig":
@@ -128,6 +129,9 @@ class ModelConfig:
                 and self.thinking in {"", "enabled", "disabled"}
                 and self.profile in {"compatible", "openai"}
                 and (self.profile != "openai" or self.thinking == "")
+                and isinstance(self.reasoning_effort, str)
+                and self.reasoning_effort in {"none", "low"}
+                and (self.profile == "openai" or self.reasoning_effort == "none")
             )
         except ValueError:
             return False
@@ -158,7 +162,11 @@ class ModelConfig:
             else "max_tokens"
             if self.profile == "compatible"
             else None,
-            "reasoning_effort": "none" if self.profile == "openai" else None,
+            "reasoning_effort": self.reasoning_effort
+            if self.profile == "openai"
+            and isinstance(self.reasoning_effort, str)
+            and self.reasoning_effort in {"none", "low"}
+            else None,
             "temperature": 0 if self.profile == "compatible" else None,
             "thinking": "not_sent"
             if self.profile == "openai"
@@ -241,7 +249,7 @@ class ModelClient:
         }
         if self.config.profile == "openai":
             payload["max_completion_tokens"] = self.config.max_output_tokens
-            payload["reasoning_effort"] = "none"
+            payload["reasoning_effort"] = self.config.reasoning_effort
         else:
             payload["max_tokens"] = self.config.max_output_tokens
             payload["temperature"] = 0
@@ -291,24 +299,60 @@ class ModelClient:
                     and type(value) is int
                     and value >= 0
                 }
+                completion_details = usage.get("completion_tokens_details")
+                if isinstance(completion_details, dict):
+                    reasoning_tokens = completion_details.get("reasoning_tokens")
+                    if type(reasoning_tokens) is int and reasoning_tokens >= 0:
+                        # A provider-reported subset of completion_tokens, never added
+                        # to totals or priced again. Missing/invalid values stay unknown.
+                        call["reasoning_tokens"] = reasoning_tokens
             if not _safe_json(raw):
+                call["output_issue"] = "unsafe_response"
                 raise ModelError("invalid_output", "模型响应包含无法保存的字符或数值，请重试。")
             if isinstance(raw.get("model"), str):
                 call["returned_model"] = raw["model"][:200]
+            output_issue = "invalid_response_shape"
+            content = None
             try:
                 choice = raw["choices"][0]
+                output_issue = "invalid_choice"
                 if not isinstance(choice, dict) or not isinstance(choice.get("message"), dict):
                     raise ValueError("invalid choice")
+                output_issue = "incomplete_response"
                 if choice.get("finish_reason") != "stop":
                     raise ValueError("incomplete response")
+                output_issue = "missing_content"
                 content = choice["message"]["content"]
+                output_issue = "non_string_content"
                 if not isinstance(content, str):
                     raise ValueError("content is not a string")
                 call["response_sha256"] = hashlib.sha256(content.encode()).hexdigest()
+                output_issue = "invalid_json"
                 result = json.loads(content)
-                if not isinstance(result, dict) or not _safe_json(result):
+                output_issue = "non_object"
+                if not isinstance(result, dict):
                     raise ValueError("JSON object required")
+                output_issue = "unsafe_json_value"
+                if not _safe_json(result):
+                    raise ValueError("JSON value cannot be persisted")
             except (KeyError, IndexError, TypeError, ValueError) as exc:
+                call["output_issue"] = output_issue
+                if isinstance(content, str):
+                    stripped = content.strip()
+                    call["output_shape"] = {
+                        "content_chars": len(content),
+                        "first_nonspace_codepoint": ord(stripped[0]) if stripped else None,
+                        "last_nonspace_codepoint": ord(stripped[-1]) if stripped else None,
+                    }
+                if isinstance(exc, json.JSONDecodeError):
+                    # The standard decoder's msg is a fixed parser description. Never save
+                    # exc.doc, str(exc), snippets, or the provider's content in this record.
+                    call["json_error"] = {
+                        "lineno": exc.lineno,
+                        "colno": exc.colno,
+                        "pos": exc.pos,
+                        "msg": exc.msg,
+                    }
                 raise ModelError("invalid_output", "模型未返回完整的结构化结果，请重试。") from exc
             call["status"] = "succeeded"
             return result

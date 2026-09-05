@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "review_source": "ai",
+  "reviewed_at": "2026-09-05T12:13:14.511070+00:00",
+  "run_name": "20260905T120604.854158Z-52344d5fd6874774a3842848e681d064",
+  "run_code_sha": "ca9fabc3c84009d1ae91968d69957e551006fb17",
+  "pipeline_version": "paper-introduction-v7",
+  "application_status": "insufficient_evidence",
+  "application_error_code": null,
+  "published_introduction_present": false,
+  "application_self_check_used_as_quality_evidence": false,
+  "independent_summary": {
+    "full_semantic_acceptance": false,
+    "scored_material": "attempt_2_unpublished_revised_candidate",
+    "reviewed_candidate_units": 8,
+    "published_output_units": 0,
+    "own_citation_fully_supported_units": 7,
+    "partially_supported_units": 1,
+    "unsupported_units": 0,
+    "coverage_aspects_covered": 5,
+    "coverage_aspects_total": 5,
+    "coverage_is_content_presence_not_full_support": true,
+    "terms_reviewed": 3,
+    "terms_fully_supported": 2,
+    "terms_partially_supported": 1,
+    "terms_plain_language_understandable": 3,
+    "necessary_conditions_in_body": {
+      "frozen_model": true,
+      "human_demonstration_trajectories": true
+    },
+    "mechanism_own_setup_support_complete": true,
+    "mechanism_dense_sparse_asynchronous_distinction": true,
+    "results_own_setup_support_complete": true,
+    "results_own_outcome_support_complete": true,
+    "basis_categories_present": {
+      "paper_statement": 8,
+      "author_interpretation": 0,
+      "teaching_example": 0,
+      "system_inference": 0
+    },
+    "basis_categories_appropriate": 8,
+    "absent_basis_categories_not_evaluated": true,
+    "body_characters": 456,
+    "citation_occurrences": 28,
+    "unique_citation_chunks": 19,
+    "all_citation_identity_checks_passed": true
+  },
+  "findings": [
+    {
+      "id": "term-navigation-own-citation-gap",
+      "field": "terms[1]",
+      "candidate_phrase": "查询、导航、操作或结束指令",
+      "paper_fact_true": true,
+      "own_citation_support_complete": false,
+      "reason": "查询/结束及一般动作定义有自身引文支持，但“导航”未在该术语所附可读quote中具体出现。所附Figure 1块图文开头乱码，不可用未引用完整图或结果段其他引用补齐。",
+      "missing_source_option": {
+        "chunk_id": "pti_5aab808075b2fa25f0f0e4d0ef2891ef",
+        "physical_page": 7,
+        "supports": "ALFWorld通过文本动作导航于模拟家庭，例go to coffeetable 1"
+      },
+      "minimum_fix": "删除非必要的导航举例，或把该导航源块直接附在术语自身。所有附加具体动作例子都应重复此检查。",
+      "blocks_fully_supported_card_acceptance": true
+    }
+  ],
+  "run_path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/introduction-runs/20260905T120604.854158Z-52344d5fd6874774a3842848e681d064",
+  "terminal_sha256": "8d1ed3ed5a3e90758832b6340035b3ee52eb9b4b5d20e7c0407fbf82350c584e",
+  "source_pages_sha256": "6e4c7b00dc4633b09f58d06f2dc5b6efe74696c7d956c4788f81a42698466809",
+  "original_run_integrity": {
+    "original_manifest_entries_verified": 17,
+    "all_match": true,
+    "original_run_modified": false
+  },
+  "resource_observation": {
+    "model_calls": 4,
+    "successful_call_stages": [
+      "introduction_generate",
+      "introduction_verify",
+      "introduction_revise",
+      "introduction_verify"
+    ],
+    "elapsed_seconds": 168.811,
+    "prompt_tokens": 195927,
+    "completion_tokens": 7620,
+    "total_tokens": 203547,
+    "cost": null,
+    "cost_status": "unknown",
+    "additional_provider_calls_by_this_review": 0
+  },
+  "human_review": {
+    "status": "pending",
+    "reviewer": null,
+    "reviewed_at": null
+  },
+  "product_acceptance": "pending",
+  "learning_acceptance": "pending",
+  "prior_scores_unchanged": true,
+  "engineering_completion_note": "本次4次调用完整走完生成/核验/修订/再核验，但应用未发布；最终候选仍有一项严格自有引文支持缺口。不能把候选诊断记作已发布质量或全通过。",
+  "artifacts": [
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T120604.854158Z-52344d5fd6874774a3842848e681d064/intro-react-v7-independent-review.json",
+      "sha256": "9b5aaddd9e674afbb142639b3c6c317f328f79c7b9fe920772c283df92f8474a"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T120604.854158Z-52344d5fd6874774a3842848e681d064/intro-react-v7-review.sha256",
+      "sha256": "0c57838ee4b45173d96ca4b06747b915bf4a953668c289ae7180265e8dd83a7c"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T120604.854158Z-52344d5fd6874774a3842848e681d064/intro-react-v7-application-comparison.json",
+      "sha256": "fd6657a07983d8c086a076a1289d0c2e8198316f5e7fc950d4abf3f75eed204c"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T120604.854158Z-52344d5fd6874774a3842848e681d064/intro-react-v7-comparison.sha256",
+      "sha256": "b24db117ca65b8e4acd5a724deec65aeae898d6cf15c5f093bbb8f137227c1b0"
+    }
+  ],
+  "application_comparison": {
+    "application_supported_units": 6,
+    "independent_fully_supported_candidate_units": 7,
+    "disagreements": [
+      {
+        "field": "mechanism",
+        "application_supported": false,
+        "independent_supported": true,
+        "application_reason": "pti_1cc13e0882bdd1adc245aec71fa938a0支持上下文由观察和既有动作构成；pti_01a37204473fa87ec964fb1670e03f18支持语言思考不触发环境观察；pti_ce485c53486dc81da4663589fef0e063支持冻结PaLM-540B、人工轨迹式少样本示范及生成动作和思考；pti_b238082a137252a09565b6395c3bab48与pti_f4af24a145e9c80086aff6e1f2baef05支持推理任务采用密集思考—动作—观察步骤、决策任务采用稀疏异步思考。但本 claim 所附引文没有明确支持“输出是答案或完成任务的行动轨迹”这一完整输出表述，尤其没有明确陈述答案输出；应补入含finish[answer]或任务最终输出定义的段落后再保留该句。",
+        "independent_reason": "本项pti_01a…明确最终动作用于完成QA任务，pti_b238…明确task-solving trajectory由thought-action-observation步骤组成；结合本项生成task-specific actions的描述，独立审查将“输出答案或完成任务行动轨迹”视为合理概括。应用要求答案输出有更直接的finish[answer]定义。此为概括粒度分歧，不覆盖应用拒绝，也不把独立7/8写成发布质量。",
+        "minimum_resolution": "把第4页pti_92d38402d160b5a8b4da2df41ce0b900直接附到mechanism自身；其中finish[answer]明确结束任务并提供answer。当前该字段5条，可增为6条。"
+      }
+    ],
+    "both_reject_full_semantic_acceptance": true
+  },
+  "revision_diagnosis": {
+    "initial_feedback_addressed": true,
+    "results_own_setup_fixed": true,
+    "dense_sparse_boundary_fixed": true,
+    "remaining_issues_already_present_initially": true,
+    "suspected_revision_feedback_loss_supported_by_this_run": false,
+    "minimum_generic_adjustment": "在生成/第一次核验时逐项列出机制输入、过程分支、输出形式以及术语每个具体例子的本字段来源；没有直接来源的非必要例子应收窄或删除。修订先完成已指出的问题，再按同一清单复查保留细节。要求可泛化到任意论文，不写ReAct标准答案或特定块ID进生产prompt。"
+  }
+}

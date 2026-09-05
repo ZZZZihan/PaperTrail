@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "review_source": "independent_ai",
+  "reviewed_at": "2026-09-05T12:43:52.556938+00:00",
+  "run_name": "20260905T122051.689720Z-9511886873e148db9255d3aac59f7f1d",
+  "run_path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/introduction-runs/20260905T122051.689720Z-9511886873e148db9255d3aac59f7f1d",
+  "run_code_sha": "1a6e23df072e252d411ddb23e614f4d585d459e4",
+  "core_code_sha": "8085ef7343f80d355c17631d82023410ffe793fe",
+  "pipeline_version": "paper-introduction-v8",
+  "records": [
+    {
+      "paper": "react",
+      "task_id": "2ce2b34f-963c-4921-b93d-141defdf40bb",
+      "application_status": "insufficient_evidence",
+      "published_introduction_present": false,
+      "scored_material": "attempt_2_unpublished_revised_candidate",
+      "candidate_units": 8,
+      "own_quote_complete": 7,
+      "own_quote_partial": 1,
+      "basis_appropriate": 8,
+      "own_quote_and_basis_both_complete": 7,
+      "independent_coverage_complete": 4,
+      "coverage_aspects": 5,
+      "all_basis_categories_used": {
+        "paper_statement": 8,
+        "author_interpretation": 0,
+        "teaching_example": 0,
+        "system_inference": 0
+      },
+      "unused_basis_branches_unexercised": true,
+      "application_final_support_true": 7,
+      "application_final_coverage_true": 5,
+      "final_citation_occurrences": 24,
+      "final_unique_chunks": 12,
+      "all_citation_identity_checks_passed": true,
+      "necessary_issues": [
+        "mechanism修订新写“输出是下一步任务动作”，遗漏所附来源中的内部thought产物；需区分单步模型产物、环境反馈和最终任务结果。",
+        "首轮method支持/coverage均通过，修订却重写而新增缺口；冻结未受反馈或缺失coverage影响的完整字段可避免本次回退，合并稿仍须全量再验。",
+        "结果段自身冻参/人工6与3示例、HotpotQA人工分析来源已补齐；术语无据的移动例子已删除。"
+      ],
+      "full_semantic_acceptance": false,
+      "model_calls": 4,
+      "elapsed_seconds": 176.261,
+      "prompt_tokens": 195177,
+      "completion_tokens": 8032,
+      "cost": null,
+      "cost_status": "unknown",
+      "terminal_sha256": "65ffdcfddf561c9217160a3a232ab11a35826edf7ed70e000c980791b2b04fbe",
+      "source_pages_sha256": "6e4c7b00dc4633b09f58d06f2dc5b6efe74696c7d956c4788f81a42698466809"
+    },
+    {
+      "paper": "reflexion",
+      "task_id": "cd8b219f-89fb-48aa-b947-1d75ea193dca",
+      "application_status": "insufficient_evidence",
+      "published_introduction_present": false,
+      "scored_material": "attempt_2_unpublished_revised_candidate",
+      "candidate_units": 8,
+      "own_quote_complete": 6,
+      "own_quote_partial": 2,
+      "basis_appropriate": 7,
+      "own_quote_and_basis_both_complete": 5,
+      "independent_coverage_complete": 4,
+      "coverage_aspects": 5,
+      "all_basis_categories_used": {
+        "paper_statement": 8,
+        "author_interpretation": 0,
+        "teaching_example": 0,
+        "system_inference": 0
+      },
+      "unused_basis_branches_unexercised": true,
+      "application_final_support_true": 7,
+      "application_final_coverage_true": 5,
+      "final_citation_occurrences": 28,
+      "final_unique_chunks": 17,
+      "all_citation_identity_checks_passed": true,
+      "necessary_issues": [
+        "problem中的“稀疏”与Actor中的状态观察条件缺自身引文，虽然论文其他块和其他字段包含准确来源。",
+        "结果130/134缺正文“12次连续尝试下累计解决”口径；未声称相对提升，ReAct基线名称不另算必需。",
+        "同一paper_statement段混合实测观察及作者对多样探索的概括；显式“作者认为”有帮助，但不能解决单元basis混用。",
+        "应用停止条件理由前后反转。正文until evaluator correct可支持最终稿；不根据存在OR歧义的伪代码擅自推出通过或max即停止。"
+      ],
+      "full_semantic_acceptance": false,
+      "model_calls": 4,
+      "elapsed_seconds": 153.358,
+      "prompt_tokens": 101316,
+      "completion_tokens": 7591,
+      "cost": null,
+      "cost_status": "unknown",
+      "terminal_sha256": "a0a03a6ed195b3d8f1844cecf30a3bda41c0b4d44f10ac447477e04cea7ba80e",
+      "source_pages_sha256": "ad3319862b4c31367402c0d09507bd2b0ff613cd5262df75540b9d5be8f8d067"
+    },
+    {
+      "paper": "toolformer",
+      "task_id": "effce883-e6ef-4cf7-8a91-d64a5e617ce8",
+      "application_status": "insufficient_evidence",
+      "published_introduction_present": false,
+      "scored_material": "attempt_2_unpublished_revised_candidate",
+      "candidate_units": 8,
+      "own_quote_complete": 6,
+      "own_quote_partial": 2,
+      "basis_appropriate": 8,
+      "own_quote_and_basis_both_complete": 6,
+      "independent_coverage_complete": 4,
+      "coverage_aspects": 5,
+      "all_basis_categories_used": {
+        "paper_statement": 8,
+        "author_interpretation": 0,
+        "teaching_example": 0,
+        "system_inference": 0
+      },
+      "unused_basis_branches_unexercised": true,
+      "application_final_support_true": 8,
+      "application_final_coverage_true": 4,
+      "final_citation_occurrences": 25,
+      "final_unique_chunks": 16,
+      "all_citation_identity_checks_passed": true,
+      "necessary_issues": [
+        "problem“预先指定工具用法”缺自身明确known-a-priori来源；该来源在contribution引用，不能继承。",
+        "自监督筛选术语将任何相对降损写成保留样本的充分条件，遗漏其自身来源明确的阈值；方法段已有阈值，仍不能替代本术语。",
+        "所选LAMA比较缺正文禁用Wikipedia Search的公平资源条件；实验每输入最多一次工具调用也是能力边界。精确API-trigger k=10不作为没有数值成绩的定性卡硬门槛。",
+        "这些实验条件初稿已经省略，首次coverage未发现，最后核验才拦截；不能记成修订删除条件或检索找不到来源。"
+      ],
+      "full_semantic_acceptance": false,
+      "model_calls": 4,
+      "elapsed_seconds": 153.171,
+      "prompt_tokens": 120355,
+      "completion_tokens": 7533,
+      "cost": null,
+      "cost_status": "unknown",
+      "terminal_sha256": "defba336c136aa689ec7b6ecd07abfe770b4b6a5f8d29b927a814342399915c6",
+      "source_pages_sha256": "06ad4920e0e12f30cc6a6af8d48dbc9afa54ed160bef14a7594bda2829e7ab2a"
+    }
+  ],
+  "aggregate": {
+    "papers_reviewed": 3,
+    "published_new_cards": 0,
+    "final_candidate_units": 24,
+    "own_quote_complete_units": 19,
+    "own_quote_partial_units": 5,
+    "basis_appropriate_units": 23,
+    "own_quote_and_basis_both_complete_units": 18,
+    "independent_coverage_complete": 12,
+    "coverage_aspects": 15,
+    "citation_occurrences_checked": 77,
+    "all_citation_identity_checks_passed": true,
+    "model_calls_in_run": 12,
+    "prompt_tokens": 416848,
+    "completion_tokens": 23156,
+    "unknown_cost_calls": 12,
+    "cost": null,
+    "full_semantic_acceptance": false,
+    "counts_are_candidate_diagnostics_not_accuracy_on_unseen_papers": true
+  },
+  "historical_scores_unchanged": true,
+  "human_review": {
+    "status": "pending",
+    "reviewer": null
+  },
+  "product_acceptance": "pending",
+  "learning_acceptance": "pending",
+  "protocol": "Independent candidate assessment before direct application-verdict comparison; own quotes, basis and necessary coverage scored separately. Detailed blindness/reading-scope exceptions and evaluator disagreements are preserved in immutable reports.",
+  "artifacts": [
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T122051.689720Z-9511886873e148db9255d3aac59f7f1d/react-independent-review.json",
+      "sha256": "b7b291a7d576350a7187889f90baf12f26ee0ca05e37a4aa0eba134d781eb743"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T122051.689720Z-9511886873e148db9255d3aac59f7f1d/reflexion-independent-review.json",
+      "sha256": "7131c495e5be31647b3cbfa9fd6ef5da92f2265e859b621b7488b7ef73d02f7d"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T122051.689720Z-9511886873e148db9255d3aac59f7f1d/toolformer-independent-review.json",
+      "sha256": "e692582b0dcba709927ad7db50e8b0f417ef0175c7a9f348bfbd02a66e1d9940"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T122051.689720Z-9511886873e148db9255d3aac59f7f1d/introduction-v8-independent-review.json",
+      "sha256": "5c893a592425f81eef5ddc28f2a6f24fd87d550ee20eb675c5b4e5264a9f91c8"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T122051.689720Z-9511886873e148db9255d3aac59f7f1d/introduction-v8-review.sha256",
+      "sha256": "4ee613635db5410d1a31428cc665a45aa7034ff863e9600f446b90f8a894c107"
+    }
+  ],
+  "original_run_integrity": {
+    "manifest_entries_verified": 27,
+    "all_match": true,
+    "run_modified": false
+  },
+  "no_new_provider_calls_or_holdout_access_by_review": true
+}

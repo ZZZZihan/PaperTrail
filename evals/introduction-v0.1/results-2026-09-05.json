@@ -1,0 +1,745 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-05",
+  "task": "COL-19",
+  "rubric": "docs/paper-introduction-demo.md",
+  "model": "gpt-5.6-sol",
+  "development_samples_not_held_out": true,
+  "runs": [
+    {
+      "run_directory": "data/diagnostics/introduction-runs/20260905T074112.160029Z-414cb276696646279b3bdd3f1707c515",
+      "code_sha": "e20657af02aae3ddd26846db579c226d214d2589",
+      "working_tree_dirty": false,
+      "records": [
+        {
+          "paper": "react",
+          "task_id": "6d2c5e79-7367-4135-a30b-70efa3f0a9c2",
+          "status": "failed",
+          "error_code": "invalid_citation",
+          "pipeline_version": "paper-introduction-v1",
+          "metrics": {
+            "calls": 1,
+            "cost_note": "Known subtotals exclude unknown charges and are not a provider invoice",
+            "cost_source": "unknown_provider_rates",
+            "cost_sources": [
+              "unknown_provider_rates"
+            ],
+            "currency": "USD",
+            "elapsed_seconds": 43.819,
+            "estimated_cost_known_subtotal": "0",
+            "estimated_cost_total": null,
+            "unknown_cost_calls": 1,
+            "unknown_usage_calls": 0,
+            "usage_known_subtotals": {
+              "completion_tokens": 2193,
+              "prompt_tokens": 47245,
+              "total_tokens": 49438
+            }
+          },
+          "persisted_identical": true,
+          "same_request_identical": true,
+          "excluded_from_qa_history": true,
+          "citation_check": {
+            "citations_checked": 0,
+            "errors": [],
+            "status": "not_applicable"
+          },
+          "reused_existing_task": false,
+          "terminal_sha256": "f86155bb21f48d521c70587323d1b8d6e11e864cae13808cb3f0b160bc30a3b5"
+        },
+        {
+          "paper": "reflexion",
+          "task_id": "24aca091-6f49-437f-80fd-dc93672b30cf",
+          "status": "failed",
+          "error_code": "invalid_output",
+          "pipeline_version": "paper-introduction-v1",
+          "metrics": {
+            "calls": 1,
+            "cost_note": "Known subtotals exclude unknown charges and are not a provider invoice",
+            "cost_source": "unknown_provider_rates",
+            "cost_sources": [
+              "unknown_provider_rates"
+            ],
+            "currency": "USD",
+            "elapsed_seconds": 43.055,
+            "estimated_cost_known_subtotal": "0",
+            "estimated_cost_total": null,
+            "unknown_cost_calls": 1,
+            "unknown_usage_calls": 0,
+            "usage_known_subtotals": {
+              "completion_tokens": 2236,
+              "prompt_tokens": 21852,
+              "total_tokens": 24088
+            }
+          },
+          "persisted_identical": true,
+          "same_request_identical": true,
+          "excluded_from_qa_history": true,
+          "citation_check": {
+            "citations_checked": 0,
+            "errors": [],
+            "status": "not_applicable"
+          },
+          "reused_existing_task": false,
+          "terminal_sha256": "61cac8f21f71f480dab0cfe3a495fcddb4857af84550094c4288909be2b40a64"
+        },
+        {
+          "paper": "toolformer",
+          "task_id": "b802ccea-aa58-4bf2-8a9e-535e1997043b",
+          "status": "failed",
+          "error_code": "model_timeout",
+          "pipeline_version": "paper-introduction-v1",
+          "metrics": {
+            "calls": 1,
+            "cost_note": "Known subtotals exclude unknown charges and are not a provider invoice",
+            "cost_source": "unknown_provider_rates",
+            "cost_sources": [
+              "unknown_provider_rates"
+            ],
+            "currency": "USD",
+            "elapsed_seconds": 45.044,
+            "estimated_cost_known_subtotal": "0",
+            "estimated_cost_total": null,
+            "unknown_cost_calls": 1,
+            "unknown_usage_calls": 1,
+            "usage_known_subtotals": {}
+          },
+          "persisted_identical": true,
+          "same_request_identical": true,
+          "excluded_from_qa_history": true,
+          "citation_check": {
+            "citations_checked": 0,
+            "errors": [],
+            "status": "not_applicable"
+          },
+          "reused_existing_task": false,
+          "terminal_sha256": "f1e8f6331286522a9918574a52db04e7b185ccdf0508f71071237a1f49922c94"
+        }
+      ]
+    },
+    {
+      "run_directory": "data/diagnostics/introduction-runs/20260905T074636.363989Z-fe6fa0e7737e44859e9e28e3a4080866",
+      "code_sha": "eee149752d61299853126258c50925f4c71379db",
+      "working_tree_dirty": false,
+      "records": [
+        {
+          "paper": "react",
+          "task_id": "0ce3d7f3-88aa-47e7-93c6-30c365657837",
+          "status": "failed",
+          "error_code": "invalid_citation",
+          "pipeline_version": "paper-introduction-v2",
+          "metrics": {
+            "calls": 1,
+            "cost_note": "Known subtotals exclude unknown charges and are not a provider invoice",
+            "cost_source": "unknown_provider_rates",
+            "cost_sources": [
+              "unknown_provider_rates"
+            ],
+            "currency": "USD",
+            "elapsed_seconds": 50.319,
+            "estimated_cost_known_subtotal": "0",
+            "estimated_cost_total": null,
+            "unknown_cost_calls": 1,
+            "unknown_usage_calls": 0,
+            "usage_known_subtotals": {
+              "completion_tokens": 2626,
+              "prompt_tokens": 47684,
+              "total_tokens": 50310
+            }
+          },
+          "persisted_identical": true,
+          "same_request_identical": true,
+          "excluded_from_qa_history": true,
+          "citation_check": {
+            "citations_checked": 0,
+            "errors": [],
+            "status": "not_applicable"
+          },
+          "reused_existing_task": false,
+          "terminal_sha256": "21e39f21396daf9eae263acd7d79538ae86877bff7870c6395f86f2faef07bac"
+        },
+        {
+          "paper": "reflexion",
+          "task_id": "14add768-3e88-4851-828e-6829c3601410",
+          "status": "failed",
+          "error_code": "invalid_output",
+          "pipeline_version": "paper-introduction-v2",
+          "metrics": {
+            "calls": 1,
+            "cost_note": "Known subtotals exclude unknown charges and are not a provider invoice",
+            "cost_source": "unknown_provider_rates",
+            "cost_sources": [
+              "unknown_provider_rates"
+            ],
+            "currency": "USD",
+            "elapsed_seconds": 43.489,
+            "estimated_cost_known_subtotal": "0",
+            "estimated_cost_total": null,
+            "unknown_cost_calls": 1,
+            "unknown_usage_calls": 0,
+            "usage_known_subtotals": {
+              "completion_tokens": 2282,
+              "prompt_tokens": 22291,
+              "total_tokens": 24573
+            }
+          },
+          "persisted_identical": true,
+          "same_request_identical": true,
+          "excluded_from_qa_history": true,
+          "citation_check": {
+            "citations_checked": 0,
+            "errors": [],
+            "status": "not_applicable"
+          },
+          "reused_existing_task": true,
+          "terminal_sha256": "9c178ed9fc87b075e4b18ca2914d823ff60466ad636defd83845082f02c1bfd8"
+        },
+        {
+          "paper": "toolformer",
+          "task_id": "9596d85f-ba7d-434a-895a-a5f49c6abf24",
+          "status": "insufficient_evidence",
+          "error_code": null,
+          "pipeline_version": "paper-introduction-v2",
+          "metrics": {
+            "calls": 2,
+            "cost_note": "Known subtotals exclude unknown charges and are not a provider invoice",
+            "cost_source": "unknown_provider_rates",
+            "cost_sources": [
+              "unknown_provider_rates"
+            ],
+            "currency": "USD",
+            "elapsed_seconds": 63.885,
+            "estimated_cost_known_subtotal": "0",
+            "estimated_cost_total": null,
+            "unknown_cost_calls": 2,
+            "unknown_usage_calls": 0,
+            "usage_known_subtotals": {
+              "completion_tokens": 3225,
+              "prompt_tokens": 30510,
+              "total_tokens": 33735
+            }
+          },
+          "persisted_identical": true,
+          "same_request_identical": true,
+          "excluded_from_qa_history": true,
+          "citation_check": {
+            "citations_checked": 0,
+            "errors": [],
+            "status": "not_applicable"
+          },
+          "reused_existing_task": false,
+          "terminal_sha256": "8665ac1454ea0fd9dcbb8f6b6c039621c528f0554137ca36afc7c92a7bfe8cb7"
+        }
+      ]
+    },
+    {
+      "run_directory": "data/diagnostics/introduction-runs/20260905T075704.659717Z-bb7480383da0447b891276a435136d97",
+      "code_sha": "e58632b125abdaa78bacaca58179fdde7c3d8a3a",
+      "working_tree_dirty": false,
+      "records": [
+        {
+          "paper": "react",
+          "task_id": "4732e27c-ff91-4f05-806d-4785bf9870ad",
+          "status": "insufficient_evidence",
+          "error_code": null,
+          "pipeline_version": "paper-introduction-v3",
+          "metrics": {
+            "calls": 2,
+            "cost_note": "Known subtotals exclude unknown charges and are not a provider invoice",
+            "cost_source": "unknown_provider_rates",
+            "cost_sources": [
+              "unknown_provider_rates"
+            ],
+            "currency": "USD",
+            "elapsed_seconds": 42.421,
+            "estimated_cost_known_subtotal": "0",
+            "estimated_cost_total": null,
+            "unknown_cost_calls": 2,
+            "unknown_usage_calls": 0,
+            "usage_known_subtotals": {
+              "completion_tokens": 2017,
+              "prompt_tokens": 49837,
+              "total_tokens": 51854
+            }
+          },
+          "persisted_identical": true,
+          "same_request_identical": true,
+          "excluded_from_qa_history": true,
+          "citation_check": {
+            "citations_checked": 0,
+            "errors": [],
+            "status": "not_applicable"
+          },
+          "reused_existing_task": false,
+          "terminal_sha256": "ce72c250e2553c306e1a2c9f4f5b072efa4af1fe617c565395b8562793dc75a1"
+        },
+        {
+          "paper": "reflexion",
+          "task_id": "12f39d1e-d831-4a77-a1f8-304c8c925b88",
+          "status": "insufficient_evidence",
+          "error_code": null,
+          "pipeline_version": "paper-introduction-v3",
+          "metrics": {
+            "calls": 2,
+            "cost_note": "Known subtotals exclude unknown charges and are not a provider invoice",
+            "cost_source": "unknown_provider_rates",
+            "cost_sources": [
+              "unknown_provider_rates"
+            ],
+            "currency": "USD",
+            "elapsed_seconds": 51.729,
+            "estimated_cost_known_subtotal": "0",
+            "estimated_cost_total": null,
+            "unknown_cost_calls": 2,
+            "unknown_usage_calls": 0,
+            "usage_known_subtotals": {
+              "completion_tokens": 2440,
+              "prompt_tokens": 27275,
+              "total_tokens": 29715
+            }
+          },
+          "persisted_identical": true,
+          "same_request_identical": true,
+          "excluded_from_qa_history": true,
+          "citation_check": {
+            "citations_checked": 0,
+            "errors": [],
+            "status": "not_applicable"
+          },
+          "reused_existing_task": false,
+          "terminal_sha256": "75e0bf52a6d5d4dfaaf50f413cfb6ed6779b0230ba3dd03e5ebe175a163730b7"
+        },
+        {
+          "paper": "toolformer",
+          "task_id": "8d4965db-bf59-4986-a9d9-283437e5ef85",
+          "status": "failed",
+          "error_code": "invalid_citation",
+          "pipeline_version": "paper-introduction-v3",
+          "metrics": {
+            "calls": 1,
+            "cost_note": "Known subtotals exclude unknown charges and are not a provider invoice",
+            "cost_source": "unknown_provider_rates",
+            "cost_sources": [
+              "unknown_provider_rates"
+            ],
+            "currency": "USD",
+            "elapsed_seconds": 38.982,
+            "estimated_cost_known_subtotal": "0",
+            "estimated_cost_total": null,
+            "unknown_cost_calls": 1,
+            "unknown_usage_calls": 0,
+            "usage_known_subtotals": {
+              "completion_tokens": 1104,
+              "prompt_tokens": 24659,
+              "total_tokens": 25763
+            }
+          },
+          "persisted_identical": true,
+          "same_request_identical": true,
+          "excluded_from_qa_history": true,
+          "citation_check": {
+            "citations_checked": 0,
+            "errors": [],
+            "status": "not_applicable"
+          },
+          "reused_existing_task": false,
+          "terminal_sha256": "2ef5cd59d6ec063349d907599111c5655d35723b88b0ea42348af6cc37db4d72"
+        }
+      ]
+    },
+    {
+      "run_directory": "data/diagnostics/introduction-runs/20260905T081152.162041Z-5338c546f94a4d68ac3a8f65eb3427a1",
+      "code_sha": "13e33492baf45a13ecb61797a0cc2b1676292e6b",
+      "working_tree_dirty": false,
+      "records": [
+        {
+          "paper": "react",
+          "task_id": "ce836297-727a-4be6-a1f6-9f4b64a8b210",
+          "status": "answered",
+          "error_code": null,
+          "pipeline_version": "paper-introduction-v4",
+          "metrics": {
+            "calls": 4,
+            "cost_note": "Known subtotals exclude unknown charges and are not a provider invoice",
+            "cost_source": "unknown_provider_rates",
+            "cost_sources": [
+              "unknown_provider_rates"
+            ],
+            "currency": "USD",
+            "elapsed_seconds": 106.871,
+            "estimated_cost_known_subtotal": "0",
+            "estimated_cost_total": null,
+            "unknown_cost_calls": 4,
+            "unknown_usage_calls": 0,
+            "usage_known_subtotals": {
+              "completion_tokens": 4826,
+              "prompt_tokens": 104043,
+              "total_tokens": 108869
+            }
+          },
+          "persisted_identical": true,
+          "same_request_identical": true,
+          "excluded_from_qa_history": true,
+          "citation_check": {
+            "citations_checked": 19,
+            "errors": [],
+            "semantic_support": "not_assessed_by_this_program",
+            "status": "passed"
+          },
+          "reused_existing_task": false,
+          "terminal_sha256": "13bc66515662917608d815723f58e6162686b3bded47f8ca010013d38b36c9e5"
+        },
+        {
+          "paper": "reflexion",
+          "task_id": "e7b77ffa-3a72-4ec4-8c64-eb2f197571f2",
+          "status": "insufficient_evidence",
+          "error_code": null,
+          "pipeline_version": "paper-introduction-v4",
+          "metrics": {
+            "calls": 4,
+            "cost_note": "Known subtotals exclude unknown charges and are not a provider invoice",
+            "cost_source": "unknown_provider_rates",
+            "cost_sources": [
+              "unknown_provider_rates"
+            ],
+            "currency": "USD",
+            "elapsed_seconds": 91.372,
+            "estimated_cost_known_subtotal": "0",
+            "estimated_cost_total": null,
+            "unknown_cost_calls": 4,
+            "unknown_usage_calls": 0,
+            "usage_known_subtotals": {
+              "completion_tokens": 4388,
+              "prompt_tokens": 56202,
+              "total_tokens": 60590
+            }
+          },
+          "persisted_identical": true,
+          "same_request_identical": true,
+          "excluded_from_qa_history": true,
+          "citation_check": {
+            "citations_checked": 0,
+            "errors": [],
+            "status": "not_applicable"
+          },
+          "reused_existing_task": false,
+          "terminal_sha256": "b2550b531e94ea14e92e57869478c88fc51b4ac2ec63e484fc1e1ac86b60f640"
+        },
+        {
+          "paper": "toolformer",
+          "task_id": "769694a4-ba56-42f9-acc8-e76cd025c40c",
+          "status": "insufficient_evidence",
+          "error_code": null,
+          "pipeline_version": "paper-introduction-v4",
+          "metrics": {
+            "calls": 4,
+            "cost_note": "Known subtotals exclude unknown charges and are not a provider invoice",
+            "cost_source": "unknown_provider_rates",
+            "cost_sources": [
+              "unknown_provider_rates"
+            ],
+            "currency": "USD",
+            "elapsed_seconds": 95.608,
+            "estimated_cost_known_subtotal": "0",
+            "estimated_cost_total": null,
+            "unknown_cost_calls": 4,
+            "unknown_usage_calls": 0,
+            "usage_known_subtotals": {
+              "completion_tokens": 4137,
+              "prompt_tokens": 67152,
+              "total_tokens": 71289
+            }
+          },
+          "persisted_identical": true,
+          "same_request_identical": true,
+          "excluded_from_qa_history": true,
+          "citation_check": {
+            "citations_checked": 0,
+            "errors": [],
+            "status": "not_applicable"
+          },
+          "reused_existing_task": false,
+          "terminal_sha256": "286734f38d07a3a78711e1c9dfb8b6d706d3ac06ff058829804d31c7b07a284e"
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "new_calls_this_feature": 24,
+    "known_total_tokens": 530224,
+    "calls_with_unknown_usage": 1,
+    "application_scope_calls_before": 129,
+    "application_scope_calls_after": 153,
+    "unchanged_scope_cap": 160,
+    "remaining_call_slots": 7,
+    "actual_cost": null,
+    "cost_source": "unknown_provider_rates"
+  },
+  "latest_outcome": {
+    "papers_run": 3,
+    "displayable_introductions": 1,
+    "insufficient_evidence": 2,
+    "all_samples_passed": false,
+    "human_acceptance": "pending"
+  },
+  "independent_ai_review": {
+    "schema_version": 1,
+    "reviewed_at_utc": "2026-09-05T08:20:08.879381+00:00",
+    "reviewer": "independent Codex AI content review subagent /root/review_intro_content",
+    "run_id": "20260905T081152.162041Z-5338c546f94a4d68ac3a8f65eb3427a1",
+    "code_sha": "13e33492baf45a13ecb61797a0cc2b1676292e6b",
+    "prompt_version": "paper-introduction-v4",
+    "rubric_source": "docs/paper-introduction-demo.md: 开发样例与检查规则（真实运行前固定）",
+    "rubric_source_sha256": "923e8f72669c269d5a71b38014055d148249aa10d8d9bf79486cd79d0cb787a3",
+    "review_scope": "Only successful persisted introduction is scored as displayable content. Rejected candidates are diagnosed separately and receive no invented displayable-content score.",
+    "method": "Read frozen extracted pages and actual terminal JSON, independently assess content and cited support, and recompute citation provenance with Python. No external provider calls; no source or existing run artifact edits.",
+    "development_provenance": "AI-prepared public papers previously used in development. This reviewer also supplied source-grounded writing feedback on rejected v3 candidates; this is a development diagnostic, not a held-out benchmark.",
+    "human_review": "pending",
+    "source_checks": {
+      "react": {
+        "page_count": 33,
+        "all_page_text_sha256_match_manifest": true,
+        "source_pdf_sha256": "f285b0971ae4a790e402fb93966bed3adde2cf0a04977d08b2b40d6ab0cace69"
+      },
+      "reflexion": {
+        "page_count": 19,
+        "all_page_text_sha256_match_manifest": true,
+        "source_pdf_sha256": "6059b6f89fea9959bd3dab553fbb97756a3dfb1b15e3cbab2fbf3ab6664333bd"
+      },
+      "toolformer": {
+        "page_count": 17,
+        "all_page_text_sha256_match_manifest": true,
+        "source_pdf_sha256": "6d7483d94653008e40c2058a1c22441c92e3713dae278b6361e8efc447c99522"
+      }
+    },
+    "results": [
+      {
+        "paper": "react",
+        "paper_id": "acffff0b-0513-4b00-98d3-40567542eda9",
+        "terminal_sha256": "13bc66515662917608d815723f58e6162686b3bded47f8ca010013d38b36c9e5",
+        "application_status": "answered",
+        "displayable_introduction": true,
+        "body_chars": 421,
+        "criteria": [
+          {
+            "id": 1,
+            "name": "研究问题",
+            "rating": "完整",
+            "reason": "区分仅推理无法从外界及时补充信息与仅行动缺少高层目标推理、状态跟踪的困难；问题和实际交互场景对应。",
+            "source_physical_pages": [
+              2,
+              3
+            ]
+          },
+          {
+            "id": 2,
+            "name": "主要贡献",
+            "rating": "完整",
+            "reason": "准确描述用提示把自然语言思考与任务动作交错，说明思考组织计划、行动取得外部信息的双向作用。没有把提示主设置改写为一种训练算法。",
+            "source_physical_pages": [
+              2,
+              3
+            ]
+          },
+          {
+            "id": 3,
+            "name": "核心原理与必要条件",
+            "rating": "完整",
+            "reason": "保留主要设置冻结模型参数、人工编写少量思考/动作/观察示范；交代模型生成动作而环境返回观察，并区分知识推理任务密集交替与长程决策任务在关键位置思考。未沿用上一候选中模型生成环境反馈的误导表达。",
+            "source_physical_pages": [
+              3,
+              4
+            ]
+          },
+          {
+            "id": 4,
+            "name": "关键术语易懂且有据",
+            "rating": "部分",
+            "reason": "推理轨迹和观察的定义清楚且符合原文；思维链解释仍引入未解释的内部表征，正文首次出现的冻结参数、上下文提示、工作记忆也未顺带解释。对先理解关键术语的新手目标不能记为完整。",
+            "source_physical_pages": [
+              2,
+              3,
+              5
+            ],
+            "remaining_gap": "用户尚需自行理解部分术语；易懂程度须由用户试读核对。"
+          },
+          {
+            "id": 5,
+            "name": "结果与范围",
+            "rating": "完整",
+            "reason": "结果限定于HotpotQA/FEVER对仅行动提示以及ALFWorld/WebShop的所比较方法，没有声称所有任务或所有基线全面领先；搜索信息无效、重复循环及示范受到输入长度限制均有原文依据。",
+            "source_physical_pages": [
+              5,
+              6,
+              8,
+              9
+            ]
+          },
+          {
+            "id": 6,
+            "name": "引用存在归属与独立语义核对",
+            "rating": "完整",
+            "reason": "对最终可展示内容19处引用、14个不同片段重算标识并核对原始页偏移、逐字文本、物理页、当前论文ID及PDF哈希，全部通过；另行逐项对照所附引文及冻结页文，未发现足以改变核心结论的未支持陈述。该判据不替代第4项易懂程度，也不等于人工验收。",
+            "programmatic_checks": {
+              "citation_occurrences": 19,
+              "distinct_chunk_ids": 14,
+              "exact_original_page_span": true,
+              "chunk_id_recomputed": true,
+              "current_paper_identity_and_sha256": true,
+              "page_index": true
+            }
+          }
+        ],
+        "overall_content_rating": "部分",
+        "overall_reason": "Five criteria complete; key-term accessibility remains partial. Can be shown as a sourced AI demo with human review pending.",
+        "human_review": "pending"
+      },
+      {
+        "paper": "reflexion",
+        "paper_id": "c48760cc-266c-4d27-b677-592f2a743bbe",
+        "terminal_sha256": "b2550b531e94ea14e92e57869478c88fc51b4ac2ec63e484fc1e1ac86b60f640",
+        "application_status": "insufficient_evidence",
+        "displayable_introduction": false,
+        "criteria": null,
+        "review_status": "not_scored_no_displayable_introduction",
+        "rejected_candidate_diagnosis": {
+          "field": "evidence_and_limits",
+          "independently_checked": true,
+          "reason": "最终结果段使用相对强基线，但该段四个实际引用没有为强基线限定提供完整依据；原文邻接片段存在强基线论述。这是段内断言与引用匹配不足，不能据此说原论文缺少结果。",
+          "source_physical_pages": [
+            2,
+            7,
+            14
+          ]
+        },
+        "human_review": "pending"
+      },
+      {
+        "paper": "toolformer",
+        "paper_id": "3148eb83-07b1-4e61-84fa-c5681283971d",
+        "terminal_sha256": "286734f38d07a3a78711e1c9dfb8b6d706d3ac06ff058829804d31c7b07a284e",
+        "application_status": "insufficient_evidence",
+        "displayable_introduction": false,
+        "criteria": null,
+        "review_status": "not_scored_no_displayable_introduction",
+        "rejected_candidate_diagnosis": {
+          "field": "evidence_and_limits",
+          "independently_checked": true,
+          "reason": "最终结果段断言问答任务提升和小模型不能有效用工具，但实际所引页6问答部分及页8规模部分仅到章节开头，未覆盖对应结果。全文页7及页8后续文字存在相关结果，因此是证据片段未配齐，不能把整篇论文判为没有依据。",
+          "source_physical_pages": [
+            6,
+            7,
+            8,
+            11
+          ]
+        },
+        "human_review": "pending"
+      }
+    ],
+    "summary": {
+      "papers_run": 3,
+      "displayable_introductions": 1,
+      "displayable_complete_content_rubric": 0,
+      "displayable_partial_content_rubric": 1,
+      "not_scored_no_displayable_introduction": 2,
+      "human_acceptance": "pending"
+    },
+    "artifact_note": "Added after runner completion. The existing artifacts.sha256 does not include this review; no pre-existing run file was changed."
+  },
+  "independent_ai_review_sha256": "33e3f201673935931dbba9c138e50cbe1cdd86e61dd82ad1bd4185cd9f957fc4",
+  "displayable_demo": {
+    "paper": "react",
+    "paper_id": "acffff0b-0513-4b00-98d3-40567542eda9",
+    "url": "http://127.0.0.1:8000/#paper=acffff0b-0513-4b00-98d3-40567542eda9&page=0",
+    "content": {
+      "contribution": {
+        "text": "核心贡献是一个基于提示的通用范式：把自然语言思考加入智能体可生成的空间，并与会影响环境的任务动作交错，以统一语言推理和交互决策。",
+        "physical_pages": [
+          2,
+          3
+        ]
+      },
+      "evidence_and_limits": {
+        "text": "在HotpotQA和FEVER上，该方法均优于仅行动提示；在ALFWorld和WebShop上也优于所比较的仅行动及训练型方法。HotpotQA分析显示，无效搜索和重复循环会导致失败；复杂大动作空间还可能需要更多示范并超过上下文长度。",
+        "physical_pages": [
+          5,
+          6,
+          8,
+          9
+        ]
+      },
+      "mechanism": {
+        "text": "主要设置冻结大模型参数，用人工编写的少量“思考—动作—观察”示范作上下文提示。模型用思考分解目标、整理观察和调整计划，再生成动作；环境返回观察供下一轮使用，推理任务密集交替，长程决策任务只在关键处稀疏思考。",
+        "physical_pages": [
+          3,
+          4
+        ]
+      },
+      "problem": {
+        "text": "仅做思维链时，模型难以依据外界反馈更新知识，容易产生事实幻觉和错误累积；仅生成动作时，又缺少高层目标推理和工作记忆，可能无法理解当前状态并重复错误动作。",
+        "physical_pages": [
+          2,
+          3
+        ]
+      },
+      "summary": {
+        "text": "论文针对大语言模型把推理与行动分开处理的问题，提出交错生成语言思考与任务动作，让思考规划行动，并让外部信息反过来更新推理。",
+        "physical_pages": [
+          1,
+          2
+        ]
+      },
+      "terms": [
+        {
+          "term": "思维链",
+          "explanation": "本文把它作为仅推理基线：保留语言思考，但移除动作和观察。由于思考依赖模型内部表征而未与外界信息相连，它可能产生事实幻觉并传播早期错误。",
+          "physical_pages": [
+            2,
+            5
+          ]
+        },
+        {
+          "term": "推理轨迹",
+          "explanation": "模型生成的自然语言思考记录，本身不改变外部环境，也不直接得到环境反馈；它整理当前上下文中的计划、关键信息或进度，支持后续思考和行动。",
+          "physical_pages": [
+            3
+          ]
+        },
+        {
+          "term": "观察",
+          "explanation": "观察是环境提供给智能体的信息，不是模型生成的思考或动作；它与此前的动作共同进入上下文，成为后续决策的依据。",
+          "physical_pages": [
+            2,
+            3
+          ]
+        }
+      ]
+    }
+  },
+  "preservation_checks": {
+    "papers_identical": true,
+    "previous_50_qa_identical": true,
+    "previous_129_calls_preserved": true,
+    "pdf_hashes_identical": true,
+    "no_active_tasks": true,
+    "same_scope_within_original_cap": true,
+    "all_persistent_data_identical_across_restart": true
+  },
+  "browser_checks": {
+    "native_browser": "Codex in-app browser",
+    "observed_stages": [
+      "generating",
+      "revising",
+      "answered"
+    ],
+    "final_content_and_term_order": true,
+    "mechanism_citation_navigated_to_physical_page": 3,
+    "reload_retained_introduction": true,
+    "qa_transition_and_prior_react_history_count": 19,
+    "mobile_width": 390,
+    "mobile_height": 844,
+    "mobile_document_scroll_width": 390,
+    "deliverable_tab_marked": true,
+    "user_review": "pending"
+  }
+}

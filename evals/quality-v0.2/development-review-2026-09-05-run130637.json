@@ -1,0 +1,983 @@
+{
+  "application_self_check_used_as_quality_evidence": false,
+  "application_status_counts": {
+    "answered": 8,
+    "insufficient_evidence": 4,
+    "partial_answer": 3
+  },
+  "artifacts": [
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T130637.505954Z-480131ece73e4699b0c61029df13db68/ai-review.json",
+      "sha256": "8ac7f7de708640c33d1cacb89196f0caa16e68631833d96230c43e3f4e944c90"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T130637.505954Z-480131ece73e4699b0c61029df13db68/ai-summary.json",
+      "sha256": "d9de6055a7b7fd470e2d6c4f3ea14144d4d6b1b9cbdb2bc2e6538927d8835d06"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T130637.505954Z-480131ece73e4699b0c61029df13db68/ai-template.json",
+      "sha256": "b9cc9d5399819fe4397ea0414e39c03bf2caebfbb6f47020d970299a18b02fc9"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T130637.505954Z-480131ece73e4699b0c61029df13db68/artifacts.sha256",
+      "sha256": "072e1ede43ae5db33afd5319533a03e80cfafa889d7a541612d8d3bf0845217b"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T130637.505954Z-480131ece73e4699b0c61029df13db68/draft-items.json",
+      "sha256": "7feea12e56ebf128117f7e862363d98f6f2d753baf9b1c888413e61af87c9840"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T130637.505954Z-480131ece73e4699b0c61029df13db68/react-read-progress.json",
+      "sha256": "e165712d275b6d6826980ee27e0fb2bd6f6d21970a8a275f0aa97ef3d5de951f"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T130637.505954Z-480131ece73e4699b0c61029df13db68/react-review-fragment.json",
+      "sha256": "b51322023bef333edf319428f8eaf476222f9f8620656376376f13871c88e2fe"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T130637.505954Z-480131ece73e4699b0c61029df13db68/reflexion-review-fragment.json",
+      "sha256": "ba4c7cfba347693b83941e63543040f1d090c1a392824847e2e856a616e918b1"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T130637.505954Z-480131ece73e4699b0c61029df13db68/source-integrity-audit.json",
+      "sha256": "8cb81d3b35cca7f8df6de216363a31b99be11d1b1482dcaec5fe090184132c7d"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T130637.505954Z-480131ece73e4699b0c61029df13db68/toolformer-review-fragment.json",
+      "sha256": "e5a5d75483ea75e79ad29a166278b6e04510985a3fc6da3da81fb26b022c09cf"
+    }
+  ],
+  "comparison_with_previous_v6": {
+    "interpretation": "同一冻结旧开发集的两次运行：严格完整6/10→8/10、原点13/18→17/18、条件9/11→11/11、检索9/10→10/10；无据不足回答0/5→1/5。事实82/82→72/73使用各次实际输出依赖的原子清单，不能据分母变化推断能力提升。当前react03词补充未发生实际替换；不同模型查询/输出与本次全部结果不能作为词补充单独因果效应或统计稳定性证据。",
+    "previous_metrics": {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 0.7222222222222222,
+        "denominator": 18,
+        "negative": 5,
+        "numerator": 13,
+        "pending": 0,
+        "rate": 0.7222222222222222
+      },
+      "citation_source_compliance": {
+        "citations_checked": 24,
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 12,
+        "negative": 0,
+        "numerator": 12,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "complete_supported_answer": {
+        "confirmed_fraction_of_all": 0.6,
+        "denominator": 10,
+        "negative": 4,
+        "numerator": 6,
+        "pending": 0,
+        "rate": 0.6
+      },
+      "engineering_failure": {
+        "confirmed_fraction_of_all": 0.0,
+        "denominator": 15,
+        "negative": 15,
+        "numerator": 0,
+        "pending": 0,
+        "rate": 0.0
+      },
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 82,
+        "denominator_is_complete": true,
+        "negative": 0,
+        "numerator": 82,
+        "pending": 0,
+        "questions_with_unfinished_fact_inventory": [],
+        "rate": 1.0
+      },
+      "false_refusal_on_answerable": {
+        "confirmed_fraction_of_all": 0.0,
+        "denominator": 10,
+        "negative": 10,
+        "numerator": 0,
+        "pending": 0,
+        "rate": 0.0
+      },
+      "necessary_condition_coverage": {
+        "confirmed_fraction_of_all": 0.8181818181818182,
+        "denominator": 11,
+        "denominator_is_complete": true,
+        "negative": 2,
+        "numerator": 9,
+        "pending": 0,
+        "questions_without_frozen_condition_rubric": [],
+        "rate": 0.8181818181818182
+      },
+      "retrieval_sufficiency_on_answerable": {
+        "confirmed_fraction_of_all": 0.9,
+        "denominator": 10,
+        "negative": 1,
+        "numerator": 9,
+        "pending": 0,
+        "rate": 0.9
+      },
+      "unjustified_answer_on_unanswerable": {
+        "confirmed_fraction_of_all": 0.0,
+        "denominator": 5,
+        "negative": 5,
+        "numerator": 0,
+        "pending": 0,
+        "rate": 0.0
+      }
+    },
+    "record_path": "evals/quality-v0.2/development-review-2026-09-05-run123700.json",
+    "record_sha256": "fbaf8d749e7880dfa21d75a2be3d5c46ee416017b0433ccc59f10f19334a60d1",
+    "run_path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/runs/20260905T123700.665098Z-789421e2076a49358cb7757801594e17",
+    "same_frozen_original_points_and_conditions": true
+  },
+  "diagnostic_observations": [
+    {
+      "details": "两类记忆保存内容已补齐；最终仅说明长期经验用途，短期轨迹参与下一次决策仍缺，原点1/2且检索充分。附加时点要求单列；即使去掉它也仍真实部分覆盖。",
+      "question_ids": [
+        "reflexion-01"
+      ],
+      "type": "real_original_point_omission_despite_sufficient_retrieval"
+    },
+    {
+      "details": "正文将简单启发式130/134与经过12次连续试验相连，原点和条件均完整；应用仍partial，严格完整指标保持false。属于必要累计条件的语义重复判缺，不是可选背景膨胀。",
+      "question_ids": [
+        "reflexion-02"
+      ],
+      "type": "necessary_condition_semantic_false_partial"
+    },
+    {
+      "details": "最终仅剩实验背景及不能认定评测目标任务，没有直接回答目标正确率无法确定；“本文列明的其他实验是”穷尽范围遗漏附录WebShop，1个范围事实不支持，unjustified=true。未编造目标正确率数值。 候选中的不可确定正确率回应与额外全篇否定绑定后被剔除；未发布候选不补入成绩。与v5穷尽范围裁判一致。",
+      "question_ids": [
+        "reflexion-05"
+      ],
+      "type": "unsupported_exhaustive_scope_and_insufficiency_relevance_failure"
+    },
+    {
+      "details": "本次正文确实恢复模型冻结、作者错误分类和人工示例条件。react03冻结片段已在补充前的合并列表，实际decisions=[]；恢复不等于此运行发生词补充插入，更不证明稳定解决。",
+      "question_ids": [
+        "react-03",
+        "react-04",
+        "toolformer-01"
+      ],
+      "type": "actual_coverage_recovered_without_single_component_causal_attribution"
+    },
+    {
+      "details": "本次均返回限定当前检索范围的空claims不足提示，无无据具体数字/清单或不相干背景替代目标。",
+      "question_ids": [
+        "react-05",
+        "reflexion-04",
+        "toolformer-04",
+        "toolformer-05"
+      ],
+      "type": "proper_insufficiency_observed"
+    },
+    {
+      "details": "两原点完整；本条引文所在同一个原句的局部上下文支持交错和双向作用，另记节选完整性提示。 交错描述在该引文所属同一句前半，未借另一claim引用。",
+      "question_ids": [
+        "react-01"
+      ],
+      "type": "citation_local_context_adjudication"
+    },
+    {
+      "details": "正文给出双基准较小加权损失、调用及结果前缀和至少降低tau_f的保留条件；未展开后续词元的损失目标解释，按前两轮相同题义裁判，所问比较基准与保留准则已覆盖。",
+      "question_ids": [
+        "toolformer-02"
+      ],
+      "type": "criterion_level_wording_adjudication"
+    }
+  ],
+  "evaluation_split": "development_regression_not_held_out",
+  "human_review": {
+    "reviewed_at": null,
+    "reviewer": null,
+    "status": "pending"
+  },
+  "independent_citation_source_check": {
+    "answered_or_partial_questions_checked": 11,
+    "citations_checked": 23,
+    "errors": [],
+    "meaning": "23处实际引用的存在/当前论文归属与语义支持分别核对；4道空claims不足题没有实际引用，不能从空引用检查推断语义通过。",
+    "recomputed_against_frozen_pages": true
+  },
+  "main_finding": "本次v7旧15题开发回归：严格完整有据8/10，原点17/18，条件11/11，事实72/73，检索10/10。仍有1个真实原点遗漏、1题正文语义完整但应用partial，以及不足题实验范围断言错误；不能由条件覆盖或引用存在全部通过代替完整质量。",
+  "metrics": {
+    "answer_point_coverage": {
+      "confirmed_fraction_of_all": 0.9444444444444444,
+      "denominator": 18,
+      "negative": 1,
+      "numerator": 17,
+      "pending": 0,
+      "rate": 0.9444444444444444
+    },
+    "citation_source_compliance": {
+      "citations_checked": 23,
+      "confirmed_fraction_of_all": 1.0,
+      "denominator": 11,
+      "negative": 0,
+      "numerator": 11,
+      "pending": 0,
+      "rate": 1.0
+    },
+    "complete_supported_answer": {
+      "confirmed_fraction_of_all": 0.8,
+      "denominator": 10,
+      "negative": 2,
+      "numerator": 8,
+      "pending": 0,
+      "rate": 0.8
+    },
+    "engineering_failure": {
+      "confirmed_fraction_of_all": 0.0,
+      "denominator": 15,
+      "negative": 15,
+      "numerator": 0,
+      "pending": 0,
+      "rate": 0.0
+    },
+    "fact_support": {
+      "confirmed_fraction_of_all": 0.9863013698630136,
+      "denominator": 73,
+      "denominator_is_complete": true,
+      "negative": 1,
+      "numerator": 72,
+      "pending": 0,
+      "questions_with_unfinished_fact_inventory": [],
+      "rate": 0.9863013698630136
+    },
+    "false_refusal_on_answerable": {
+      "confirmed_fraction_of_all": 0.0,
+      "denominator": 10,
+      "negative": 10,
+      "numerator": 0,
+      "pending": 0,
+      "rate": 0.0
+    },
+    "necessary_condition_coverage": {
+      "confirmed_fraction_of_all": 1.0,
+      "denominator": 11,
+      "denominator_is_complete": true,
+      "negative": 0,
+      "numerator": 11,
+      "pending": 0,
+      "questions_without_frozen_condition_rubric": [],
+      "rate": 1.0
+    },
+    "retrieval_sufficiency_on_answerable": {
+      "confirmed_fraction_of_all": 1.0,
+      "denominator": 10,
+      "negative": 0,
+      "numerator": 10,
+      "pending": 0,
+      "rate": 1.0
+    },
+    "unjustified_answer_on_unanswerable": {
+      "confirmed_fraction_of_all": 0.2,
+      "denominator": 5,
+      "negative": 4,
+      "numerator": 1,
+      "pending": 0,
+      "rate": 0.2
+    }
+  },
+  "missing_result_question_ids": [],
+  "original_run_integrity": {
+    "artifacts_sha256": "150d99a066249ddbe3c9fcffee54bfe8a4b037871976ad061199b3cf2f577993",
+    "artifacts_verified": 77,
+    "original_run_modified": false
+  },
+  "per_question": [
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": true,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": null,
+        "denominator": 0,
+        "negative": 0,
+        "numerator": 0,
+        "pending": 0,
+        "rate": null
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 9,
+        "negative": 0,
+        "numerator": 9,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "finding": "两原点完整；本条引文所在同一个原句的局部上下文支持交错和双向作用，另记节选完整性提示。",
+      "question_id": "react-01",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": true,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "finding": "存在与不存在两个分支、前5句与相近5实体、Wikipedia搜索引擎来源完整。",
+      "question_id": "react-02",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": true,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 14,
+        "negative": 0,
+        "numerator": 14,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "finding": "PaLM-540B冻结条件与人工轨迹均进入当前selected和最终正文；6/3、训练集来源及生成方式完整。本轮冻结段已在merged_selected，词补充decisions为空，不能把成功单独归因为词补充插入。",
+      "question_id": "react-03",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 1,
+        "negative": 0,
+        "numerator": 1,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": true,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": null,
+        "denominator": 0,
+        "negative": 0,
+        "numerator": 0,
+        "pending": 0,
+        "rate": null
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 5,
+        "negative": 0,
+        "numerator": 5,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "finding": "循环表现与作者归为推理错误均进入正文，原复合点完整。",
+      "question_id": "react-04",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": null,
+      "application_status": "insufficient_evidence",
+      "citation_source_check": null,
+      "complete_supported_answer": null,
+      "condition_coverage": null,
+      "condition_rubric_missing": true,
+      "engineering_failure": false,
+      "expected_status": "insufficient_evidence",
+      "fact_inventory_complete": true,
+      "fact_support": null,
+      "false_refusal": null,
+      "finding": "空claims并明确当前检索范围证据不足；无人民币费用、汇率编造或以背景代答。",
+      "question_id": "react-05",
+      "record_missing": false,
+      "retrieval_sufficient": null,
+      "unjustified_answer": false
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 0.5,
+        "denominator": 2,
+        "negative": 1,
+        "numerator": 1,
+        "pending": 0,
+        "rate": 0.5
+      },
+      "application_status": "partial_answer",
+      "citation_source_check": true,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": null,
+        "denominator": 0,
+        "negative": 0,
+        "numerator": 0,
+        "pending": 0,
+        "rate": null
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 9,
+        "negative": 0,
+        "numerator": 9,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "finding": "两类记忆保存内容已补齐；最终仅说明长期经验用途，短期轨迹参与下一次决策仍缺，原点1/2且检索充分。附加时点要求单列；即使去掉它也仍真实部分覆盖。",
+      "question_id": "reflexion-01",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "partial_answer",
+      "citation_source_check": true,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 6,
+        "negative": 0,
+        "numerator": 6,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "finding": "正文将简单启发式130/134与经过12次连续试验相连，原点和条件均完整；应用仍partial，严格完整指标保持false。属于必要累计条件的语义重复判缺，不是可选背景膨胀。",
+      "question_id": "reflexion-02",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 1,
+        "negative": 0,
+        "numerator": 1,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": true,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 1,
+        "negative": 0,
+        "numerator": 1,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 1,
+        "negative": 0,
+        "numerator": 1,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "finding": "可能陷入非最优局部最小值的风险及限定完整。",
+      "question_id": "reflexion-03",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": null,
+      "application_status": "insufficient_evidence",
+      "citation_source_check": null,
+      "complete_supported_answer": null,
+      "condition_coverage": null,
+      "condition_rubric_missing": true,
+      "engineering_failure": false,
+      "expected_status": "insufficient_evidence",
+      "fact_inventory_complete": true,
+      "fact_support": null,
+      "false_refusal": null,
+      "finding": "当前已检索范围不足提示恰当，无墙钟时间/GPU编造。",
+      "question_id": "reflexion-04",
+      "record_missing": false,
+      "retrieval_sufficient": null,
+      "unjustified_answer": false
+    },
+    {
+      "answer_point_coverage": null,
+      "application_status": "partial_answer",
+      "citation_source_check": true,
+      "complete_supported_answer": null,
+      "condition_coverage": null,
+      "condition_rubric_missing": true,
+      "engineering_failure": false,
+      "expected_status": "insufficient_evidence",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 0.8888888888888888,
+        "denominator": 9,
+        "negative": 1,
+        "numerator": 8,
+        "pending": 0,
+        "rate": 0.8888888888888888
+      },
+      "false_refusal": null,
+      "finding": "最终仅剩实验背景及不能认定评测目标任务，没有直接回答目标正确率无法确定；“本文列明的其他实验是”穷尽范围遗漏附录WebShop，1个范围事实不支持，unjustified=true。未编造目标正确率数值。",
+      "question_id": "reflexion-05",
+      "record_missing": false,
+      "retrieval_sufficient": null,
+      "unjustified_answer": true
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": true,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 1,
+        "negative": 0,
+        "numerator": 1,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 9,
+        "negative": 0,
+        "numerator": 9,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "finding": "正文明确每个API的少量人工示例，自监督和人工来源两原点与条件完整。",
+      "question_id": "toolformer-01",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": true,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 6,
+        "negative": 0,
+        "numerator": 6,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "finding": "正文给出双基准较小加权损失、调用及结果前缀和至少降低tau_f的保留条件；未展开后续词元的损失目标解释，按前两轮相同题义裁判，所问比较基准与保留准则已覆盖。",
+      "question_id": "toolformer-02",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": true,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 1,
+        "negative": 0,
+        "numerator": 1,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 3,
+        "negative": 0,
+        "numerator": 3,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "finding": "预训练GPT-J与固定论文标注6.7B来源归属完整。",
+      "question_id": "toolformer-03",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": null,
+      "application_status": "insufficient_evidence",
+      "citation_source_check": null,
+      "complete_supported_answer": null,
+      "condition_coverage": null,
+      "condition_rubric_missing": true,
+      "engineering_failure": false,
+      "expected_status": "insufficient_evidence",
+      "fact_inventory_complete": true,
+      "fact_support": null,
+      "false_refusal": null,
+      "finding": "当前检索范围不足说明恰当，没有虚构完整CCNet文档ID或种子清单。",
+      "question_id": "toolformer-04",
+      "record_missing": false,
+      "retrieval_sufficient": false,
+      "unjustified_answer": false
+    },
+    {
+      "answer_point_coverage": null,
+      "application_status": "insufficient_evidence",
+      "citation_source_check": null,
+      "complete_supported_answer": null,
+      "condition_coverage": null,
+      "condition_rubric_missing": true,
+      "engineering_failure": false,
+      "expected_status": "insufficient_evidence",
+      "fact_inventory_complete": true,
+      "fact_support": null,
+      "false_refusal": null,
+      "finding": "当前检索范围不足说明恰当，没有编造工具美元成本。",
+      "question_id": "toolformer-05",
+      "record_missing": false,
+      "retrieval_sufficient": false,
+      "unjustified_answer": false
+    }
+  ],
+  "previous_v5_record": {
+    "path": "evals/quality-v0.2/development-review-2026-09-05-run121135.json",
+    "sha256": "9619cbbd8c70f0421c2827dad16925724a4d1a91ac0e0b833dca7d7355c7b352"
+  },
+  "prior_failed_attempt": {
+    "actual_cost": null,
+    "actual_model_calls": null,
+    "actual_tokens": null,
+    "artifact_hashes": {
+      "artifacts.sha256": "1025b9354ff224509c426a1d96b2cfab368b58e0ec9f0338eb8125abdf4beb80",
+      "invocation.json": "19fce767a800141037a6ec24c0b887231665d5fb22aa28a39f3e1a5a946b5c57",
+      "preparation.json": "c7b59d58337980b8697e28eb537ec283ef739fc1ee318dfc8e97f5e500ff8900",
+      "selection.json": "b2533fe9fada85965959a328d1a468156c6a813ab20c9968905d4f4bdb7e8c60",
+      "summary.json": "237c6e65988989d89740bbcf1d42f249a9eea715f88c52866e6dc4510f7c22bd"
+    },
+    "audit_source": "ai",
+    "call_count_note": "RUN itself has 15 unmeasured questions with calls_may_have_occurred=true; recorded_calls=0 is not evidence of actual zero. External root ledger observation is a separate evidence source and is not substituted here.",
+    "engineering_failure": {
+      "denominator": 15,
+      "numerator": 15,
+      "pending": 0
+    },
+    "failure_type": "HTTP409 creating application question for all15; no delivered model answers",
+    "human_review": "pending",
+    "known_recorded_calls": 0,
+    "original_artifacts_verified": 47,
+    "preselected_questions": 15,
+    "provider_calls_by_this_audit": 0,
+    "reviewed_at": "2026-09-05T12:27:05.135804+00:00",
+    "run_code": {
+      "branch": "codex/col-19-paper-introduction-demo",
+      "dirty": false,
+      "sha": "ca9fabc3c84009d1ae91968d69957e551006fb17",
+      "status_porcelain": [],
+      "working_file_sha256": {
+        ".github/workflows/ci.yml": "72b8889f367a9d786def8723ca7ec0035f23f50387dcd055bad184d5e09771b0",
+        ".gitignore": "3b7aff44a290a423c2c4d5c9157aa2fc32e6fe5431fffa083ba90dee82445075",
+        ".python-version": "f01d748a75eb195e6fd73201279bfb23f09036ddd360eb3e9ff40ef042acbc8a",
+        "AGENTS.md": "1e382ff1fda6c345c5e87f38c992b079870100ccd21d04bb7c59ea6e4a2b0610",
+        "Makefile": "6b23b1b2e19936ea0e86773a419594e8c3ae82b112aa235f633e4b1b0bbbd370",
+        "README.md": "dbdc26761a0f3244092366b0e7a0e2ab0ec1185aa1ac797faf61305034d497fa",
+        "docs/development-diagnostics.md": "db1bc52bcfbffaeaecd6d1b466ba5e2e92b887e9946d6e86a9e0301353fbbe1c",
+        "docs/development-workflow.md": "8627b2a546b1d6e535495d81631fe9e033c73be7c38559cde6833ff769df75d7",
+        "docs/evidence-qa-v01.md": "e88dd1f387822430c7c2deb6e6ba38e6ed832663b02c4ac9280e5f9fe00ba466",
+        "docs/handoff.md": "03d7c0083934e1282e2dc5fed8912eb8056fec2f841fe630f1de572f3661c3ba",
+        "docs/linear-snapshot.md": "d34647edc0dd494c63a52f7787682f5631aaa184720d9b75eb32b32501724d83",
+        "docs/local-development.md": "59d1a5eb71b59cb5cf5f804484ce0e38cbb0a860136046f8bc41116079625308",
+        "docs/manual-trial-v01.md": "0642855b62b2b8ae46046ffc966fa2e40051fa6f6b2b3901387f588a846bc4aa",
+        "docs/manual-trial-v02.md": "272c02d0b651fca75d810b8cf2dce943f8ba82c1ad14fa0a42ed7b5559d1d931",
+        "docs/paper-introduction-demo.md": "f53f1a03210b24523dcf5f3dc3e6a56152b76443f3cd4a1945a3a7f7050e6150",
+        "docs/pdf-import.md": "8eb7ab5ceb4985e92faaa797ef272f828bf8adaa20cdcb874183c77975c5dfcc",
+        "docs/product-brief.md": "49af23ad2fa7224596f47e22021088256fc88fa7320cd7f0ddcff76ba061f0df",
+        "docs/project-baseline.md": "b46558a6a49604512bfd9f1ab3c77d92f6914efcc8a54b1b61a312f112a8ce5b",
+        "docs/quality-evaluation-v02.md": "3e7b31fa769bc7101cfe3dad25e3a16d4d26bf3c76de1c8fda173f746cbededb",
+        "docs/reading-quality-v02.md": "01ed2435613f4f44ee5c84551e149040ca20b7d85a2242fed05f28348f6e569d",
+        "docs/retrieval-coverage-comparison.md": "76859ac8dac0ebec16ae1a5cf7a6bb39254e128cea8207c094e3eb930abde405",
+        "docs/verification-col-16.md": "b79dcc9685a79446b5d56d189b35c79915286fd6c65291b7f59b7435d73173ac",
+        "docs/verification-col-18.md": "0b11dab6eb2897d79f7c4d09ddbc046dc64b1dbfe84a6436fa889e269a57b9ec",
+        "docs/verification-col-19.md": "e3f9ce5997d0d4a1b6bace8d8190b4beec6df5326ed5e6cf3e6d13c9dfc882e7",
+        "docs/verification-quality-v02.md": "996856885c96aea7d1a7e1c44c300960aa467f751e8b0c36c7810a9a5cc0419e",
+        "evals/development-v0.1/checksums.sha256": "87c4a2be30f3d7f52c62e11a4205ac976447835bba214f74cf73f0df7b5c4693",
+        "evals/development-v0.1/manifest.json": "876b348732b4047202f24e355f33b196ddbfde38841d03de6e51799abb7def82",
+        "evals/development-v0.1/questions.json": "f1265203baa095d321d5cc413c5d52e98c740ca95de6db05e1c38f68f7a82112",
+        "evals/development-v0.1/results-2026-09-05.json": "6bf1acaca3220e45144c061a81e64c38a75649990df34cb16aee93c12ea36681",
+        "evals/development-v0.1/source-verification.json": "31250f7963ad605b59b051ea72d377e7f5653bcd7eccd081954d14226413d720",
+        "evals/holdout-v0.2/README.md": "3d1bbc08b11dfa9e38fe831772be5fa8921ef1f66c8a193c7880265d68746fbe",
+        "evals/holdout-v0.2/checksums.sha256": "3eadf6a1a36afd532d5166f950872e71d8140861b31bd52fb3f97b196cd255e4",
+        "evals/holdout-v0.2/evidence.json": "b6bbbd4511b2fbc5abaf8dc50556ec546e01f365f4fe28378e8eb5fa11d44df2",
+        "evals/holdout-v0.2/manifest.json": "19c5b4725de92c926fe97ff22d9c15dd46fc08d1d8ad934c7eb9c2cb98ac6d14",
+        "evals/holdout-v0.2/questions.json": "490e447aa0f091dc6c53e55814a05424e96a4f84ea533f953a5eb6ee372f698b",
+        "evals/holdout-v0.2/rubric.json": "694019998676166a9e2e3e0b4f80ed4dc8b374c8d5604a765c1682ceee565843",
+        "evals/introduction-v0.1/results-2026-09-05.json": "6487d8ffdfdab295c4bfc1b7f8925b3cf1cd07d3ebb548ebd7f22e1ddf00f4bc",
+        "evals/quality-v0.2/README.md": "507c91daf961c8cf8e11bd5693eb303a19e1a98996c586f2e563b360c8add5d0",
+        "evals/quality-v0.2/development-v01-conditions-v1.json": "a47beb1c104041b5377b21409a224864643d4fe7c597b851f252b6fe1f19cbfa",
+        "evals/quality-v0.2/intro-react-v6-review-2026-09-05.json": "d8fd547c92610cbf5379857c0767f9524bec05c325179e4f30d90094ecd0a2b1",
+        "evals/quality-v0.2/intro-react-v7-review-2026-09-05.json": "1480596367d39a36dfc0ca7171c7446d05f2cfc5b33c87615faec6de4441bf38",
+        "evals/quality-v0.2/react-03-conditions.json": "284769b50b9106d587b95d97a4a75044edf3a200eb43239c0cd9625194db1f4c",
+        "evals/quality-v0.2/react-03-review-2026-09-05-run1.json": "54a6232b5bb94394043ab1da1c67ae74ca672b6cdd2f09c40e3921b545211726",
+        "evals/quality-v0.2/react-03-review-2026-09-05-run2.json": "95b731011f3f7b133021459f39b4ea3494fc515f537abacdd19fcf7391d209f7",
+        "pyproject.toml": "edb92ad29501d1034ee2795bc0cbb3eb1fd316ffa2db8965d2ce7547b009472e",
+        "scripts/browser_fixture.py": "4f662b0609df39f37af6819f7ea6d40ea46ebf4ef103af150b9ec6103f1fc273",
+        "scripts/check_backend.py": "b39c29471dc81e928728c1916337723f5080dead71ddb1c7df564260cd458c22",
+        "scripts/evaluate_development.py": "3eab1bd74afef511ab3e7752e8e304768ad8185d6c199bcb4da6db11b36f701f",
+        "scripts/evaluate_introductions.py": "6fa3d9783ed83f2d6eaca478c5ddefc7bd9b0f307bbd2ee4ff1894988901b8d7",
+        "scripts/fetch_diagnostic_papers.py": "f660291faa4430b73c76710207efb15fc61b51790c3b042ab65d7a215f42d819",
+        "scripts/fetch_holdout_papers.py": "4b740f034c3c8883ce1f17077cf515424495ebf5620f8dce6e4170e39e887762",
+        "scripts/postgres.py": "31025f9f3645f800aed986b3de4cce1ce69e70afa214811660543cf3fdbc8f64",
+        "scripts/score_quality.py": "bcf8dbf8e5ce61295541fa0a8f25bc10934afe904b60a16ba4abce2ee066298c",
+        "scripts/smoke.py": "9fc1b98483f4613a4a956918829ce2dbb99545d68962f0a61085329e91b09df3",
+        "src/papertrail/__init__.py": "7c7e3bdec8784746824e46e9dbde92628c50f3b136b21ccd48fb9cca1274b3e5",
+        "src/papertrail/budget.py": "64a595a55f461f42a84c789ef714bb88aac64f5fb43e620bf2365ec4123977b3",
+        "src/papertrail/config.py": "5d18fd9879eb903842d64e4a82147754d55d82843b5be225c56d6ae73e2efeb8",
+        "src/papertrail/coverage.py": "5986e727cd280ad3ed0b5f6a8e3685e56e90f6c33a3aae98041a9d21aa453968",
+        "src/papertrail/errors.py": "e98c514985805fecd85a1120ab5b25994945911b5eb9c374808e6cb0e3677f28",
+        "src/papertrail/ingestion.py": "98fa3b957d713078e79206a97223d8391c64295d24434d3eeedbc4c50b775178",
+        "src/papertrail/introduction.py": "da95161a6989bbdf20109936807ff6b66036156fefb841965de8f2c45f77b0d8",
+        "src/papertrail/main.py": "ecee5a36c70bb13a655f9010d86a98451d667fc786550f975aabd6c728016b64",
+        "src/papertrail/model.py": "e94324d75d4e96aa4ae596ca3604968eb0fce355e43c82473f3baad2a3c32579",
+        "src/papertrail/parser.py": "2017ffef51fcbcb3b4765c5514570680bf2f0b4550f24b89c042e93d1a68be3c",
+        "src/papertrail/qa.py": "e66a5621f9aa49027824ac31f25bf0ad67ffeff094a3d735ea02ba4b6ff5211e",
+        "src/papertrail/questions.py": "9f829a064821f6105e16184d5bb1959a1867d46e6fcf53dfa6839d782196561d",
+        "src/papertrail/repository.py": "528bac340413091913a4341bd95c71bead78e9f26132af7043dfe8103a4812a6",
+        "src/papertrail/retrieval.py": "57708baa48750616789886d31b1cd0389bd324d1c8f058a6931b283df1aaa962",
+        "src/papertrail/schema.sql": "4e2c887a06c5145e400c51b96c4998377c8e7bb0c0742c8c80316bd557defdf6",
+        "tests/conftest.py": "aba93a7fb919392972df4bf4d09746d2d19cfe451d77821a86aa9fa56c4eaa5d",
+        "tests/pdf_fixtures.py": "8241e1d09d2463235e0929a183cd2db182a0413088e6cea00542cd3807a07804",
+        "tests/test_browser_fixture.py": "74a4769fe90bfaea37b6f457cfb7edd705f1c69f263a2c539f3ea61978d09613",
+        "tests/test_coverage.py": "a8dd68c63beb4d8eefb95558f0d01fa81150b715d674bcedaaa349df2050f6ba",
+        "tests/test_diagnostic_runner.py": "87337194f56c6805f13dd9d5833a310264f867698a79dd373edef26e38b92e05",
+        "tests/test_holdout_sources.py": "35e1a963fd3bcbc2e1cbd83cde40aab00ad6973efe22b655baddb7ebc41d4925",
+        "tests/test_import.py": "48c66ca8d3070d058213276f57d7fe3fd48433b7107f89e805bd29b1a7a7e4e3",
+        "tests/test_intro_diagnostic.py": "176d00b2801748c4bc68ddf59603216f01f7e483d6b866b1d952b9bd02eebf52",
+        "tests/test_introduction.py": "6471eef2bf95c74eb8666d9d62969fd278a1ed9fbdb1ad6193758b27ee92cd86",
+        "tests/test_introduction_cache_versions.py": "e94c58b47f94c3b7ea5a94c5ad88569ca151e73ff8d309439f27e176772e0064",
+        "tests/test_introduction_model_diagnostics.py": "e1e6f9b47c9111d3d9102caf970917d39f8dbac95a42d0aec1e7002b56197261",
+        "tests/test_introduction_reading_card.py": "7d57bbe3d92e0cdbb183f3f25a1cdcd74bed79161e01f7dd401981e543684925",
+        "tests/test_introduction_revision.py": "286a95e93369fec0b9d0c412b0922523c3c7083d18b8e40e39354c89f959b482",
+        "tests/test_introduction_tasks.py": "feb723f9f4e154a17b61363b3ca64ed8074be47d27fadec59dc477e7d1d21243",
+        "tests/test_model.py": "03535298818712bda3ba6e5a20b328ebda40d94bc27d629e8f11fbc2e62044c7",
+        "tests/test_qa.py": "ce50d47e219a47447f55859bdebc7df88db0f95bd76f52ddee7fbe87448bb45c",
+        "tests/test_quality_persistence.py": "70ac3140b0911d737ef350d1b3e1a2aefc698e20ebbcddc99f1c47a0545b6a2a",
+        "tests/test_quality_scoring.py": "fe2855e1e429ba08cff8a645832cfdb40d9a058bb6d34b052a8e86486d25640f",
+        "tests/test_questions.py": "155a6c3d7950c95f47c50147ab8b58899a23bcf634fee772f5963fbc07fe70ac",
+        "tests/test_retrieval.py": "53b23fc11572dc0db24ea1aca9001616991f458d5bd17a197dac50351d5fe210",
+        "tests/test_unlimited_budget.py": "198d515f9ab8b3f5c424e090fe5d6bd09363fcf131189a087ff965e96dacbcc0",
+        "uv.lock": "7c85c34617d1a1e8cf1ece01b59c898695f30a2b318f4099fbaa14b61bb0688b",
+        "web/index.html": "bebfbd9edb95a1abe27321f46b381bc28659cc1be2f7bd8c3b7385524262823b",
+        "web/package-lock.json": "4b30e56799f425bf8acd1d8f8c61ccbe34ff4407f5bed316f6635e79e60f4f3b",
+        "web/package.json": "1f73b09832a543d4faa8fa3c4524231de7c9e09dc1c7575f972c4da28c0b1b5f",
+        "web/scripts/pdf-assets.mjs": "88978f6069ecb4f432fe8fb5a6cf9312357970f273ad30d47edd4b0939a7e5a6",
+        "web/src/IntroductionPanel.css": "5ccb95c72789c43a59dba56d29109a19f2602589f75ace4bd866be88edc9a8c2",
+        "web/src/IntroductionPanel.tsx": "1e6cd1269e62f0171882a6de85db73a34dd6eb775baa7371f69372ca5ce6a5c3",
+        "web/src/PdfPage.tsx": "8dd16489d81363cd3d879c2ed5459711b64ecc8769299b735c2f251b0f9f4bb7",
+        "web/src/QuestionPanel.tsx": "51d613dc9a5eb8f966d34e1abb11d41b14a3e05e909631e9bb31477114b8b487",
+        "web/src/main.tsx": "198500332b6c4a3fdb5cd82da8848527d665566c407e08af4269dd9412be7f30",
+        "web/src/style.css": "a2e92e4d4ce17db4e2e25f403f13ee19a2602ad2371e7c5c1d53a0b6ffff3524",
+        "web/tsconfig.json": "231e67379e60e489690ab13c08fc15f847e95128a32c89af00f5b9835a0af35b",
+        "web/vite.config.ts": "09cc91cf63f3bb34a74c019a0be4cb7c9591c51ba9fcb89c6710a6a68c3d29ee"
+      }
+    },
+    "run_path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/runs/20260905T120747.657918Z-af3af42615a8444d91ea0a05a8d8db76",
+    "scope_note": "Separate failed batch retained. It is not merged into the new run denominator and is not erased by a later run.",
+    "semantic_review": "not_applicable_no_actual_answers",
+    "unmeasured_questions": 15
+  },
+  "provider_calls_by_this_independent_review": 0,
+  "qa_prompt_version": "evidence-qa-v7-query-term-coverage",
+  "resource_observation": {
+    "calls_known_subtotal": 45,
+    "calls_total": 45,
+    "cost_note": "Recorded estimates, not provider invoices. Unknown rates remain unknown.",
+    "elapsed_questions_missing": 0,
+    "elapsed_questions_observed": 15,
+    "elapsed_seconds_known_subtotal": 393.813,
+    "elapsed_seconds_mean_observed": 26.2542,
+    "estimated_cost_known_subtotals": {
+      "USD": "0"
+    },
+    "estimated_cost_totals": null,
+    "questions_with_unknown_call_count": 0,
+    "questions_with_unknown_total_cost": 15,
+    "token_known_subtotals": {
+      "completion_tokens": 11617,
+      "prompt_tokens": 186093,
+      "total_tokens": 197710
+    },
+    "unknown_cost_calls": 45,
+    "unknown_usage_calls": 0
+  },
+  "retrieval_version": "bm25-v2-query-term-coverage",
+  "review_source": "ai",
+  "reviewed_at": "2026-09-05T13:24:16.872694+00:00",
+  "reviewer": "Codex quality_evaluation with independent Reflexion and Toolformer reading agents",
+  "rubric": {
+    "frozen_at": "2026-09-05T12:01:58.832447+00:00",
+    "frozen_before_run": true,
+    "necessary_conditions": 11,
+    "original_answer_points": 18,
+    "path": "evals/quality-v0.2/development-v01-conditions-v1.json",
+    "sha256": "a47beb1c104041b5377b21409a224864643d4fe7c597b851f252b6fe1f19cbfa"
+  },
+  "run_code_dirty": false,
+  "run_code_note": "Invocation freezes clean606f97be75e4d105af5825e665162bc34545c5b3; QA core176c15d adds bounded lexical query-term coverage with v6 prompt semantics unchanged. Runtime trace versions recorded below.",
+  "run_code_sha": "606f97be75e4d105af5825e665162bc34545c5b3",
+  "run_path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/runs/20260905T130637.505954Z-480131ece73e4699b0c61029df13db68",
+  "schema_version": 1,
+  "scope_limitations": [
+    "这是参与开发诊断的旧3篇15题回归，不是新留出成绩或统计稳定性证明。",
+    "严格完整回答保持partial状态不可算完整；reflexion02正文语义完整仅作独立诊断列出。",
+    "原点18和条件11未改；必要局部上下文与题义层级裁判沿用先前记录，未为本轮追求100%修改评分。",
+    "AI判定不是人工阅读、用户认可或学习验收；所有human pending。",
+    "本独立评审未访问provider、应用API或holdout，未改原RUN、应用提示或检索。",
+    "45次调用及197710 tokens来自当前运行记录；所有45次费用因费率未知保持未知，不将USD0已知小计当总成本。",
+    "保留旧v5/v6与之前全15题HTTP409工程失败，失败分母独立列示，不覆盖或混入本次完整运行。"
+  ],
+  "selected_questions": 15,
+  "source_read_scope": {
+    "react": "当前5题正文及引文重新核对；当前来源与连续独立审读原文完全一致，53个先前完整已读片段出现逐项字节确认，7个新片段全文读；相关完整原页1、3、4、5、6、7、8已读并本次重验，未声称重读全部33页。",
+    "reflexion": "独立审读全部60个selected出现/29不同片段、实际引用与充分原文；19页PDF/文本哈希及重新提取一致。",
+    "selected_chunk_occurrences_independently_read": 180,
+    "selected_source_slices_programmatically_reverified": 180,
+    "toolformer": "独立审读全部60个selected出现/38不同片段、实际引用和第1、2、3、4、5、11、15、17页充分原文；17页来源哈希一致。"
+  }
+}

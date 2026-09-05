@@ -15,6 +15,15 @@ class QuestionService:
         self.repository = repository
 
     def run(self, question_id: UUID, paper_id: UUID, question: str) -> None:
+        self._run(question_id, paper_id, question, kind="qa")
+
+    def run_introduction(self, question_id: UUID, paper_id: UUID) -> None:
+        from papertrail.introduction import INTRODUCTION_QUESTION
+
+        self._run(question_id, paper_id, INTRODUCTION_QUESTION, kind="introduction")
+
+    def _run(self, question_id: UUID, paper_id: UUID, question: str, *, kind: str) -> None:
+        from papertrail.introduction import introduce_paper, introduction_model_config
         from papertrail.model import ModelClient, ModelConfig
         from papertrail.qa import answer_question
 
@@ -24,24 +33,28 @@ class QuestionService:
             "status": "failed",
             "claims": [],
             "error_code": "internal_error",
-            "message": "处理未能完成，原问题已保存。请查看本地服务状态后主动重试。",
+            "message": "处理未能完成，任务已保存。请查看本地服务状态后主动重试。",
         }
         try:
             self.repository.progress_question(question_id, "retrieving")
             paper = self.repository.get(paper_id)
             pages = self.repository.pages(paper_id)
+            config = ModelConfig.from_env()
+            if kind == "introduction":
+                config = introduction_model_config(config)
             client = ModelClient(
-                ModelConfig.from_env(),
+                config,
                 before_call=ledger.before_call,
                 record_call=ledger.record_call,
             )
-            result = answer_question(
-                paper,
-                pages,
-                question,
-                client=client,
-                progress=lambda stage: self.repository.progress_question(question_id, stage),
-            )
+
+            def progress(stage):
+                self.repository.progress_question(question_id, stage)
+
+            if kind == "introduction":
+                result = introduce_paper(paper, pages, client=client, progress=progress)
+            else:
+                result = answer_question(paper, pages, question, client=client, progress=progress)
         except Exception as error:
             # No raw provider text, question content or credentials in application logs.
             logger.error("Question failed: %s", type(error).__name__)
@@ -58,7 +71,7 @@ class QuestionService:
             except Exception as error:
                 logger.error("Question result save failed: %s", type(error).__name__)
                 # A malformed provider value must not keep the global task slot forever.
-                # If the DB remains unavailable, startup / 5-minute expiry recovers it.
+                # If the DB stays unavailable, startup / task-specific expiry recovers it.
                 try:
                     self.repository.finish_question(
                         question_id,

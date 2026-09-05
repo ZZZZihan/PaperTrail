@@ -13,7 +13,7 @@ TEXT = "Experiments use HotpotQA and FEVER benchmarks. Results are limited to th
 PAGES = [{"page_index": 0, "text": ""}, {"page_index": 1, "text": TEXT}]
 
 
-def pipeline_client(*, generate=None, verify=None, search=None):
+def pipeline_client(*, generate=None, verify=None, search=None, requirements=None):
     def handler(request):
         payload = json.loads(request.content)
         data = json.loads(payload["messages"][1]["content"])
@@ -23,8 +23,19 @@ def pipeline_client(*, generate=None, verify=None, search=None):
                 if verify is not None
                 else {
                     "verdicts": [
-                        {"claim_index": 0, "supported": True, "reason": "片段明确列出了数据集。"}
-                    ]
+                        {"claim_index": i, "supported": True, "reason": "片段明确列出了数据集。"}
+                        for i in range(len(data["claims"]))
+                    ],
+                    "coverage": [
+                        {
+                            "requirement_index": i,
+                            "covered": bool(data["claims"]),
+                            "claim_indices": [0] if data["claims"] else [],
+                            "reason": "测试覆盖判断。",
+                        }
+                        for i in range(len(data["requirements"]))
+                    ],
+                    "additional_requirements": [],
                 }
             )
         elif "passages" in data:
@@ -46,7 +57,10 @@ def pipeline_client(*, generate=None, verify=None, search=None):
             if generate:
                 result = generate(result)
         else:
-            result = {"search_queries": search or ["experiments datasets benchmarks"]}
+            result = {
+                "search_queries": search or ["experiments datasets benchmarks"],
+                "requirements": requirements or ["实验使用什么数据集？"],
+            }
         return httpx.Response(
             200,
             json={
@@ -81,6 +95,12 @@ def test_complete_fixed_pipeline_resolves_page_and_records_separate_checks():
     assert trace["usage"] == {"prompt_tokens": 300, "completion_tokens": 120, "complete": True}
     assert trace["retrieval"]["baseline_selected"] == []
     assert trace["retrieval"]["selected"][0]["page_index"] == 1
+    assert trace["retrieval"]["merged_selected"] == trace["retrieval"]["selected"]
+    assert trace["retrieval"]["supplementation"]["decisions"] == []
+    assert trace["retrieval"]["supplementation"]["baseline_matched_terms"] == [
+        "benchmarks",
+        "experiments",
+    ]
     assert stages == ["translating", "retrieving", "generating", "validating", "verifying"]
 
 
@@ -157,7 +177,18 @@ def test_real_quote_from_wrong_paper_is_rejected_and_whitespace_is_only_normaliz
 def test_semantically_unsupported_claim_is_withheld_despite_valid_quote():
     client = pipeline_client(
         verify={
-            "verdicts": [{"claim_index": 0, "supported": False, "reason": "该引文不支持这个结论。"}]
+            "verdicts": [
+                {"claim_index": 0, "supported": False, "reason": "该引文不支持这个结论。"}
+            ],
+            "coverage": [
+                {
+                    "requirement_index": 0,
+                    "covered": False,
+                    "claim_indices": [],
+                    "reason": "无支持。",
+                }
+            ],
+            "additional_requirements": [],
         }
     )
     result = answer_question(PAPER, PAGES, "所有任务都有提升吗？", client=client)
@@ -203,7 +234,7 @@ def test_no_retrieval_or_generation_insufficient_does_not_invent_answer():
     assert generated["status"] == "insufficient_evidence"
     assert generated["claims"] == []
     assert "paper never" not in generated["message"]
-    assert generated["trace"]["call_count"] == 2
+    assert generated["trace"]["call_count"] == 3
 
 
 def test_model_configuration_missing_returns_saved_failure_shape():
@@ -315,7 +346,18 @@ def test_pipeline_sends_authoritative_recovered_quote_to_support_check():
         data = json.loads(payload["messages"][1]["content"])
         if "claims" in data:
             support_inputs.append(data["claims"][0]["citations"][0]["quote"])
-            output = {"verdicts": [{"claim_index": 0, "supported": True, "reason": "测试判定"}]}
+            output = {
+                "verdicts": [{"claim_index": 0, "supported": True, "reason": "测试判定"}],
+                "coverage": [
+                    {
+                        "requirement_index": 0,
+                        "covered": True,
+                        "claim_indices": [0],
+                        "reason": "正文完整。",
+                    }
+                ],
+                "additional_requirements": [],
+            }
         elif "passages" in data:
             output = {
                 "status": "answered",
@@ -329,7 +371,10 @@ def test_pipeline_sends_authoritative_recovered_quote_to_support_check():
                 ],
             }
         else:
-            output = {"search_queries": ["experiments model useful calls"]}
+            output = {
+                "search_queries": ["experiments model useful calls"],
+                "requirements": ["实验设置？"],
+            }
         return httpx.Response(
             200,
             json={

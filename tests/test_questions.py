@@ -137,7 +137,10 @@ def test_lost_guard_stops_model_calls_and_new_questions_but_keeps_history_readab
                         {
                             "finish_reason": "stop",
                             "message": {
-                                "content": '{"search_queries":["Alpha evidence physical page one"]}'
+                                "content": (
+                                    '{"search_queries":["Alpha evidence physical page one"],'
+                                    '"requirements":["What is Alpha evidence?"]}'
+                                )
                             },
                         }
                     ],
@@ -315,8 +318,11 @@ def test_missing_budget_refuses_call_before_reservation(client, settings):
     assert ledger.snapshot()["calls"] == []
 
 
-@pytest.mark.parametrize("cap", [None, "", "0", "-1", "1001", "1.5", "invalid", "1", "1000"])
-def test_provider_quota_requires_explicit_bounded_call_cap(monkeypatch, cap):
+@pytest.mark.parametrize(
+    "cap",
+    [None, "", "0", "-1", "1001", "1.5", "invalid", "none", "UNLIMITED", "1", "1000", "unlimited"],
+)
+def test_provider_quota_requires_explicit_valid_call_limit_configuration(monkeypatch, cap):
     for key in (
         "PAPERTRAIL_MODEL_BUDGET",
         "PAPERTRAIL_MODEL_INPUT_PRICE_PER_MILLION",
@@ -329,9 +335,9 @@ def test_provider_quota_requires_explicit_bounded_call_cap(monkeypatch, cap):
     if cap is not None:
         monkeypatch.setenv("PAPERTRAIL_MODEL_MAX_CALLS", cap)
     budget = Budget.from_env()
-    if cap in {"1", "1000"}:
+    if cap in {"1", "1000", "unlimited"}:
         assert budget.mode == "provider_quota"
-        assert budget.max_calls == int(cap)
+        assert budget.max_calls == (None if cap == "unlimited" else int(cap))
         assert budget.currency == "USD"
     else:
         assert budget is None

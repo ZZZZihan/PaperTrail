@@ -1,8 +1,12 @@
 # 本地开发与运行
 
-## 当前功能（COL-18，真实模型验证待配置）
+## 当前功能（COL-19 研读质量 v0.2）
 
-PDF 导入、持久保存、逐页核对已扩展为固定流程的单篇证据问答：中文查询转换、BM25 检索、结构化生成、引用程序校验、独立 AI 支持检查及持久历史。关联分支 `codex/col-18-evidence-qa-v01`；[问答规格](evidence-qa-v01.md)、[开发诊断](development-diagnostics.md)、[人工试用与反馈](manual-trial-v01.md)。模型服务与费用上限尚未提供，离线测试不代表真实问答验收。COL-16 的 [PDF 行为](pdf-import.md) 和 [验证记录](verification-col-16.md) 继续有效，下方 COL-15 记录保留为历史。
+单篇文本 PDF 支持上传、持久保存与逐页核对。问答采用问题要点整理、中文查询转换、BM25 检索、结构化生成、引用校验，以及同一次独立 AI 调用中的事实支持和覆盖检查；有据但不完整时保存 `partial_answer` 与缺失项。简介按需生成研读卡，解释术语、研究问题、方法输入/过程/输出和实验条件，区分论文陈述、作者解释、教学示意和系统推断。两条链路共用原文、引用跳页及原调用账本。
+
+本轮本地工程与实测已完成，可试读新 ReAct 研读卡；临时不限量已关闭，同账本为 394/394。QA v7 的旧 15 题独立回归为 8/10 完整有据交付、17/18 原要点、11/11 必要条件、72/73 原子事实有据；仍有生成遗漏、完整性误判和一处背景范围错误。新 4 篇 20 题留出独立评分为 4/16 严格完整、43/62 要点、18/29 条件，原批次含 3/20 超时；已发布事实有据不代表完整回答，不将留出用于调参。简介 v10 使用 Sol low，已得到 8/8 本项引文支持、5/5 必要内容覆盖的新 ReAct 卡；这是一张开发样例，不代表所有论文均能成功。版本、分轮结果及未完成项统一见 [v0.2 验证记录](verification-quality-v02.md)；人工产品与学习验收仍待本人反馈。
+
+本机已配置真实 `gpt-5.6-sol`，QA none、简介 low。当前 Goal 的临时不限量已关闭，原 provider_quota scope 累计 394/394；历史完整保留，实际费用未知。优先按 [简短人工清单](manual-trial-v02.md) 核对已保存结果。旧 [问答 v0.1 规格](evidence-qa-v01.md)、[开发诊断](development-diagnostics.md)、[简介 v4 验证](verification-col-19.md)、COL-16 的 [PDF 行为](pdf-import.md) 和 [验证](verification-col-16.md) 保留历史证据，下方 COL-15 记录同样为历史。
 
 ### 准备与启动
 
@@ -20,12 +24,24 @@ make serve
 
 本地 PostgreSQL 仅监听 `127.0.0.1:55432`，数据位于 `data/postgres/`，角色和数据库名均为 `papertrail`，本地开发使用 trust 认证。该配置用于当前单用户开发，不作为多人服务配置。脚本不会启动或停止其他项目的数据库。首次安装 Homebrew 创建的默认集群并未用于本项目。
 
+### 可重复的离线端到端检查
+
+`make check` 验证静态规则、前端构建、后端测试和基础 HTTP 契约。需要进一步走完整 HTTP 与持久化链路时运行：
+
+```bash
+make check-e2e
+```
+
+此命令构建前端，再用动态空闲端口启动独立应用、临时论文库与 PostgreSQL 17，调用明确标为 OFFLINE 的模型替身。检查上传、空白物理页、重复文件、错误输入、六种问答结果、请求幂等、引用与原件，以及应用和数据库真实重启后的完整对象一致性；每次写请求前验证 fixture 标识，结束后清理临时服务和数据。结果保存于被忽略的 `output/e2e/latest.json`。它不读取 `.env.local`，不使用现有论文库或真实模型额度，也不是浏览器自动化或模型质量评分。该命令目前是本地扩展检查，远端 CI 仍执行 `make check`。
+
+浏览器故障走查可另运行 `uv run --locked python scripts/browser_fixture.py --port 8001`，打开打印的地址，上传打印的合成 PDF。问答支持“正常”“部分回答”“证据不足”“无效引用”“超时”“失败”；`introduction_pdfs` 提供简介成功、一次修订、失败、检查不通过、慢响应，以及旧卡升级成功/失败七种文件。旧卡仅为明确标识的合成 fixture 播种；不属于真实论文评测。向打印的 supervisor PID 发送 SIGUSR2 可重启应用与其私有数据库；Ctrl+C 清理环境。本次实际浏览器、API 和审查证据见 [提交前审查与端到端验证](verification-review-2026-09-05.md)。
+
 ### 配置与存储
 
 `.env.example` 列出监听地址、数据库连接、数据目录、大小/页数/时限。已有 `.env.local` 不覆盖，缺失的 PaperTrail 配置使用相同默认值。修改监听端口使用 `UVICORN_PORT`。
 
 - `data/library/papers/` 保存 PDF 原件，系统 UUID 命名；`staging/` 用于上传临时文件。
-- PostgreSQL 保存文件哈希、原始名称、解析版本、逐页文本、问题/回答/引用及模型调用账本；版本 2 增量添加问答和账本表，保留版本 1 论文数据。
+- PostgreSQL 保存文件哈希、原始名称、解析版本、逐页文本、问题/回答/引用及模型调用账本；版本 2 增量添加问答和账本表，版本 3 加入简介任务及请求别名，版本 4 增加 coverage 与 partial_answer；保留既有论文、任务和调用。
 - 如需备份，保留完整数据库及 `data/library/` 两部分。只拷贝 PDF 不会带回页面记录，删除 `data/` 会丢失论文及数据库。
 - `data/`、PDF、配置、虚拟环境、网页产物及浏览器证据不提交 Git；锁文件和结构 SQL 纳入 Git。
 
@@ -40,20 +56,27 @@ make serve
 | `PAPERTRAIL_MODEL_NAME` / `PAPERTRAIL_MODEL_API_KEY` | 获准的模型名称与本地密钥 |
 | `PAPERTRAIL_MODEL_PROFILE` | 显式请求参数方案：默认 `compatible`，或 `openai`；不按模型名称猜测 |
 | `PAPERTRAIL_MODEL_BUDGET_MODE` | 默认 `priced`，按金额和单价控制；明确选择 `provider_quota` 表示授权使用已有供应商额度 |
-| `PAPERTRAIL_MODEL_MAX_CALLS` | `provider_quota` 必填，1—1000 的整数；当前 scope 全部已记录调用累计上限 |
+| `PAPERTRAIL_MODEL_MAX_CALLS` | `provider_quota` 必填，1—1000 的整数是当前 scope 累计上限；仅明确获准时可设精确小写 `unlimited`，空值或拼写错误不表示不限量 |
 | `PAPERTRAIL_MODEL_BUDGET` / `PAPERTRAIL_MODEL_CURRENCY` | `priced` 必填的获准金额与币种；`provider_quota` 无需金额，币种为空时采用 USD，必须与同 scope 既有记录一致 |
 | `PAPERTRAIL_MODEL_INPUT_PRICE_PER_MILLION` / `PAPERTRAIL_MODEL_OUTPUT_PRICE_PER_MILLION` | 同币种每百万 token 保守输入/输出单价，用于调用前预留及用量后估算 |
 | `PAPERTRAIL_MODEL_BUDGET_SCOPE` | 本轮账本范围，默认 `v01-development`；不要通过换值绕过已经消耗的额度 |
 
-每题最多三次固定调用，单次默认 45 秒，总期限 180 秒；输出默认限制 1800 tokens。`PAPERTRAIL_MODEL_THINKING` 默认空，仅在服务支持时设 `disabled` 或 `enabled`。本轮建议非推理模式，避免思考 token 占用结构化输出额度。服务必须支持 JSON 输出；未配置时可浏览 PDF 与历史，不生成模拟答案。
+每题最多三次固定调用，单次默认 45 秒，总期限 180 秒；输出默认限制 1800 tokens。`PAPERTRAIL_MODEL_THINKING` 默认空，仅在服务支持时设 `disabled` 或 `enabled`。普通问答使用非推理模式，避免思考 token 占用结构化输出额度。服务必须支持 JSON 输出；未配置时可浏览 PDF 与历史，不生成模拟答案。
 
-`compatible` 请求使用 `max_tokens`、`temperature: 0`，并在配置非空时附带服务的 `thinking` 参数。`openai` 请求使用 `max_completion_tokens` 和 `reasoning_effort: "none"`，省略 `temperature` 与 `thinking`；此方案下 `PAPERTRAIL_MODEL_THINKING` 必须留空，否则视为配置无效。两种方案都使用 Chat Completions、JSON 对象输出及 `stream: false`，内部输出上限与预算预留仍使用同一个 `PAPERTRAIL_MODEL_MAX_OUTPUT_TOKENS`。配置必须与所选服务和模型的实际参数支持一致；程序不会根据模型前缀切换方案，也不会在请求失败后自动换参数重试。运行追踪保存所选方案、实际输出参数名、推理强度和温度；未发送的温度记录为 `null`。
+论文简介自 v6 起另用至少 120 秒的单次窗口和至少 5,000 tokens 输出上限，共享固定 300 秒总期限；正常两次调用，发生一次内容修订时最多四次，全部进入同一账本。每项可选 1—8 个原文片段用于补齐必要依据，普通问答每条仍最多 4 个引用。刷新、查看成功缓存、重新点击已有成功简介均不再调用模型。旧格式成功简介可经用户主动“补全为研读卡”新建任务，POST 使用新的 request_id 和 refresh_if_outdated: true；当前 paper-reading-card-v1 成功结果仍复用。升级中或失败时接口通过 previous_introduction 保留旧卡可读，失败后主动重试创建新任务。同一 request_id 始终指向原任务，网络提交不确定时先确认原提交结果。
+
+`compatible` 请求使用 `max_tokens`、`temperature: 0`，并在配置非空时附带服务的 `thinking` 参数。`openai` 请求使用 `max_completion_tokens` 和 `reasoning_effort: "none"`（简介显式 opt-in 可为 `low`），省略 `temperature` 与 `thinking`；此方案下 `PAPERTRAIL_MODEL_THINKING` 必须留空，否则视为配置无效。两种方案都使用 Chat Completions、JSON 对象输出及 `stream: false`，内部输出上限与预算预留仍使用同一个 `PAPERTRAIL_MODEL_MAX_OUTPUT_TOKENS`。配置必须与所选服务和模型的实际参数支持一致；程序不会根据模型前缀切换方案，也不会在请求失败后自动换参数重试。运行追踪保存所选方案、实际输出参数名、推理强度和温度；未发送的温度记录为 `null`。
+
+简介 v10 新增可选 `PAPERTRAIL_INTRODUCTION_REASONING_EFFORT=none|low`，缺省 `none`。
+它只影响简介，普通问答保持 `none`；`low` 需 `openai` profile，非法简介选项在网络前失败。
+推理和可见内容共用输出预算；实际返回的 reasoning tokens 为独立可选诊断，未知不补零、不重复计费。
+变更推理参数不会自动刷新缓存；当前流程旧卡需主动更新，后续同流程已有卡继续复用。
 
 HTTPS 和 `http://127.0.0.1` / `http://localhost` 沿用默认支持。若用户指定局域网 HTTP 中转站，例如服务根路径为 `http://192.168.1.2:8080/private-route/v1`，则将 `PAPERTRAIL_MODEL_ALLOW_HTTP_ORIGIN` 设为 `http://192.168.1.2:8080`。允许项只接受单个 origin，不含用户信息、查询参数、片段或业务路径（末尾单个 `/` 可省略）；协议、主机和有效端口必须与服务根路径一致，未写 HTTP 端口时按 80 匹配。该设置只允许这个明确入口，不接受地址列表或通配符，也不因地址属于局域网而自动允许。运行追踪仅保存服务 origin 和完整根路径的哈希，不保存业务路径或密钥。
 
 `priced` 模式每次调用前在持久账本预留输入保守上界及最大输出费用；成功返回用量后按配置单价估算，网络失败且用量未知则保留预留额。费用是配置单价计算的估算，不是供应商账单；特殊费用、不同计费规则或错误单价可能导致偏差。应使用普通文本 token 计费模型和供应商侧额度限制。服务、价格、额度得到用户授权后再运行真实诊断。
 
-当用户明确授权使用已有中转额度、而所选模型费率无法核实时，可显式选择 `provider_quota` 并设置 `PAPERTRAIL_MODEL_MAX_CALLS`；此模式不读取金额或单价，不估造模型费用。它在相同持久账本和事务锁下预留一次调用名额，累计当前 scope 的全部历史行，包含之前的 `priced` 调用、失败调用及未完成预留；重启或换模型、模式不会重置次数。达到上限后拒绝下一次调用，无自动重试或自动更换 scope。供应商余额限制仍由供应商执行，本地调用次数上限不是美元费用上限。
+当用户明确授权使用已有中转额度、而所选模型费率无法核实时，可显式选择 `provider_quota` 并设置 `PAPERTRAIL_MODEL_MAX_CALLS`；此模式不读取金额或单价，不估造模型费用。它在相同持久账本和事务锁下预留一次调用名额，累计当前 scope 的全部历史行，包含之前的 `priced` 调用、失败调用及未完成预留；重启或换模型、模式不会重置次数。数值上限达到后拒绝下一次调用，无自动重试或自动更换 scope。显式 `unlimited` 仅略过累计次数上限比较，仍保留同 scope 全部账本、事务锁、服务实例守卫、任务次数及期限；恢复数值上限后继续累计原有全部记录。供应商余额限制仍由供应商执行，本地调用次数上限不是美元费用上限。
 
 额度模式中的 `reserved_cost: 0` 仅为调用名额占位，绝不表示免费；`actual_cost` 和逐次 `estimated_cost` 始终为 `null`，即使用量 tokens 已知也不估费，来源记录为 `unknown_provider_rates`。快照中的 `known_cost_subtotal` 只累计已知金额；全部调用费用未知时它为 `0`、`estimated_cost` 为 `null`，并逐次计入 `unknown_cost_calls`。同 scope 已有额度模式调用后，不能切回金额模式将这些未知费用当作零继续预留。
 
@@ -65,7 +88,14 @@ uv run --locked python scripts/fetch_diagnostic_papers.py --verify-only
 uv run --locked python scripts/evaluate_development.py --prepare-only
 ```
 
-真实诊断通过运行中的应用 API 发起，使用相同预算账本：`uv run --locked python scripts/evaluate_development.py --run`。结果写入不复用的 `data/diagnostics/runs/`，具体核对步骤见 [开发诊断说明](development-diagnostics.md)。
+真实诊断通过运行中的应用 API 发起，使用相同持久账本。先检查实际余量和当前活跃任务，按冻结来源选择代表性样例，不将下面的复现命令当作要求立即重复运行：
+
+```bash
+uv run --locked python scripts/evaluate_development.py --run --ids react-03
+uv run --locked python scripts/evaluate_introductions.py --run --ids react --refresh-if-outdated
+```
+
+问答结果写入不复用的 `data/diagnostics/runs/`，简介写入 `data/diagnostics/introduction-runs/`。默认问答 `--run` 会执行原开发集全量，仅在明确有足够已授权余量时安排；本轮未执行的全量回归和候选留出评测不能记为完成。旧来源与复现规则见 [开发诊断说明](development-diagnostics.md)，当前执行证据见 [v0.2 验证记录](verification-quality-v02.md)。
 
 ### 前端与检查
 
@@ -75,7 +105,7 @@ uv run --locked python scripts/evaluate_development.py --prepare-only
 
 `make check` 运行 Ruff、前端类型检查与生产构建、业务测试、HTTP/OpenAPI 冒烟和 `git diff --check`。本地测试自动启动临时 PostgreSQL 集群并清理；不会清空开发论文库。CI 使用 PostgreSQL 17 服务，检查脚本创建独立 UUID 命名数据库再删除它；需 `PAPERTRAIL_TEST_ADMIN_URL` 指向专用测试服务。CI 是否通过以实际远端运行记录为准。
 
-学习入口：`src/papertrail/ingestion.py` 解释文件怎样进入系统；`repository.py` 解释文件与数据库的事务边界；`web/src/main.tsx` 解释页面怎样发起请求、读取逐页结果。正文/图表质量限制见验证记录。
+学习入口：`src/papertrail/coverage.py` 解释问题要点怎样与已发布事实关联；`introduction.py` 解释支持、来源类别和覆盖怎样分别检查；`src/papertrail/ingestion.py` 解释文件怎样进入系统；`repository.py` 解释文件与数据库的事务边界；`web/src/main.tsx` 解释页面怎样发起请求、读取逐页结果。正文/图表质量限制见验证记录。
 
 ## COL-15 初始服务基线（历史）
 

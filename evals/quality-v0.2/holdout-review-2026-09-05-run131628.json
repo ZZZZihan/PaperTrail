@@ -1,0 +1,1284 @@
+{
+  "application_self_check_used_as_quality_evidence": false,
+  "application_status_counts": {
+    "answered": 7,
+    "failed": 3,
+    "insufficient_evidence": 5,
+    "partial_answer": 5
+  },
+  "category_groups": {
+    "cross_section_conditions": {
+      "answer_points": {
+        "covered": 22,
+        "total": 22
+      },
+      "answerable": 4,
+      "engineering_failures": 0,
+      "fact_support": {
+        "supported": 71,
+        "total": 71
+      },
+      "false_refusals": 0,
+      "necessary_conditions": {
+        "covered": 11,
+        "total": 11
+      },
+      "questions": 4,
+      "retrieval_sufficient": 4,
+      "semantic_content_complete": 4,
+      "strict_complete_supported": 1,
+      "unanswerable": 0,
+      "unjustified_answers": 0
+    },
+    "fact": {
+      "answer_points": {
+        "covered": 12,
+        "total": 13
+      },
+      "answerable": 4,
+      "engineering_failures": 0,
+      "fact_support": {
+        "supported": 27,
+        "total": 27
+      },
+      "false_refusals": 0,
+      "necessary_conditions": {
+        "covered": 1,
+        "total": 2
+      },
+      "questions": 4,
+      "retrieval_sufficient": 4,
+      "semantic_content_complete": 2,
+      "strict_complete_supported": 2,
+      "unanswerable": 0,
+      "unjustified_answers": 0
+    },
+    "false_premise": {
+      "answer_points": {
+        "covered": 1,
+        "total": 12
+      },
+      "answerable": 4,
+      "engineering_failures": 3,
+      "fact_support": {
+        "supported": 13,
+        "total": 13
+      },
+      "false_refusals": 0,
+      "necessary_conditions": {
+        "covered": 0,
+        "total": 5
+      },
+      "questions": 4,
+      "retrieval_sufficient": 4,
+      "semantic_content_complete": 0,
+      "strict_complete_supported": 0,
+      "unanswerable": 0,
+      "unjustified_answers": 0
+    },
+    "insufficient_evidence": {
+      "answer_points": {
+        "covered": 0,
+        "total": 0
+      },
+      "answerable": 0,
+      "engineering_failures": 0,
+      "fact_support": {
+        "supported": 0,
+        "total": 0
+      },
+      "false_refusals": 0,
+      "necessary_conditions": {
+        "covered": 0,
+        "total": 0
+      },
+      "questions": 4,
+      "retrieval_sufficient": 0,
+      "semantic_content_complete": 0,
+      "strict_complete_supported": 0,
+      "unanswerable": 4,
+      "unjustified_answers": 0
+    },
+    "table_footnote_probe": {
+      "answer_points": {
+        "covered": 8,
+        "total": 15
+      },
+      "answerable": 4,
+      "engineering_failures": 0,
+      "fact_support": {
+        "supported": 24,
+        "total": 24
+      },
+      "false_refusals": 1,
+      "necessary_conditions": {
+        "covered": 6,
+        "total": 11
+      },
+      "questions": 4,
+      "retrieval_sufficient": 3,
+      "semantic_content_complete": 1,
+      "strict_complete_supported": 1,
+      "unanswerable": 0,
+      "unjustified_answers": 0
+    }
+  },
+  "dataset_id": "papertrail-candidate-holdout-v0.2",
+  "diagnostic_summary": [
+    "This first 4-paper holdout has 4/16 strict complete-and-supported deliveries, distinct from 135/135 supported published atoms; fact support does not imply completeness.",
+    "Published prose meets the complete semantic rubric in 7/16 answerable questions. Three of these remain partial_answer in the application, so the frozen strict delivery metric stays 4/16. The original SC paper review used semantic-completeness wording; the combined report explicitly resolves that naming difference without overwriting it.",
+    "One answerable refusal is associated with incomplete actual retrieval. The remaining answerable retrieval sets collectively support the frozen criteria, including the three failed tasks; answer/condition omissions, semantic checker disagreements and infrastructure failures therefore require separate reporting.",
+    "All three engineering failures are model_timeout; they remain selected failures without reruns, and no unissued candidate answer is scored as published.",
+    "Four intentionally unanswerable questions appropriately withhold unsupported requested values with a current-retrieval-scoped message; no unsupported substantive answer was published on those questions.",
+    "The four table/footnote probes remain in the main denominator: one strict complete delivery, two partial deliveries and one refusal. Table columns, splits, conditions and omissions are assessed under the original frozen rubric.",
+    "Known usage is only a subtotal: three timed-out calls lack token usage, and all 58 calls have unknown cost. USD 0 known subtotal is not zero total cost.",
+    "No application/prompt/retrieval changes, model retries or replacement labels were made from these held-out results. The root receives only final metrics and failure classes, not per-paper reference-answer details for tuning. This is an AI-prepared candidate holdout; human labels and product/learning acceptance are pending and pretraining exposure cannot be excluded."
+  ],
+  "frozen_dataset_files": {
+    "checksums.sha256": "3eadf6a1a36afd532d5166f950872e71d8140861b31bd52fb3f97b196cd255e4",
+    "evidence.json": "b6bbbd4511b2fbc5abaf8dc50556ec546e01f365f4fe28378e8eb5fa11d44df2",
+    "manifest.json": "19c5b4725de92c926fe97ff22d9c15dd46fc08d1d8ad934c7eb9c2cb98ac6d14",
+    "questions.json": "490e447aa0f091dc6c53e55814a05424e96a4f84ea533f953a5eb6ee372f698b",
+    "rubric.json": "694019998676166a9e2e3e0b4f80ed4dc8b374c8d5604a765c1682ceee565843"
+  },
+  "human_review": {
+    "questions_reviewed": 0,
+    "questions_total": 20,
+    "status": "pending"
+  },
+  "learning_acceptance": "pending",
+  "ledger": {
+    "active_after": 0,
+    "active_before": 0,
+    "calls_after": 388,
+    "calls_before": 330,
+    "max_calls_during_run": null,
+    "mode": "provider_quota",
+    "observation_source": "Root contemporaneous read-only SQL observations, also documented in docs/verification-quality-v02.md at b619942d595f98b2a527a4962b28c54d258506c1 lines 374-381. Original RUN contains per-task ledger, not global before/after. Preflight records scope/mode/model but not global numeric count; these are attributed observations, not invented RUN fields.",
+    "provider_cost": null,
+    "run_calls": 58,
+    "scope_sha256": "c104b0323b7ddb128b881e00b8feaa9825a12b2c15b5ff593d43d52a562f1e3e",
+    "temporarily_unlimited_authorized": true
+  },
+  "metrics": {
+    "answer_point_coverage": {
+      "confirmed_fraction_of_all": 0.6935483870967742,
+      "denominator": 62,
+      "negative": 19,
+      "numerator": 43,
+      "pending": 0,
+      "rate": 0.6935483870967742
+    },
+    "citation_source_compliance": {
+      "citations_checked": 54,
+      "confirmed_fraction_of_all": 1.0,
+      "denominator": 12,
+      "negative": 0,
+      "numerator": 12,
+      "pending": 0,
+      "rate": 1.0
+    },
+    "complete_supported_answer": {
+      "confirmed_fraction_of_all": 0.25,
+      "denominator": 16,
+      "negative": 12,
+      "numerator": 4,
+      "pending": 0,
+      "rate": 0.25
+    },
+    "engineering_failure": {
+      "confirmed_fraction_of_all": 0.15,
+      "denominator": 20,
+      "negative": 17,
+      "numerator": 3,
+      "pending": 0,
+      "rate": 0.15
+    },
+    "fact_support": {
+      "confirmed_fraction_of_all": 1.0,
+      "denominator": 135,
+      "denominator_is_complete": true,
+      "negative": 0,
+      "numerator": 135,
+      "pending": 0,
+      "questions_with_unfinished_fact_inventory": [],
+      "rate": 1.0
+    },
+    "false_refusal_on_answerable": {
+      "confirmed_fraction_of_all": 0.0625,
+      "denominator": 16,
+      "negative": 15,
+      "numerator": 1,
+      "pending": 0,
+      "rate": 0.0625
+    },
+    "necessary_condition_coverage": {
+      "confirmed_fraction_of_all": 0.6206896551724138,
+      "denominator": 29,
+      "denominator_is_complete": true,
+      "negative": 11,
+      "numerator": 18,
+      "pending": 0,
+      "questions_without_frozen_condition_rubric": [],
+      "rate": 0.6206896551724138
+    },
+    "retrieval_sufficiency_on_answerable": {
+      "confirmed_fraction_of_all": 0.9375,
+      "denominator": 16,
+      "negative": 1,
+      "numerator": 15,
+      "pending": 0,
+      "rate": 0.9375
+    },
+    "unjustified_answer_on_unanswerable": {
+      "confirmed_fraction_of_all": 0.0,
+      "denominator": 4,
+      "negative": 4,
+      "numerator": 0,
+      "pending": 0,
+      "rate": 0.0
+    }
+  },
+  "model": "gpt-5.6-sol",
+  "paper_groups": {
+    "cot": {
+      "answer_points": {
+        "covered": 8,
+        "total": 13
+      },
+      "answerable": 4,
+      "engineering_failures": 1,
+      "fact_support": {
+        "supported": 36,
+        "total": 36
+      },
+      "false_refusals": 1,
+      "necessary_conditions": {
+        "covered": 4,
+        "total": 7
+      },
+      "questions": 5,
+      "retrieval_sufficient": 3,
+      "semantic_content_complete": 2,
+      "strict_complete_supported": 1,
+      "unanswerable": 1,
+      "unjustified_answers": 0
+    },
+    "dpr": {
+      "answer_points": {
+        "covered": 14,
+        "total": 18
+      },
+      "answerable": 4,
+      "engineering_failures": 1,
+      "fact_support": {
+        "supported": 30,
+        "total": 30
+      },
+      "false_refusals": 0,
+      "necessary_conditions": {
+        "covered": 6,
+        "total": 8
+      },
+      "questions": 5,
+      "retrieval_sufficient": 4,
+      "semantic_content_complete": 3,
+      "strict_complete_supported": 3,
+      "unanswerable": 1,
+      "unjustified_answers": 0
+    },
+    "rag": {
+      "answer_points": {
+        "covered": 12,
+        "total": 18
+      },
+      "answerable": 4,
+      "engineering_failures": 1,
+      "fact_support": {
+        "supported": 30,
+        "total": 30
+      },
+      "false_refusals": 0,
+      "necessary_conditions": {
+        "covered": 4,
+        "total": 7
+      },
+      "questions": 5,
+      "retrieval_sufficient": 4,
+      "semantic_content_complete": 1,
+      "strict_complete_supported": 0,
+      "unanswerable": 1,
+      "unjustified_answers": 0
+    },
+    "sc": {
+      "answer_points": {
+        "covered": 9,
+        "total": 13
+      },
+      "answerable": 4,
+      "engineering_failures": 0,
+      "fact_support": {
+        "supported": 39,
+        "total": 39
+      },
+      "false_refusals": 0,
+      "necessary_conditions": {
+        "covered": 4,
+        "total": 7
+      },
+      "questions": 5,
+      "retrieval_sufficient": 4,
+      "semantic_content_complete": 1,
+      "strict_complete_supported": 0,
+      "unanswerable": 1,
+      "unjustified_answers": 0
+    }
+  },
+  "per_question": [
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": true,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": null,
+        "denominator": 0,
+        "negative": 0,
+        "numerator": 0,
+        "pending": 0,
+        "rate": null
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "question_id": "cot-01",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 6,
+        "negative": 0,
+        "numerator": 6,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "partial_answer",
+      "citation_source_check": true,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 4,
+        "negative": 0,
+        "numerator": 4,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 34,
+        "negative": 0,
+        "numerator": 34,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "question_id": "cot-02",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 0.0,
+        "denominator": 2,
+        "negative": 2,
+        "numerator": 0,
+        "pending": 0,
+        "rate": 0.0
+      },
+      "application_status": "failed",
+      "citation_source_check": null,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 0.0,
+        "denominator": 1,
+        "negative": 1,
+        "numerator": 0,
+        "pending": 0,
+        "rate": 0.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": true,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": null,
+      "false_refusal": false,
+      "question_id": "cot-03",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": null,
+      "application_status": "insufficient_evidence",
+      "citation_source_check": null,
+      "complete_supported_answer": null,
+      "condition_coverage": null,
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "insufficient_evidence",
+      "fact_inventory_complete": true,
+      "fact_support": null,
+      "false_refusal": null,
+      "question_id": "cot-04",
+      "record_missing": false,
+      "retrieval_sufficient": null,
+      "unjustified_answer": false
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 0.0,
+        "denominator": 3,
+        "negative": 3,
+        "numerator": 0,
+        "pending": 0,
+        "rate": 0.0
+      },
+      "application_status": "insufficient_evidence",
+      "citation_source_check": null,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 0.0,
+        "denominator": 2,
+        "negative": 2,
+        "numerator": 0,
+        "pending": 0,
+        "rate": 0.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": null,
+      "false_refusal": true,
+      "question_id": "cot-05",
+      "record_missing": false,
+      "retrieval_sufficient": false,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 0.6666666666666666,
+        "denominator": 3,
+        "negative": 1,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 0.6666666666666666
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": null,
+        "denominator": 0,
+        "negative": 0,
+        "numerator": 0,
+        "pending": 0,
+        "rate": null
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 7,
+        "negative": 0,
+        "numerator": 7,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "question_id": "sc-01",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 5,
+        "negative": 0,
+        "numerator": 5,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "partial_answer",
+      "citation_source_check": true,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 3,
+        "negative": 0,
+        "numerator": 3,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 18,
+        "negative": 0,
+        "numerator": 18,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "question_id": "sc-02",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 0.5,
+        "denominator": 2,
+        "negative": 1,
+        "numerator": 1,
+        "pending": 0,
+        "rate": 0.5
+      },
+      "application_status": "partial_answer",
+      "citation_source_check": true,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 0.0,
+        "denominator": 1,
+        "negative": 1,
+        "numerator": 0,
+        "pending": 0,
+        "rate": 0.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 13,
+        "negative": 0,
+        "numerator": 13,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "question_id": "sc-03",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": null,
+      "application_status": "insufficient_evidence",
+      "citation_source_check": null,
+      "complete_supported_answer": null,
+      "condition_coverage": null,
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "insufficient_evidence",
+      "fact_inventory_complete": true,
+      "fact_support": null,
+      "false_refusal": null,
+      "question_id": "sc-04",
+      "record_missing": false,
+      "retrieval_sufficient": false,
+      "unjustified_answer": false
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 0.3333333333333333,
+        "denominator": 3,
+        "negative": 2,
+        "numerator": 1,
+        "pending": 0,
+        "rate": 0.3333333333333333
+      },
+      "application_status": "partial_answer",
+      "citation_source_check": true,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 0.3333333333333333,
+        "denominator": 3,
+        "negative": 2,
+        "numerator": 1,
+        "pending": 0,
+        "rate": 0.3333333333333333
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 1,
+        "negative": 0,
+        "numerator": 1,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "question_id": "sc-05",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 4,
+        "negative": 0,
+        "numerator": 4,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 0.0,
+        "denominator": 1,
+        "negative": 1,
+        "numerator": 0,
+        "pending": 0,
+        "rate": 0.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 10,
+        "negative": 0,
+        "numerator": 10,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "question_id": "rag-01",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 6,
+        "negative": 0,
+        "numerator": 6,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "partial_answer",
+      "citation_source_check": true,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 9,
+        "negative": 0,
+        "numerator": 9,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "question_id": "rag-02",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 0.0,
+        "denominator": 4,
+        "negative": 4,
+        "numerator": 0,
+        "pending": 0,
+        "rate": 0.0
+      },
+      "application_status": "failed",
+      "citation_source_check": null,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 0.0,
+        "denominator": 1,
+        "negative": 1,
+        "numerator": 0,
+        "pending": 0,
+        "rate": 0.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": true,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": null,
+      "false_refusal": false,
+      "question_id": "rag-03",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": null,
+      "application_status": "insufficient_evidence",
+      "citation_source_check": null,
+      "complete_supported_answer": null,
+      "condition_coverage": null,
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "insufficient_evidence",
+      "fact_inventory_complete": true,
+      "fact_support": null,
+      "false_refusal": null,
+      "question_id": "rag-04",
+      "record_missing": false,
+      "retrieval_sufficient": null,
+      "unjustified_answer": false
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 0.5,
+        "denominator": 4,
+        "negative": 2,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 0.5
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 0.6666666666666666,
+        "denominator": 3,
+        "negative": 1,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 0.6666666666666666
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 11,
+        "negative": 0,
+        "numerator": 11,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "question_id": "rag-05",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 4,
+        "negative": 0,
+        "numerator": 4,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": true,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 1,
+        "negative": 0,
+        "numerator": 1,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 8,
+        "negative": 0,
+        "numerator": 8,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "question_id": "dpr-01",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 5,
+        "negative": 0,
+        "numerator": 5,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": true,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 2,
+        "negative": 0,
+        "numerator": 2,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 10,
+        "negative": 0,
+        "numerator": 10,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "question_id": "dpr-02",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 0.0,
+        "denominator": 4,
+        "negative": 4,
+        "numerator": 0,
+        "pending": 0,
+        "rate": 0.0
+      },
+      "application_status": "failed",
+      "citation_source_check": null,
+      "complete_supported_answer": false,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 0.0,
+        "denominator": 2,
+        "negative": 2,
+        "numerator": 0,
+        "pending": 0,
+        "rate": 0.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": true,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": null,
+      "false_refusal": false,
+      "question_id": "dpr-03",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    },
+    {
+      "answer_point_coverage": null,
+      "application_status": "insufficient_evidence",
+      "citation_source_check": null,
+      "complete_supported_answer": null,
+      "condition_coverage": null,
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "insufficient_evidence",
+      "fact_inventory_complete": true,
+      "fact_support": null,
+      "false_refusal": null,
+      "question_id": "dpr-04",
+      "record_missing": false,
+      "retrieval_sufficient": null,
+      "unjustified_answer": false
+    },
+    {
+      "answer_point_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 5,
+        "negative": 0,
+        "numerator": 5,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "application_status": "answered",
+      "citation_source_check": true,
+      "complete_supported_answer": true,
+      "condition_coverage": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 3,
+        "negative": 0,
+        "numerator": 3,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "condition_rubric_missing": false,
+      "engineering_failure": false,
+      "expected_status": "answered",
+      "fact_inventory_complete": true,
+      "fact_support": {
+        "confirmed_fraction_of_all": 1.0,
+        "denominator": 12,
+        "negative": 0,
+        "numerator": 12,
+        "pending": 0,
+        "rate": 1.0
+      },
+      "false_refusal": false,
+      "question_id": "dpr-05",
+      "record_missing": false,
+      "retrieval_sufficient": true,
+      "unjustified_answer": null
+    }
+  ],
+  "product_acceptance": "pending",
+  "qa_pipeline_version": "evidence-qa-v7-query-term-coverage",
+  "reasoning_effort": "none",
+  "resources": {
+    "calls_known_subtotal": 58,
+    "calls_total": 58,
+    "cost_note": "Recorded estimates, not provider invoices. Unknown rates remain unknown.",
+    "elapsed_questions_missing": 0,
+    "elapsed_questions_observed": 20,
+    "elapsed_seconds_known_subtotal": 833.317,
+    "elapsed_seconds_mean_observed": 41.66585,
+    "estimated_cost_known_subtotals": {
+      "USD": "0"
+    },
+    "estimated_cost_totals": null,
+    "questions_with_unknown_call_count": 0,
+    "questions_with_unknown_total_cost": 20,
+    "token_known_subtotals": {
+      "completion_tokens": 24119,
+      "prompt_tokens": 237223,
+      "total_tokens": 261342
+    },
+    "unknown_cost_calls": 58,
+    "unknown_usage_calls": 3
+  },
+  "retrieval_version": "bm25-v2-query-term-coverage",
+  "review_artifacts": [
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/ai-review.json",
+      "sha256": "3f0df6e4dfe937e3af109ee7bf4ade691a2bb56f0d73c856e62c87df967d84a9"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/ai-summary.json",
+      "sha256": "dd5816643c89c79d03d70a86518689190cf7b097c51dae9d116822e3c9c3e90d"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/ai-template.json",
+      "sha256": "83dc14e0635c5f75067083050bf781b6c503b5b0d67350b9519a578a14574e0e"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/artifacts.sha256",
+      "sha256": "716f1bc98542cb7736834cdd02dbba8f901280bc3b8782db3ab61b8fed39967f"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/cot-review-input.json",
+      "sha256": "fc369ef71a9016fec1a68e559cac30490aefde9590430aab89bc7274848f1b34"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/cot-review.json",
+      "sha256": "d286e2364025e90a81b4d1be0ca11e8b7988f6dee07821f3570631ce154f2269"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/dpr-review-input.json",
+      "sha256": "959b979038c11424dd701a4cafba5c7ab99f30b6addd3a418ff26b730a514db5"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/dpr-review.json",
+      "sha256": "0c02dfa0135cb5f6081e7e7867e03d8cf8752aacdf5189eda453e140d12b551d"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/dpr-table3-page6.png",
+      "sha256": "665fbb22c4f028794db434acdad07868b7802a944f52fb44950b4ef1ab81b190"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/human-pending-template.json",
+      "sha256": "9f063d0cc419ca50c5478e25afd661bde9b9565567b870b9fafe55b42e614710"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/rag-review-input.json",
+      "sha256": "4fb76e10f35cbc4899aac19a4fd96374c6f8f9c69faa6e1231b69dd650f228a0"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/rag-review.json",
+      "sha256": "70e86dd37ce1b1cdbf8a5190c8bf224aa7ec18db284aa8b46f0de65acf2e5d5c"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/rag-table2-page6.png",
+      "sha256": "0d68dd09070688d2f8cad19f04e7c59cd8bed03ad024996633e8bdc90ac4060a"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/sc-review-input.json",
+      "sha256": "738bed8779d59cde629084ef16966c907ed85c1ea92c9a1173a10fdc18639c09"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/sc-review.json",
+      "sha256": "104303573d0ce45004d37642c477a1421d82c5180ac8314aeb2b4d3229e7828a"
+    },
+    {
+      "path": "data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/source-integrity-audit.json",
+      "sha256": "2f75f0eb3b3eb464f8bb59a90e3bfd9aa727d89b80c53ad175945f8775594d90"
+    }
+  ],
+  "review_model_calls": 0,
+  "review_source": "ai",
+  "reviewed_at": "2026-09-05T13:58:53.992876+00:00",
+  "reviewer": "Codex independent holdout reviewer with independent CoT and Self-Consistency paper reviewers",
+  "run": "data/diagnostics/runs/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10",
+  "run_code_dirty": false,
+  "run_code_sha": "606f97be75e4d105af5825e665162bc34545c5b3",
+  "schema_version": 1,
+  "selected_questions": 20,
+  "semantic_content_complete_supplement": {
+    "application_partial_but_semantically_complete_ids": [
+      "cot-02",
+      "sc-02",
+      "rag-02"
+    ],
+    "denominator": 16,
+    "numerator": 7,
+    "rule": "All frozen points and conditions explicit and supported, all published facts supported and citations valid; allows partial_answer status solely for a separate semantic-content diagnostic. Does not replace frozen strict complete-delivery score."
+  },
+  "source_integrity": {
+    "all_passed": true,
+    "citations_checked": 54,
+    "fresh_pypdf_text_matches_frozen": true,
+    "model_calls": 0,
+    "original_artifacts_verified": 102,
+    "original_run": "data/diagnostics/runs/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10",
+    "per_question": [
+      {
+        "citations_checked": 2,
+        "error_code": null,
+        "passed": true,
+        "question_id": "cot-01",
+        "selected_occurrences": 12,
+        "status": "answered"
+      },
+      {
+        "citations_checked": 7,
+        "error_code": null,
+        "passed": true,
+        "question_id": "cot-02",
+        "selected_occurrences": 12,
+        "status": "partial_answer"
+      },
+      {
+        "citations_checked": 0,
+        "error_code": "model_timeout",
+        "passed": true,
+        "question_id": "cot-03",
+        "selected_occurrences": 12,
+        "status": "failed"
+      },
+      {
+        "citations_checked": 0,
+        "error_code": null,
+        "passed": true,
+        "question_id": "cot-04",
+        "selected_occurrences": 12,
+        "status": "insufficient_evidence"
+      },
+      {
+        "citations_checked": 0,
+        "error_code": null,
+        "passed": true,
+        "question_id": "cot-05",
+        "selected_occurrences": 12,
+        "status": "insufficient_evidence"
+      },
+      {
+        "citations_checked": 3,
+        "error_code": null,
+        "passed": true,
+        "question_id": "sc-01",
+        "selected_occurrences": 12,
+        "status": "answered"
+      },
+      {
+        "citations_checked": 7,
+        "error_code": null,
+        "passed": true,
+        "question_id": "sc-02",
+        "selected_occurrences": 12,
+        "status": "partial_answer"
+      },
+      {
+        "citations_checked": 5,
+        "error_code": null,
+        "passed": true,
+        "question_id": "sc-03",
+        "selected_occurrences": 12,
+        "status": "partial_answer"
+      },
+      {
+        "citations_checked": 0,
+        "error_code": null,
+        "passed": true,
+        "question_id": "sc-04",
+        "selected_occurrences": 12,
+        "status": "insufficient_evidence"
+      },
+      {
+        "citations_checked": 1,
+        "error_code": null,
+        "passed": true,
+        "question_id": "sc-05",
+        "selected_occurrences": 12,
+        "status": "partial_answer"
+      },
+      {
+        "citations_checked": 4,
+        "error_code": null,
+        "passed": true,
+        "question_id": "rag-01",
+        "selected_occurrences": 12,
+        "status": "answered"
+      },
+      {
+        "citations_checked": 3,
+        "error_code": null,
+        "passed": true,
+        "question_id": "rag-02",
+        "selected_occurrences": 12,
+        "status": "partial_answer"
+      },
+      {
+        "citations_checked": 0,
+        "error_code": "model_timeout",
+        "passed": true,
+        "question_id": "rag-03",
+        "selected_occurrences": 12,
+        "status": "failed"
+      },
+      {
+        "citations_checked": 0,
+        "error_code": null,
+        "passed": true,
+        "question_id": "rag-04",
+        "selected_occurrences": 12,
+        "status": "insufficient_evidence"
+      },
+      {
+        "citations_checked": 4,
+        "error_code": null,
+        "passed": true,
+        "question_id": "rag-05",
+        "selected_occurrences": 12,
+        "status": "answered"
+      },
+      {
+        "citations_checked": 5,
+        "error_code": null,
+        "passed": true,
+        "question_id": "dpr-01",
+        "selected_occurrences": 12,
+        "status": "answered"
+      },
+      {
+        "citations_checked": 7,
+        "error_code": null,
+        "passed": true,
+        "question_id": "dpr-02",
+        "selected_occurrences": 12,
+        "status": "answered"
+      },
+      {
+        "citations_checked": 0,
+        "error_code": "model_timeout",
+        "passed": true,
+        "question_id": "dpr-03",
+        "selected_occurrences": 12,
+        "status": "failed"
+      },
+      {
+        "citations_checked": 0,
+        "error_code": null,
+        "passed": true,
+        "question_id": "dpr-04",
+        "selected_occurrences": 12,
+        "status": "insufficient_evidence"
+      },
+      {
+        "citations_checked": 6,
+        "error_code": null,
+        "passed": true,
+        "question_id": "dpr-05",
+        "selected_occurrences": 12,
+        "status": "answered"
+      }
+    ],
+    "reviewed_at": "2026-09-05T13:57:34.242357+00:00",
+    "selected_occurrences_verified": 240,
+    "semantic_scoring": "separate handwritten review; hashes prove identity only",
+    "source_page_counts": {
+      "cot": 43,
+      "dpr": 13,
+      "rag": 19,
+      "sc": 24
+    },
+    "source_pdf_count": 4
+  },
+  "unrun_question_ids": [],
+  "verification_commands": [
+    "uv run --locked python scripts/fetch_holdout_papers.py --verify-only",
+    "uv run --locked python scripts/score_quality.py template --run data/diagnostics/runs/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10 --review-source ai --output data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/ai-template.json",
+    "uv run --locked python scripts/score_quality.py summarize --run data/diagnostics/runs/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10 --review data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/ai-review.json --output data/diagnostics/reviews/20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10/ai-summary.json"
+  ]
+}
