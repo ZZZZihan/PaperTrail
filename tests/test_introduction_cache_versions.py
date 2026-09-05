@@ -125,3 +125,49 @@ def test_server_recomputes_check_version_without_backfilling_the_saved_card(clie
     assert shown["trace"] == trace and shown["introduction"]["coverage"] == introduction["coverage"]
     cached = client.post(path, json={"request_id": str(uuid4())}).json()
     assert cached == shown
+
+
+@pytest.mark.parametrize("route", ["first_task", "update", "cached_alias", "existing_request"])
+def test_response_query_failure_rolls_back_task_and_alias_before_any_scheduling(
+    client, monkeypatch, route
+):
+    repository = client.app.state.repository
+    if route == "first_task":
+        paper_id = UUID(upload(client).json()["paper"]["id"])
+        old_id, original_request = None, None
+    else:
+        paper_id, original_request, old_id, _, _ = store_success(
+            client, pipeline="historical-check"
+        )
+    request_id = original_request if route == "existing_request" else uuid4()
+    request = {"request_id": str(request_id), "refresh_if_outdated": route == "update"}
+    path = f"/api/papers/{paper_id}/introduction"
+    started = []
+    monkeypatch.setattr(
+        client.app.state.questions, "run_introduction", lambda *args: started.append(args)
+    )
+    original_view = repository._introduction_view
+
+    def fail_response_query(conn, row):
+        # A real SQL error aborts the transaction after the candidate/alias insertion.
+        conn.execute("SELECT 1 / 0")
+
+    monkeypatch.setattr(repository, "_introduction_view", fail_response_query)
+    failed_response = client.post(path, json=request)
+    assert failed_response.status_code == 503
+    assert started == []
+    with repository.connect() as conn:
+        rows = conn.execute("SELECT id, status FROM questions").fetchall()
+        aliases = conn.execute("SELECT request_id FROM question_request_aliases").fetchall()
+    assert rows == ([] if old_id is None else [{"id": old_id, "status": "answered"}])
+    assert aliases == []
+
+    monkeypatch.setattr(repository, "_introduction_view", original_view)
+    retried = client.post(path, json=request)
+    assert retried.status_code == 202
+    new_task = route in {"first_task", "update"}
+    assert retried.json()["status"] == ("pending" if new_task else "answered")
+    assert len(started) == int(new_task)
+    # A successfully returned request remains idempotent after the failed first attempt.
+    assert client.post(path, json=request).json()["id"] == retried.json()["id"]
+    assert len(started) == int(new_task)

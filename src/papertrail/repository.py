@@ -103,15 +103,13 @@ class Repository:
     def create_introduction(self, paper_id: UUID, request_id: UUID, *, refresh_if_outdated=False):
         from papertrail.introduction import INTRODUCTION_QUESTION
 
-        row, created = self._create_task(
+        return self._create_task(
             paper_id,
             request_id,
             INTRODUCTION_QUESTION,
             "introduction",
             refresh_if_outdated=refresh_if_outdated,
         )
-        with self.connect() as conn:
-            return self._introduction_view(conn, row), created
 
     @staticmethod
     def _introduction_outdated(row: dict) -> bool:
@@ -151,7 +149,10 @@ class Repository:
                     raise ImportFailure(
                         "request_conflict", "提交标识已用于其他任务，请重新提交。", 409
                     )
-                return existing, False
+                return (
+                    self._introduction_view(conn, existing) if kind == "introduction" else existing,
+                    False,
+                )
             if not conn.execute("SELECT id FROM papers WHERE id = %s", (paper_id,)).fetchone():
                 raise ImportFailure("not_found", "找不到这篇论文，请返回论文库。", 404)
             if kind == "introduction":
@@ -173,7 +174,7 @@ class Repository:
                         "VALUES (%s, %s)",
                         (request_id, existing["id"]),
                     )
-                    return existing, False
+                    return self._introduction_view(conn, existing), False
             if conn.execute(
                 "SELECT id FROM questions WHERE status IN ('pending', 'running') LIMIT 1"
             ).fetchone():
@@ -185,7 +186,9 @@ class Repository:
                 "VALUES (%s, %s, %s, %s, %s, 'pending') RETURNING *",
                 (uuid4(), paper_id, request_id, question, kind),
             ).fetchone()
-            return row, True
+            # Build all response metadata before committing. A failed fallback query
+            # must roll back this insertion, so a retry can still schedule a new task.
+            return self._introduction_view(conn, row) if kind == "introduction" else row, True
 
     def questions(self, paper_id: UUID, offset: int = 0) -> list[dict]:
         self.expire_questions()
