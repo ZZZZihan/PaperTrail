@@ -11,7 +11,7 @@ from papertrail.qa import (
     validate_claims,
 )
 
-INTRODUCTION_VERSION = "paper-introduction-v6"
+INTRODUCTION_VERSION = "paper-introduction-v7"
 INTRODUCTION_SCHEMA_VERSION = "paper-reading-card-v1"
 INTRODUCTION_CHUNK_VERSION = "introduction-page-span-v1-1000"
 INTRODUCTION_SPAN_CHARS = 1000
@@ -134,6 +134,14 @@ manually composed vs automatically generated demonstrations). Prefer 输入…�
 The evidence_and_limits field must connect one main observation to the task, comparison and
 setup conditions under which it was observed. Keep the conclusion within that tested scope.
 Necessary conditions must appear in the body, not just in citations. Do not omit them for brevity.
+For this results field, select BOTH the result evidence AND the setup evidence it needs.
+Check each task covered by a shared qualifier such as few-shot, frozen, fine-tuned or manually
+prepared. A results table or comparison paragraph may establish the outcome without establishing
+that qualifier for every listed task. In that case attach the exact setup passage to this same
+field, even if it is already cited by the mechanism or a term. Do not assume that a setting for
+one task applies to another. Keep the supported qualifier and add its actual source, rather
+than deleting a necessary condition to avoid supplying evidence. No evidence is inherited
+between fields.
 Optionally add "learning_aids": [] with at most TWO entries. Each entry has text, citations
 and basis, using the same citation ID-only format. Its basis is either "teaching_example" or
 "system_inference". Omit aids when they do not improve understanding.
@@ -160,6 +168,14 @@ Support and attribution: judge every claim ONLY against quotations attached to t
 Other claims' citations, unquoted complete passages and prior knowledge cannot rescue it.
 A partly supported paper assertion is false. Check numbers, necessary conditions, causality,
 scope and qualifiers. paper_statement means the paper actually states or reports the claim;
+For each experimental claim, separately inspect the outcome, the comparison and EACH setup
+qualifier for EACH task to which it applies. A cited result does not automatically prove a
+few-shot/fine-tuning setup, and a cited setup for one task does not establish another task's
+setup. Before returning supported=true, find the supporting sentence for every such detail
+inside THIS claim's quotations. In reason identify the attached chunk IDs establishing the
+setting and result; if the needed passage appears only elsewhere in the card or full paper,
+return supported=false and identify that missing passage for the allowed revision. Do not
+let a true whole-paper fact or a coverage=true decision override this claim-local check.
 author_interpretation requires a cited author explanation/hypothesis and explicit attribution,
 not demonstrated causal certainty. Wrong or misleading basis makes supported=false.
 teaching_example is allowed ONLY as an explicitly hypothetical 教学示意 derived from the quoted
