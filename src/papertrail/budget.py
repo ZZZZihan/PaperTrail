@@ -120,7 +120,9 @@ class CallLedger:
                 )
             if not quota and any(row["unpriced_calls"] for row in rows):
                 raise ModelError(
-                    "budget_mode_conflict", "本轮已有费用未知的额度调用，不能改按金额继续预留。"
+                    "budget_mode_conflict",
+                    "本轮已有费用未知的额度调用，不能改按金额继续预留。"
+                    "请恢复本轮原有的配额预算配置后重启应用。",
                 )
             used = sum((row["used"] for row in rows), Decimal(0))
             if not quota and used + reserved > budget.limit:

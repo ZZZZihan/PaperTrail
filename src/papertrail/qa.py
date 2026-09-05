@@ -9,7 +9,7 @@ from collections.abc import Callable
 from papertrail.model import ModelClient, ModelConfig, ModelError
 from papertrail.retrieval import CHUNK_VERSION, RETRIEVAL_VERSION, build_chunks, retrieve
 
-PROMPT_VERSION = "evidence-qa-v1"
+PROMPT_VERSION = "evidence-qa-v2"
 PIPELINE_TIMEOUT = 180
 INSUFFICIENT = "在当前已检索证据中未找到足够支持。请尝试更具体的问题，或直接查看原文核对。"
 QUERY_PROMPT = """You prepare search queries for a single academic paper. Return JSON only:
@@ -61,6 +61,35 @@ def normalize_quote(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def _source_quote(quote: str, source: str) -> str | None:
+    """Recover an exact source span, allowing only actual ASCII-hyphen line wraps."""
+    normalized = normalize_quote(quote)
+    if normalized in normalize_quote(source):
+        return normalized
+    pattern = []
+    line_break = r"[ \t]*(?:\r?\n[ \t]*)+"
+    for index, char in enumerate(normalized):
+        pattern.append(r"\s+" if char == " " else re.escape(char))
+        if char == "-" and index + 1 < len(normalized) and normalized[index + 1] != " ":
+            # PaLM-\n540B -> PaLM-540B: preserve the literal hyphen.
+            # A following candidate space already matches whitespace; avoid ambiguous repetition.
+            pattern.append(f"(?:{line_break})?")
+        elif (
+            char.isascii()
+            and char.isalpha()
+            and index + 1 < len(normalized)
+            and normalized[index + 1].isascii()
+            and normalized[index + 1].isalpha()
+        ):
+            # con-\nsiders -> considers: deletion only at an ASCII-letter line wrap.
+            pattern.append(f"(?:-{line_break})?")
+    match = re.search("".join(pattern), source)
+    if match is None:
+        return None
+    # Return the authoritative contiguous source, including its hyphen and whitespace.
+    return normalize_quote(source[match.start() : match.end()])
+
+
 def validate_claims(candidate: object, retrieved: list[dict], paper: dict) -> list[dict]:
     """Check existence, current-paper ownership and exact normalized quote containment."""
     if not isinstance(candidate, list) or not 1 <= len(candidate) <= 8:
@@ -89,15 +118,17 @@ def validate_claims(candidate: object, retrieved: list[dict], paper: dict) -> li
                 or not isinstance(quote, str)
                 or not 8 <= len(quote) <= 1200
                 or not normalize_quote(quote)
-                or normalize_quote(quote) not in normalize_quote(chunk["text"])
             ):
+                raise ModelError("invalid_citation", "引用无法在当前论文证据中核对，已停止展示。")
+            source_quote = _source_quote(quote, chunk["text"])
+            if source_quote is None or not 8 <= len(source_quote) <= 1200:
                 raise ModelError("invalid_citation", "引用无法在当前论文证据中核对，已停止展示。")
             resolved.append(
                 {
                     "chunk_id": chunk_id,
                     "paper_id": str(paper["id"]),
                     "page_index": chunk["page_index"],
-                    "quote": normalize_quote(quote),
+                    "quote": source_quote,
                 }
             )
         result.append({"text": text.strip(), "citations": resolved})

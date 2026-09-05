@@ -5,7 +5,7 @@ import httpx2 as httpx
 import pytest
 
 from papertrail.model import ModelClient, ModelConfig, ModelError
-from papertrail.qa import answer_question, validate_claims
+from papertrail.qa import answer_question, normalize_quote, validate_claims
 from papertrail.retrieval import build_chunks
 
 PAPER = {"id": "paper-one", "sha256": "immutable-source-hash"}
@@ -210,3 +210,145 @@ def test_model_configuration_missing_returns_saved_failure_shape():
     result = answer_question(PAPER, PAGES, "实验？", client=ModelClient(ModelConfig()))
     assert result["status"] == "failed" and result["error_code"] == "model_not_configured"
     assert result["trace"]["calls"] == []
+
+
+@pytest.mark.parametrize(
+    ("source", "candidate"),
+    [
+        ("We use PaLM-\n540B for experiments.", "We use PaLM-540B for experiments."),
+        ("We use PaLM-\r\n    540B for experiments.", "We use PaLM-540B for experiments."),
+        ("We use PaLM-\n\n  540B for experiments.", "We use PaLM-540B for experiments."),
+        ("The model con-\nsiders useful calls.", "The model considers useful calls."),
+        ("The model con- \r\n\t siders useful calls.", "The model considers useful calls."),
+        ("PaLM-\n540B con-\nsiders useful calls.", "PaLM-540B considers useful calls."),
+        ("Wang and Komat-\nsuzaki, 2021", "Wang and Komat-suzaki, 2021"),
+        ("A-\n B-\n PaLM-\n540B", "A- B- PaLM-540B"),
+    ],
+)
+def test_hyphen_line_wrap_recovery_returns_contiguous_source_quote(source, candidate):
+    chunks = build_chunks(PAPER["id"], PAPER["sha256"], [{"page_index": 4, "text": source}])
+    claims = [
+        {"text": "测试事实", "citations": [{"chunk_id": chunks[0]["chunk_id"], "quote": candidate}]}
+    ]
+    citation = validate_claims(claims, chunks, PAPER)[0]["citations"][0]
+    assert citation["quote"] == normalize_quote(source)
+    assert citation["quote"] != candidate
+    assert citation["page_index"] == 4
+    assert citation["quote"] in normalize_quote(chunks[0]["text"])
+
+
+@pytest.mark.parametrize(
+    ("source", "candidate"),
+    [
+        ("We use PaLM- 540B.", "We use PaLM-540B."),
+        ("We use PaLM-\n540B.", "We use PaLM540B."),
+        ("We use PaLM-\n540B.", "We use PaLM-640B."),
+        ("We use PaLM-\n540B.", "We use PaLM-540B!"),
+        ("We use PaLM-\n540B.", "We test PaLM-540B."),
+        ("The model con-siders useful calls.", "The model considers useful calls."),
+        ("The model con siders useful calls.", "The model considers useful calls."),
+        ("The model con\nsiders useful calls.", "The model considers useful calls."),
+        ("PaLM-\n540B is ﬁnetuned.", "PaLM-540B is finetuned."),
+    ],
+)
+def test_source_recovery_does_not_change_words_digits_punctuation_or_ordinary_hyphens(
+    source, candidate
+):
+    chunks = build_chunks(PAPER["id"], PAPER["sha256"], [{"page_index": 0, "text": source}])
+    claims = [
+        {"text": "测试事实", "citations": [{"chunk_id": chunks[0]["chunk_id"], "quote": candidate}]}
+    ]
+    with pytest.raises(ModelError) as error:
+        validate_claims(claims, chunks, PAPER)
+    assert error.value.code == "invalid_citation"
+
+
+def test_source_recovery_cannot_search_another_chunk_or_cross_paper():
+    chunks = build_chunks(
+        PAPER["id"],
+        PAPER["sha256"],
+        [
+            {"page_index": 0, "text": "Different text on this page."},
+            {"page_index": 1, "text": "We use PaLM-\n540B for experiments."},
+        ],
+    )
+    claims = [
+        {
+            "text": "测试事实",
+            "citations": [
+                {"chunk_id": chunks[0]["chunk_id"], "quote": "We use PaLM-540B for experiments."}
+            ],
+        }
+    ]
+    with pytest.raises(ModelError):
+        validate_claims(claims, chunks, PAPER)
+    claims[0]["citations"][0]["chunk_id"] = chunks[1]["chunk_id"]
+    chunks[1]["paper_id"] = "other-paper"
+    with pytest.raises(ModelError):
+        validate_claims(claims, chunks, PAPER)
+
+
+def test_recovered_source_quote_must_still_fit_quote_limit():
+    candidate = "a" * 1195 + "-b."
+    source = "a" * 1195 + "-\nb."
+    chunks = build_chunks(PAPER["id"], PAPER["sha256"], [{"page_index": 0, "text": source}])
+    claims = [
+        {"text": "长度边界", "citations": [{"chunk_id": chunks[0]["chunk_id"], "quote": candidate}]}
+    ]
+    assert len(validate_claims(claims, chunks, PAPER)[0]["citations"][0]["quote"]) == 1199
+    candidate = "a" * 1197 + "-b."
+    source = "a" * 1197 + "-\nb."
+    chunks = build_chunks(PAPER["id"], PAPER["sha256"], [{"page_index": 0, "text": source}])
+    claims[0]["citations"][0] = {"chunk_id": chunks[0]["chunk_id"], "quote": candidate}
+    assert len(candidate) == 1200
+    with pytest.raises(ModelError):
+        validate_claims(claims, chunks, PAPER)
+
+
+def test_pipeline_sends_authoritative_recovered_quote_to_support_check():
+    quote = "Experiments use PaLM-540B and the model considers useful calls."
+    source = "Experiments use PaLM-\n540B and the model con-\nsiders useful calls."
+    support_inputs = []
+
+    def handler(request):
+        payload = json.loads(request.content)
+        data = json.loads(payload["messages"][1]["content"])
+        if "claims" in data:
+            support_inputs.append(data["claims"][0]["citations"][0]["quote"])
+            output = {"verdicts": [{"claim_index": 0, "supported": True, "reason": "测试判定"}]}
+        elif "passages" in data:
+            output = {
+                "status": "answered",
+                "claims": [
+                    {
+                        "text": "测试结论",
+                        "citations": [
+                            {"chunk_id": data["passages"][0]["chunk_id"], "quote": quote}
+                        ],
+                    }
+                ],
+            }
+        else:
+            output = {"search_queries": ["experiments model useful calls"]}
+        return httpx.Response(
+            200,
+            json={
+                "choices": [{"finish_reason": "stop", "message": {"content": json.dumps(output)}}]
+            },
+        )
+
+    client = ModelClient(
+        ModelConfig(
+            base_url="https://test.invalid/v1", api_key="test-only", model_name="unit-test"
+        ),
+        transport=httpx.MockTransport(handler),
+    )
+    result = answer_question(
+        PAPER, [{"page_index": 0, "text": source}], "实验是什么？", client=client
+    )
+    assert result["status"] == "answered"
+    assert result["trace"]["pipeline_version"] == "evidence-qa-v2"
+    assert result["trace"]["generated_claims"][0]["citations"][0]["quote"] == quote
+    assert result["claims"][0]["citations"][0]["quote"] == normalize_quote(source)
+    assert support_inputs == [normalize_quote(source)]
+    assert result["trace"]["call_count"] == 3
