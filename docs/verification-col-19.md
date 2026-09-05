@@ -24,6 +24,7 @@
 | --- | --- | --- | --- |
 | v1 / `e20657a` | `invalid_output`，未解析出 JSON 对象 | `invalid_citation`，公式符号引用不一致 | `model_timeout`，45 秒单次期限 |
 | v2 / `eee1497` | `invalid_output`，JSON 对象解析仍失败 | `invalid_citation`，引用跨越所选片段边界 | `insufficient_evidence`，引用存在但多项语义未完整支持 |
+| v3 / `e58632b` | `insufficient_evidence`，8 项中 3 项部分断言缺少配套引用 | `insufficient_evidence`，8 项中结果与边界 1 项有未被引文支持的附加断言 | `invalid_citation`，未进入语义检查 |
 
 原运行分别保存在 `data/diagnostics/introduction-runs/20260905T074112.160029Z-414cb276696646279b3bdd3f1707c515` 和 `data/diagnostics/introduction-runs/20260905T074636.363989Z-fe6fa0e7737e44859e9e28e3a4080866`。Reflexion v2 由真实浏览器重试按钮发起，运行器复用了该活跃任务；其余由本地应用接口提交。未删除、覆盖或改写失败结果，未把格式失败记成语义不足。
 
@@ -32,3 +33,7 @@ v2 使用完整 JSON 示例、纯文字引用要求，并将简介单次窗口�
 迁移后已逐项确认 3 篇论文、50 条旧问答完整数据、原 PDF 哈希一致，129 条既有调用均保留，结果见同目录 `after-migration.json`。
 
 成功简介的真实结果、浏览器和重启检查在下方追加实际证据；上方失败不因后续成功而改写。
+
+v3 的 `make check` 为 212 项测试全部通过。真实运行保存在 `data/diagnostics/introduction-runs/20260905T075704.659717Z-bb7480383da0447b891276a435136d97`，增加 5 次调用，应用累计为 141/160。上述不足是独立支持检查的判定，不代表原文必然没有相关内容。v3 ReAct 的原理段已明确冻结模型、人工示范轨迹及思考出现频率的条件，但不能因此改写 COL-18 旧题的部分覆盖评分。
+
+后续修订根据这些实际失败加入固定一次内容修订，完整保留原标准和失败记录；实际效果须另建运行验证。

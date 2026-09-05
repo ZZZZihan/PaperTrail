@@ -16,7 +16,7 @@ from papertrail.model import ModelClient, ModelConfig
 from papertrail.repository import Repository
 
 
-def configure_fake_model(monkeypatch, *, cap=10):
+def configure_fake_model(monkeypatch, *, cap=10, support_passed=True):
     for key, value in {
         "PAPERTRAIL_MODEL_BASE_URL": "https://test.invalid/v1",
         "PAPERTRAIL_MODEL_API_KEY": "test-only-key",
@@ -37,7 +37,7 @@ def configure_fake_model(monkeypatch, *, cap=10):
         if "claims" in data:
             result = {
                 "verdicts": [
-                    {"claim_index": i, "supported": True, "reason": "测试固定判定。"}
+                    {"claim_index": i, "supported": support_passed, "reason": "测试固定判定。"}
                     for i in range(len(data["claims"]))
                 ]
             }
@@ -187,3 +187,29 @@ def test_intro_unknown_paper_and_invalid_input_do_not_create_tasks(client):
     path = f"/api/papers/{paper['id']}/introduction"
     assert client.post(path, json={}).status_code == 422
     assert client.get(path).json() is None
+
+
+def test_content_revision_cannot_escape_prior_qa_calls_in_the_shared_scope(
+    client, settings, monkeypatch
+):
+    requests = configure_fake_model(monkeypatch, cap=4, support_passed=False)
+    paper_id = UUID(upload(client).json()["paper"]["id"])
+    repository = Repository(settings)
+    qa, _ = repository.create_question(paper_id, uuid4(), "此前同一轮问答调用")
+    ledger = CallLedger(repository, qa["id"], Budget.from_env())
+    ledger.before_call({"stage": "query", "input_token_upper_bound": 50, "max_output_tokens": 1800})
+    ledger.record_call({"usage": {"prompt_tokens": 10, "completion_tokens": 10}})
+    repository.finish_question(qa["id"], {"status": "answered"})
+    path = f"/api/papers/{paper_id}/introduction"
+    client.post(path, json={"request_id": str(uuid4())})
+    row = client.get(path).json()
+    assert row["status"] == "failed" and row["error_code"] == "call_limit_exceeded"
+    assert row["introduction"] is None and row["claims"] == []
+    assert len(row["trace"]["attempts"]) == 2
+    assert len(requests) == len(row["trace"]["ledger"]["calls"]) == 3
+    assert [call["stage"] for call in row["trace"]["ledger"]["calls"]] == [
+        "introduction_generate",
+        "introduction_verify",
+        "introduction_revise",
+    ]
+    assert row["trace"]["ledger"]["estimated_cost"] is None

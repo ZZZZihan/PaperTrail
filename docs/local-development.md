@@ -1,8 +1,8 @@
 # 本地开发与运行
 
-## 当前功能（COL-18，真实模型验证待配置）
+## 当前功能（COL-18 证据问答、COL-19 论文简介）
 
-PDF 导入、持久保存、逐页核对已扩展为固定流程的单篇证据问答：中文查询转换、BM25 检索、结构化生成、引用程序校验、独立 AI 支持检查及持久历史。关联分支 `codex/col-18-evidence-qa-v01`；[问答规格](evidence-qa-v01.md)、[开发诊断](development-diagnostics.md)、[人工试用与反馈](manual-trial-v01.md)。模型服务与费用上限尚未提供，离线测试不代表真实问答验收。COL-16 的 [PDF 行为](pdf-import.md) 和 [验证记录](verification-col-16.md) 继续有效，下方 COL-15 记录保留为历史。
+PDF 导入、持久保存、逐页核对已扩展为固定流程的单篇证据问答：中文查询转换、BM25 检索、结构化生成、引用程序校验、独立 AI 支持检查及持久历史。后续 COL-19 分支 `codex/col-19-paper-introduction-demo` 增加按需生成和保存论文简介，解释关键术语、研究问题与核心原理；与问答共用原文、引用跳页和调用账本。本机已配置真实 `gpt-5.6-sol`，现有中转额度的原 scope 累计上限为 160 次，实际费用未知。实现和实测分别见 [问答规格](evidence-qa-v01.md)、[开发诊断](development-diagnostics.md)、[简介规格](paper-introduction-demo.md)、[简介验证](verification-col-19.md)。用户认可仍需按 [人工试用与反馈](manual-trial-v01.md) 单独记录。COL-16 的 [PDF 行为](pdf-import.md) 和 [验证记录](verification-col-16.md) 继续有效，下方 COL-15 记录保留为历史。
 
 ### 准备与启动
 
@@ -46,6 +46,8 @@ make serve
 | `PAPERTRAIL_MODEL_BUDGET_SCOPE` | 本轮账本范围，默认 `v01-development`；不要通过换值绕过已经消耗的额度 |
 
 每题最多三次固定调用，单次默认 45 秒，总期限 180 秒；输出默认限制 1800 tokens。`PAPERTRAIL_MODEL_THINKING` 默认空，仅在服务支持时设 `disabled` 或 `enabled`。本轮建议非推理模式，避免思考 token 占用结构化输出额度。服务必须支持 JSON 输出；未配置时可浏览 PDF 与历史，不生成模拟答案。
+
+论文简介另用至少 90 秒的单次窗口和至少 5,000 tokens 输出上限，总期限仍为 180 秒；正常两次调用，发生一次内容修订时最多四次，全部进入同一账本。刷新、查看成功缓存、重新点击已有成功简介均不再调用模型。只有用户明确发起新生成且原任务失败时才新建；网络提交不确定时先确认原提交结果。
 
 `compatible` 请求使用 `max_tokens`、`temperature: 0`，并在配置非空时附带服务的 `thinking` 参数。`openai` 请求使用 `max_completion_tokens` 和 `reasoning_effort: "none"`，省略 `temperature` 与 `thinking`；此方案下 `PAPERTRAIL_MODEL_THINKING` 必须留空，否则视为配置无效。两种方案都使用 Chat Completions、JSON 对象输出及 `stream: false`，内部输出上限与预算预留仍使用同一个 `PAPERTRAIL_MODEL_MAX_OUTPUT_TOKENS`。配置必须与所选服务和模型的实际参数支持一致；程序不会根据模型前缀切换方案，也不会在请求失败后自动换参数重试。运行追踪保存所选方案、实际输出参数名、推理强度和温度；未发送的温度记录为 `null`。
 

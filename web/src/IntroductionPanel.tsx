@@ -49,9 +49,11 @@ const stages: Record<string, string> = {
   retrieval: "正在查找论文的问题、方法与实验依据…",
   generating: "正在整理研究问题、核心原理与关键术语…",
   generation: "正在整理研究问题、核心原理与关键术语…",
+  revising: "正在对照原文补充遗漏、调整表述…",
   validating: "正在校验引用是否来自当前论文…",
   citation_validation: "正在校验引用是否来自当前论文…",
   checking_support: "正在检查原文是否支持简介中的说法…",
+  verifying: "正在检查原文是否支持简介中的说法…",
   support_check: "正在检查原文是否支持简介中的说法…",
 };
 
@@ -234,15 +236,6 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
             <p>{introduction.summary.text}</p>
             <Sources citations={introduction.summary.citations} paperId={paperId} onCitation={onCitation} />
           </div>
-          <div className="introduction-sections">
-            {sections.map((section) => (
-              <section className={`introduction-section introduction-${section.key}`} key={section.key}>
-                <h3><span aria-hidden="true">{section.number}</span>{section.title}</h3>
-                <p>{introduction[section.key].text}</p>
-                <Sources citations={introduction[section.key].citations} paperId={paperId} onCitation={onCitation} />
-              </section>
-            ))}
-          </div>
           <section className="introduction-terms" aria-label="关键术语">
             <h3>读懂它，需要理解这些词</h3>
             <p className="introduction-terms-note">结合这篇论文解释，帮助你回到方法本身。</p>
@@ -258,6 +251,15 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
               ))}
             </dl>
           </section>
+          <div className="introduction-sections">
+            {sections.map((section) => (
+              <section className={`introduction-section introduction-${section.key}`} key={section.key}>
+                <h3><span aria-hidden="true">{section.number}</span>{section.title}</h3>
+                <p>{introduction[section.key].text}</p>
+                <Sources citations={introduction[section.key].citations} paperId={paperId} onCitation={onCitation} />
+              </section>
+            ))}
+          </div>
           <div className="introduction-footer">
             <p>引用来自当前论文，已通过来源校验。{task?.support_status === "ai_checked" ? "AI 已检查原文支持关系；" : ""}简介仍待你对照原文核对。页码按 PDF 文件顺序计算。</p>
             <button type="button" className="text-button" onClick={onAsk}>还有不明白的地方？继续向论文提问 →</button>
@@ -274,9 +276,11 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
             </div>
           ) : task?.status === "failed" || task?.status === "insufficient_evidence" ? (
             <div className="introduction-failure" role="alert">
-              <h3>{task.status === "failed" ? "这次简介未能完成" : "当前已检索证据不足以形成简介"}</h3>
+              <h3>{task.status === "failed" ? "这次简介未能完成" : task.support_status === "ai_checked" ? "这次简介还有未核实的说法" : "当前提取文字尚不足以形成简介"}</h3>
               <p>{task.message || "本次结果已保留，请检查服务状态后主动重试。"}</p>
-              {task.status === "insufficient_evidence" && <p>这不表示整篇论文没有相关内容。你可以对照原文，或切换到证据问答，先问一个具体问题。</p>}
+              {task.status === "insufficient_evidence" && <p>{task.support_status === "ai_checked"
+                ? "简介未通过本次原文支持检查，可以重试生成。你也可以对照原文，或切换到证据问答，先问一个具体问题。"
+                : "请对照 PDF 原文和提取文字确认内容是否完整。你也可以重试生成，或切换到证据问答，先问一个具体问题。"}</p>}
             </div>
           ) : (
             <div className="introduction-empty">

@@ -50,7 +50,9 @@ def introduction_client(*, generate=None, verify=None, observed=None, **kwargs):
             observed.append(data)
         if "claims" in data:
             result = (
-                verify
+                verify(data)
+                if callable(verify)
+                else verify
                 if verify is not None
                 else {
                     "verdicts": [
@@ -127,7 +129,7 @@ def test_unknown_citation_blocks_entire_intro_before_semantic_call(location):
     result = introduce_paper(PAPER, PAGES, client=introduction_client(generate=corrupt))
     assert result["status"] == "failed" and result["error_code"] == "invalid_citation"
     assert result["introduction"] is None and result["claims"] == []
-    assert result["trace"]["call_count"] == 1
+    assert result["trace"]["call_count"] == 2
 
 
 @pytest.mark.parametrize("mismatch", ["paper_id", "paper_sha256"])
@@ -137,7 +139,7 @@ def test_actual_citation_with_wrong_paper_ownership_is_withheld(monkeypatch, mis
     monkeypatch.setattr("papertrail.introduction.build_introduction_chunks", lambda *args: chunks)
     result = introduce_paper(PAPER, PAGES, client=introduction_client())
     assert result["error_code"] == "invalid_citation"
-    assert result["introduction"] is None and result["trace"]["call_count"] == 1
+    assert result["introduction"] is None and result["trace"]["call_count"] == 2
 
 
 @pytest.mark.parametrize("unsupported_index", [0, 3, 6])
@@ -158,7 +160,7 @@ def test_semantic_rejection_of_any_field_or_term_withholds_everything(unsupporte
     assert result["introduction"] is None and result["claims"] == []
     assert result["trace"]["citation_validation"] == "passed"
     assert result["trace"]["candidate_claims"]
-    assert result["trace"]["call_count"] == 2
+    assert result["trace"]["call_count"] == 4
 
 
 @pytest.mark.parametrize(
@@ -179,7 +181,7 @@ def test_incomplete_intro_is_not_published(mutation):
 
     result = introduce_paper(PAPER, PAGES, client=introduction_client(generate=corrupt))
     assert result["error_code"] == "invalid_output"
-    assert result["introduction"] is None and result["trace"]["call_count"] == 1
+    assert result["introduction"] is None and result["trace"]["call_count"] == 2
 
 
 def test_support_check_needs_exactly_one_boolean_verdict_for_each_intro_claim():
@@ -275,7 +277,7 @@ def test_model_cannot_override_program_owned_citation_content(extra):
     result = introduce_paper(PAPER, PAGES, client=introduction_client(generate=corrupt))
     assert result["error_code"] == "invalid_citation"
     assert result["claims"] == [] and result["introduction"] is None
-    assert result["trace"]["call_count"] == 1
+    assert result["trace"]["call_count"] == 2
 
 
 def test_every_published_quote_is_exact_program_supplied_span_including_symbols_and_whitespace():
