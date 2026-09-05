@@ -259,14 +259,15 @@ class Repository:
             ).rowcount
 
     def expire_questions(self) -> None:
-        # The fixed pipeline has a 180s deadline. Leave a generous persistence margin.
+        # QA has 180s and reading cards 300s; leave 120s for startup/persistence.
         # This also releases tasks whose terminal write failed during a database outage.
         with self.connect() as conn:
             conn.execute(
                 "UPDATE questions SET status = 'failed', stage = 'complete', "
                 "error_code = 'interrupted', message = %s, completed_at = now() "
                 "WHERE status IN ('pending', 'running') "
-                "AND created_at < now() - interval '5 minutes'",
+                "AND created_at < now() - CASE WHEN kind = 'introduction' "
+                "THEN interval '7 minutes' ELSE interval '5 minutes' END",
                 (
                     "处理记录超过时间上限，可能在服务异常时中断。模型调用可能已发生，"
                     "请核对后主动重试。",

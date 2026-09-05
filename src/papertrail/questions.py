@@ -80,7 +80,7 @@ class QuestionService:
             except Exception as error:
                 logger.error("Question result save failed: %s", type(error).__name__)
                 # A malformed provider value must not keep the global task slot forever.
-                # If the DB remains unavailable, startup / 5-minute expiry recovers it.
+                # If the DB stays unavailable, startup / task-specific expiry recovers it.
                 try:
                     self.repository.finish_question(
                         question_id,

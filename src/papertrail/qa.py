@@ -10,15 +10,25 @@ from papertrail.coverage import checked_coverage, requirements_from_query
 from papertrail.model import ModelClient, ModelConfig, ModelError
 from papertrail.retrieval import CHUNK_VERSION, RETRIEVAL_VERSION, build_chunks, retrieve
 
-PROMPT_VERSION = "evidence-qa-v4-coverage"
+PROMPT_VERSION = "evidence-qa-v5-setup-coverage"
 PIPELINE_TIMEOUT = 180
 INSUFFICIENT = "在当前已检索证据中未找到足够支持。请尝试更具体的问题，或直接查看原文核对。"
 QUERY_PROMPT = """You prepare search queries for a single academic paper. Return JSON only:
 {"search_queries":["English search keywords", "optional alternative keywords"],
 "requirements":["需要回答的一个中文要点", "另一个必要子问题"]}.
 List 1-12 distinct requirements as short neutral questions/topics in Chinese. Split multiple
-questions. For experimental setups include relevant training/frozen-parameter conditions,
-demonstration provenance and trial/metric scope as questions, never invent their answers.
+questions. Interpret experimental setup as including necessary qualifications of the requested
+facts, even when the user does not spell them out. A question about the model used in prompting
+experiments needs BOTH model identity AND whether its parameters are frozen or updated. A
+question about few-shot examples/trajectories needs BOTH requested sample counts AND how those
+examples/trajectories are produced. List these as separate neutral requirements; do not reduce
+them to identity or counts alone. For other experiments include relevant trial/metric scope.
+Never invent the answers to these requirements. Include the corresponding English condition
+terms (e.g. parameter updates, frozen model, manually authored or generated demonstrations)
+in the search queries so the retriever can actually find those qualifications. Group retrieval
+terms by distinct subquestion instead of repeating the paper title in all search queries.
+For experimental model/demo questions, dedicate one of the at most 3 queries to the parameter
+and demonstration conditions alone; avoid diluting it with every task name, title and count.
 For a simple fact question do not demand unrelated conditions or a full paper review.
 Translate the user's question into precise English retrieval terms; retain technical names,
 experimental conditions, comparisons and numbers. Include at most 3 concise alternative queries.
@@ -44,7 +54,12 @@ that the attached quotes do not cover, even if they seem familiar or plausible.
 Explicitly address EVERY supplied requirement in the answer text whenever the passages support
 it. Information appearing only in a citation does NOT answer a requirement. Read context for
 necessary qualifications, including how demonstrations were obtained and whether parameters
-change, when describing experimental setups. Never use an evaluation answer or outside knowledge.
+change, when describing experimental setups. If an evidence sentence says how demonstration
+trajectories were created, include that provenance in the answer about those demonstrations;
+do not copy it into the citation but omit it from the Chinese text. Likewise, model identity in
+a prompting experiment must preserve any retrieved condition about parameter updates. These
+qualifications are part of the requested facts, not peripheral detail. Never use an evaluation
+answer or outside knowledge.
 If only some requirements are answerable, return answered with just the supported claims;
 an independent checker will identify the missing parts. Do not discard a useful supported
 partial answer or invent content to make it complete. If none can be answered, return
@@ -137,7 +152,9 @@ def _source_quote(quote: str, source: str) -> str | None:
     return normalize_quote(source[match.start() : match.end()])
 
 
-def validate_claims(candidate: object, retrieved: list[dict], paper: dict) -> list[dict]:
+def validate_claims(
+    candidate: object, retrieved: list[dict], paper: dict, *, max_citations: int = 4
+) -> list[dict]:
     """Check existence, current-paper ownership and exact normalized quote containment."""
     if not isinstance(candidate, list) or not 1 <= len(candidate) <= 8:
         raise ModelError("invalid_output", "模型未提供有效的事实列表，请重新提问。")
@@ -150,7 +167,7 @@ def validate_claims(candidate: object, retrieved: list[dict], paper: dict) -> li
         if not isinstance(text, str) or not 1 <= len(text.strip()) <= 1500:
             raise ModelError("invalid_output", "模型返回的事实文字无效。")
         citations = claim.get("citations")
-        if not isinstance(citations, list) or not 1 <= len(citations) <= 4:
+        if not isinstance(citations, list) or not 1 <= len(citations) <= max_citations:
             raise ModelError("invalid_citation", "回答缺少有效引用，已停止展示，请重试。")
         resolved = []
         for citation in citations:

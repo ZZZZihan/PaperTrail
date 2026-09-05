@@ -107,7 +107,7 @@ def execute(client, source: dict, run, *, refresh_if_outdated=False) -> dict:
     )
     write_once(directory / "submitted.json", result)
     reused = bool(previous and previous["id"] == result["id"])
-    deadline = time.monotonic() + 240
+    deadline = time.monotonic() + 420
     while result["status"] not in TERMINAL:
         if time.monotonic() >= deadline:
             raise DiagnosticError("Introduction polling timeout; inspect saved task before retry")

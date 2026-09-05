@@ -9,6 +9,32 @@ from test_import import upload
 from papertrail.main import create_app
 
 
+@pytest.mark.parametrize(
+    ("kind", "age_minutes", "expired"),
+    [("qa", 6, True), ("introduction", 6, False), ("introduction", 8, True)],
+)
+def test_expiry_preserves_live_reading_card_window(client, kind, age_minutes, expired):
+    paper_id = UUID(upload(client).json()["paper"]["id"])
+    repository = client.app.state.repository
+    if kind == "qa":
+        row, _ = repository.create_question(paper_id, uuid4(), "测试超时回收")
+    else:
+        row, _ = repository.create_introduction(paper_id, uuid4())
+    repository.progress_question(row["id"], "verifying")
+    with repository.connect() as connection:
+        connection.execute(
+            "UPDATE questions SET created_at = now() - %s * interval '1 minute' WHERE id = %s",
+            (age_minutes, row["id"]),
+        )
+    repository.expire_questions()
+    with repository.connect() as connection:
+        result = connection.execute(
+            "SELECT status, error_code FROM questions WHERE id = %s", (row["id"],)
+        ).fetchone()
+    assert result["status"] == ("failed" if expired else "running")
+    assert result["error_code"] == ("interrupted" if expired else None)
+
+
 def test_partial_answer_and_coverage_survive_history_reload_and_restart(
     client, settings, monkeypatch
 ):
