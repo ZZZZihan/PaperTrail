@@ -4,9 +4,9 @@
 
 单篇文本 PDF 支持上传、持久保存与逐页核对。问答采用问题要点整理、中文查询转换、BM25 检索、结构化生成、引用校验，以及同一次独立 AI 调用中的事实支持和覆盖检查；有据但不完整时保存 `partial_answer` 与缺失项。简介按需生成研读卡，解释术语、研究问题、方法输入/过程/输出和实验条件，区分论文陈述、作者解释、教学示意和系统推断。两条链路共用原文、引用跳页及原调用账本。
 
-当前分支 `codex/col-19-paper-introduction-demo`，任务为 In Progress，PR 为 draft、未合并。原 react-03 第二次真实回归按冻结预期独立核对为完整回答 1/1、必要条件 2/2、原子事实 16/16 有据，首次失败保留。ReAct v6 应用发布而独立核对 7/8 输出单元完整支持，结果段仍缺本项设置引文；v7 更严格的审核已识别本项引用缺口并触发修订，但累计达到 167 次上限，修订调用被账本拒绝，新卡未发布。 当前版本、实际检查和限制统一见 [v0.2 验证记录](verification-quality-v02.md)。
+最新阶段已解除旧累计上限的阻塞，继续真实开发验证。QA v5 的完整旧 15 题独立核对为 7/10 完整有据交付、16/18 原要点、10/11 必要条件、79/80 原子事实有据；检索充分性为 10/10，仍存在正文遗漏、额外背景误判和范围过度断言。简介 v8 三篇均未通过发布检查，旧成功缓存继续可读。实际版本、分轮结果、检查和未完成项统一见 [v0.2 验证记录](verification-quality-v02.md)；这些是开发诊断，人工产品与学习验收仍待本人反馈。
 
-本机已配置真实 `gpt-5.6-sol`，已获准的 provider_quota 原 scope 累计上限 167 次（用户后续新增授权最多 7 次代表性测试）；本轮开始前快照 153/160 不代表实时余量，实际费用未知。优先按 [简短人工清单](manual-trial-v02.md) 核对已保存结果。旧 [问答 v0.1 规格](evidence-qa-v01.md)、[开发诊断](development-diagnostics.md)、[简介 v4 验证](verification-col-19.md)、COL-16 的 [PDF 行为](pdf-import.md) 和 [验证](verification-col-16.md) 保留历史证据，下方 COL-15 记录同样为历史。
+本机已配置真实 `gpt-5.6-sol`，当前 Goal 的必要测试已获准沿 provider_quota 原 scope 临时不限量；本轮开始前快照 153/160 不代表实时余量，实际费用未知。优先按 [简短人工清单](manual-trial-v02.md) 核对已保存结果。旧 [问答 v0.1 规格](evidence-qa-v01.md)、[开发诊断](development-diagnostics.md)、[简介 v4 验证](verification-col-19.md)、COL-16 的 [PDF 行为](pdf-import.md) 和 [验证](verification-col-16.md) 保留历史证据，下方 COL-15 记录同样为历史。
 
 ### 准备与启动
 
@@ -44,7 +44,7 @@ make serve
 | `PAPERTRAIL_MODEL_NAME` / `PAPERTRAIL_MODEL_API_KEY` | 获准的模型名称与本地密钥 |
 | `PAPERTRAIL_MODEL_PROFILE` | 显式请求参数方案：默认 `compatible`，或 `openai`；不按模型名称猜测 |
 | `PAPERTRAIL_MODEL_BUDGET_MODE` | 默认 `priced`，按金额和单价控制；明确选择 `provider_quota` 表示授权使用已有供应商额度 |
-| `PAPERTRAIL_MODEL_MAX_CALLS` | `provider_quota` 必填，1—1000 的整数；当前 scope 全部已记录调用累计上限 |
+| `PAPERTRAIL_MODEL_MAX_CALLS` | `provider_quota` 必填，1—1000 的整数是当前 scope 累计上限；仅明确获准时可设精确小写 `unlimited`，空值或拼写错误不表示不限量 |
 | `PAPERTRAIL_MODEL_BUDGET` / `PAPERTRAIL_MODEL_CURRENCY` | `priced` 必填的获准金额与币种；`provider_quota` 无需金额，币种为空时采用 USD，必须与同 scope 既有记录一致 |
 | `PAPERTRAIL_MODEL_INPUT_PRICE_PER_MILLION` / `PAPERTRAIL_MODEL_OUTPUT_PRICE_PER_MILLION` | 同币种每百万 token 保守输入/输出单价，用于调用前预留及用量后估算 |
 | `PAPERTRAIL_MODEL_BUDGET_SCOPE` | 本轮账本范围，默认 `v01-development`；不要通过换值绕过已经消耗的额度 |
@@ -59,7 +59,7 @@ HTTPS 和 `http://127.0.0.1` / `http://localhost` 沿用默认支持。若用户
 
 `priced` 模式每次调用前在持久账本预留输入保守上界及最大输出费用；成功返回用量后按配置单价估算，网络失败且用量未知则保留预留额。费用是配置单价计算的估算，不是供应商账单；特殊费用、不同计费规则或错误单价可能导致偏差。应使用普通文本 token 计费模型和供应商侧额度限制。服务、价格、额度得到用户授权后再运行真实诊断。
 
-当用户明确授权使用已有中转额度、而所选模型费率无法核实时，可显式选择 `provider_quota` 并设置 `PAPERTRAIL_MODEL_MAX_CALLS`；此模式不读取金额或单价，不估造模型费用。它在相同持久账本和事务锁下预留一次调用名额，累计当前 scope 的全部历史行，包含之前的 `priced` 调用、失败调用及未完成预留；重启或换模型、模式不会重置次数。达到上限后拒绝下一次调用，无自动重试或自动更换 scope。供应商余额限制仍由供应商执行，本地调用次数上限不是美元费用上限。
+当用户明确授权使用已有中转额度、而所选模型费率无法核实时，可显式选择 `provider_quota` 并设置 `PAPERTRAIL_MODEL_MAX_CALLS`；此模式不读取金额或单价，不估造模型费用。它在相同持久账本和事务锁下预留一次调用名额，累计当前 scope 的全部历史行，包含之前的 `priced` 调用、失败调用及未完成预留；重启或换模型、模式不会重置次数。数值上限达到后拒绝下一次调用，无自动重试或自动更换 scope。显式 `unlimited` 仅略过累计次数上限比较，仍保留同 scope 全部账本、事务锁、服务实例守卫、任务次数及期限；恢复数值上限后继续累计原有全部记录。供应商余额限制仍由供应商执行，本地调用次数上限不是美元费用上限。
 
 额度模式中的 `reserved_cost: 0` 仅为调用名额占位，绝不表示免费；`actual_cost` 和逐次 `estimated_cost` 始终为 `null`，即使用量 tokens 已知也不估费，来源记录为 `unknown_provider_rates`。快照中的 `known_cost_subtotal` 只累计已知金额；全部调用费用未知时它为 `0`、`estimated_cost` 为 `null`，并逐次计入 `unknown_cost_calls`。同 scope 已有额度模式调用后，不能切回金额模式将这些未知费用当作零继续预留。
 
