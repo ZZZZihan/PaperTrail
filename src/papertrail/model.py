@@ -45,6 +45,7 @@ class ModelConfig:
     thinking: str = ""
     allow_http_origin: str = field(default="", repr=False)
     profile: str = "compatible"
+    reasoning_effort: str = "none"
 
     @classmethod
     def from_env(cls) -> "ModelConfig":
@@ -128,6 +129,9 @@ class ModelConfig:
                 and self.thinking in {"", "enabled", "disabled"}
                 and self.profile in {"compatible", "openai"}
                 and (self.profile != "openai" or self.thinking == "")
+                and isinstance(self.reasoning_effort, str)
+                and self.reasoning_effort in {"none", "low"}
+                and (self.profile == "openai" or self.reasoning_effort == "none")
             )
         except ValueError:
             return False
@@ -158,7 +162,11 @@ class ModelConfig:
             else "max_tokens"
             if self.profile == "compatible"
             else None,
-            "reasoning_effort": "none" if self.profile == "openai" else None,
+            "reasoning_effort": self.reasoning_effort
+            if self.profile == "openai"
+            and isinstance(self.reasoning_effort, str)
+            and self.reasoning_effort in {"none", "low"}
+            else None,
             "temperature": 0 if self.profile == "compatible" else None,
             "thinking": "not_sent"
             if self.profile == "openai"
@@ -241,7 +249,7 @@ class ModelClient:
         }
         if self.config.profile == "openai":
             payload["max_completion_tokens"] = self.config.max_output_tokens
-            payload["reasoning_effort"] = "none"
+            payload["reasoning_effort"] = self.config.reasoning_effort
         else:
             payload["max_tokens"] = self.config.max_output_tokens
             payload["temperature"] = 0
@@ -291,6 +299,13 @@ class ModelClient:
                     and type(value) is int
                     and value >= 0
                 }
+                completion_details = usage.get("completion_tokens_details")
+                if isinstance(completion_details, dict):
+                    reasoning_tokens = completion_details.get("reasoning_tokens")
+                    if type(reasoning_tokens) is int and reasoning_tokens >= 0:
+                        # A provider-reported subset of completion_tokens, never added
+                        # to totals or priced again. Missing/invalid values stay unknown.
+                        call["reasoning_tokens"] = reasoning_tokens
             if not _safe_json(raw):
                 call["output_issue"] = "unsafe_response"
                 raise ModelError("invalid_output", "模型响应包含无法保存的字符或数值，请重试。")

@@ -1,8 +1,10 @@
 """Generate one grounded Chinese introduction from a bounded, complete paper text."""
 
 import hashlib
+import os
 import time
 from collections.abc import Callable
+from dataclasses import replace
 
 from papertrail.model import ModelClient, ModelConfig, ModelError
 from papertrail.qa import (
@@ -11,7 +13,7 @@ from papertrail.qa import (
     validate_claims,
 )
 
-INTRODUCTION_VERSION = "paper-introduction-v9"
+INTRODUCTION_VERSION = "paper-introduction-v10"
 INTRODUCTION_SCHEMA_VERSION = "paper-reading-card-v1"
 INTRODUCTION_CHUNK_VERSION = "introduction-page-span-v1-1000"
 INTRODUCTION_SPAN_CHARS = 1000
@@ -498,6 +500,20 @@ def _draft_checks(generated: dict, chunks: list[dict], paper: dict, attempt: dic
     return claims, terms, None
 
 
+def introduction_model_config(config: ModelConfig | None = None) -> ModelConfig:
+    """Apply explicit introduction-only settings without changing ordinary QA."""
+    config = config if config is not None else ModelConfig.from_env()
+    effort = os.getenv("PAPERTRAIL_INTRODUCTION_REASONING_EFFORT", "none").strip().lower()
+    config = replace(config, reasoning_effort=effort)
+    if config.configured:
+        config = replace(
+            config,
+            timeout=max(config.timeout, INTRODUCTION_CALL_TIMEOUT),
+            max_output_tokens=max(config.max_output_tokens, INTRODUCTION_MAX_OUTPUT_TOKENS),
+        )
+    return config
+
+
 def introduce_paper(
     paper: dict,
     pages: list[dict],
@@ -507,7 +523,7 @@ def introduce_paper(
 ) -> dict:
     started = time.monotonic()
     deadline = started + INTRODUCTION_PIPELINE_TIMEOUT
-    client = client or ModelClient(ModelConfig.from_env())
+    client = client if client is not None else ModelClient(introduction_model_config())
     trace = {
         "pipeline_version": INTRODUCTION_VERSION,
         "paper_id": str(paper["id"]),

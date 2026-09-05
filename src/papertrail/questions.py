@@ -2,7 +2,6 @@
 
 import logging
 import time
-from dataclasses import replace
 from uuid import UUID
 
 from papertrail.budget import Budget, CallLedger
@@ -24,11 +23,7 @@ class QuestionService:
         self._run(question_id, paper_id, INTRODUCTION_QUESTION, kind="introduction")
 
     def _run(self, question_id: UUID, paper_id: UUID, question: str, *, kind: str) -> None:
-        from papertrail.introduction import (
-            INTRODUCTION_CALL_TIMEOUT,
-            INTRODUCTION_MAX_OUTPUT_TOKENS,
-            introduce_paper,
-        )
+        from papertrail.introduction import introduce_paper, introduction_model_config
         from papertrail.model import ModelClient, ModelConfig
         from papertrail.qa import answer_question
 
@@ -45,12 +40,8 @@ class QuestionService:
             paper = self.repository.get(paper_id)
             pages = self.repository.pages(paper_id)
             config = ModelConfig.from_env()
-            if kind == "introduction" and config.configured:
-                config = replace(
-                    config,
-                    timeout=max(config.timeout, INTRODUCTION_CALL_TIMEOUT),
-                    max_output_tokens=max(config.max_output_tokens, INTRODUCTION_MAX_OUTPUT_TOKENS),
-                )
+            if kind == "introduction":
+                config = introduction_model_config(config)
             client = ModelClient(
                 config,
                 before_call=ledger.before_call,
