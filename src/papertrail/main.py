@@ -135,6 +135,7 @@ class Question(BaseModel):
     introduction: Introduction | None = None
     previous_introduction: Introduction | None = None
     previous_introduction_id: UUID | None = None
+    introduction_outdated: bool = False
     coverage: dict | None = None
 
 

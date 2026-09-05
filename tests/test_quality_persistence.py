@@ -89,7 +89,7 @@ def test_partial_answer_and_coverage_survive_history_reload_and_restart(
 
 
 def test_only_explicit_outdated_cache_upgrade_creates_new_task(client, monkeypatch):
-    from papertrail.introduction import INTRODUCTION_SCHEMA_VERSION
+    from papertrail.introduction import INTRODUCTION_SCHEMA_VERSION, INTRODUCTION_VERSION
 
     paper = upload(client).json()["paper"]
     repository = client.app.state.repository
@@ -110,7 +110,11 @@ def test_only_explicit_outdated_cache_upgrade_creates_new_task(client, monkeypat
 
     repository.finish_question(
         upgraded["id"],
-        {"status": "answered", "introduction": {"schema_version": INTRODUCTION_SCHEMA_VERSION}},
+        {
+            "status": "answered",
+            "introduction": {"schema_version": INTRODUCTION_SCHEMA_VERSION},
+            "trace": {"pipeline_version": INTRODUCTION_VERSION},
+        },
     )
     cached, created = repository.create_introduction(paper_id, uuid4(), refresh_if_outdated=True)
     assert not created and cached["id"] == upgraded["id"]

@@ -47,6 +47,7 @@ type IntroductionTask = {
   introduction: Introduction | null;
   previous_introduction?: Introduction | null;
   previous_introduction_id?: string | null;
+  introduction_outdated?: boolean;
 };
 type ModelConfig = { configured: boolean; model: string | null; reason: string | null };
 
@@ -131,12 +132,13 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
   const [revision, setRevision] = useState(0);
   const mounted = useRef(false);
   const sending = useRef(false);
-  const pendingRequest = useRef<string | null>(null);
+  const pendingRequest = useRef<{ id: string; refreshIfOutdated: boolean } | null>(null);
   const submission = useRef<AbortController | null>(null);
   const active = inProgress(task);
   const introduction = task?.introduction || task?.previous_introduction || null;
   const showingPrevious = !!introduction && !task?.introduction;
-  const outdated = !!introduction && introduction.schema_version !== READING_CARD_SCHEMA;
+  const legacySchema = !!introduction && introduction.schema_version !== READING_CARD_SCHEMA;
+  const outdated = !!introduction && (legacySchema || task?.introduction_outdated === true);
 
   useEffect(() => {
     mounted.current = true;
@@ -193,19 +195,19 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
   }, [paperId, revision]);
 
   async function generate() {
-    if (sending.current || active || (introduction && !outdated) || loading || loadError || !config?.configured || configError) return;
+    if (sending.current || active || (introduction && !outdated && !confirmingSubmission) || loading || loadError || !config?.configured || configError) return;
     sending.current = true;
     setSubmitting(true);
     setSubmitError("");
     const controller = new AbortController();
     submission.current = controller;
     // Reuse an uncertain request after a network failure; a confirmed failed task gets a new ID.
-    pendingRequest.current ||= crypto.randomUUID();
+    pendingRequest.current ||= { id: crypto.randomUUID(), refreshIfOutdated: outdated };
     try {
       const result = await request<IntroductionTask>(`/api/papers/${paperId}/introduction`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ request_id: pendingRequest.current, refresh_if_outdated: outdated }),
+        body: JSON.stringify({ request_id: pendingRequest.current.id, refresh_if_outdated: pendingRequest.current.refreshIfOutdated }),
         signal: controller.signal,
       });
       if (!mounted.current || controller.signal.aborted) return;
@@ -267,21 +269,26 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
           )}
           {showingPrevious && (task?.status === "failed" || task?.status === "insufficient_evidence") && (
             <div className="introduction-failure" role="alert">
-              <h3>本次研读卡尚未完成</h3>
+              <h3>{legacySchema ? "本次研读卡尚未完成" : "本次原文核对尚未完成"}</h3>
               <p>{task.message || "本次结果未通过检查，失败记录已保存。"}</p>
-              <p>下面保留此前的简介，可以继续核对原文或主动重试补全。</p>
+              <p>下面保留此前的简介，可以继续核对原文或主动重试。</p>
             </div>
           )}
-          {outdated ? (
+          {(outdated || confirmingSubmission) && (
             <div className="reading-card-legacy" role="status">
-              <p>这是已保存的旧版简介，尚未按研读卡规则核对必要要点，也未区分内容来源类别。</p>
+              <p>{confirmingSubmission
+                ? "上次提交的接收情况尚未确认。可以取回该请求的处理结果，已保存的研读卡仍可阅读。"
+                : legacySchema
+                ? "这是已保存的旧版简介，尚未按研读卡规则核对必要要点，也未区分内容来源类别。"
+                : "可更新原文核对：这份研读卡依据此前的核对规则生成，尚未按最新规则逐项复核。点击后会调用模型重新核对，更新前仍可阅读已保存内容。"}</p>
               <button type="button" className="text-button" onClick={() => void generate()}
                 disabled={submitting || active || !!loadError || !config?.configured || !!configError}>
-                {active ? "正在补全研读卡…" : submitting ? "正在提交…" : confirmingSubmission ? "确认上次提交结果 →" : "补全为研读卡 →"}
+                {active ? (legacySchema ? "正在补全研读卡…" : "正在更新原文核对…") : submitting ? "正在提交…" : confirmingSubmission ? "确认上次提交结果 →" : legacySchema ? "补全为研读卡 →" : "更新原文核对 →"}
               </button>
               {(configError || (config && !config.configured)) && <p>{configError || config?.reason || "请先完成模型配置。"}</p>}
             </div>
-          ) : (
+          )}
+          {!legacySchema && (
             <details className="reading-card-guide">
               <summary>怎样区分论文结论与辅助解释</summary>
               <p><strong>论文陈述</strong>是论文提出或报告的内容；<strong>作者解释</strong>是作者的解释、理由或假设，不能当作已证实的因果。</p>
@@ -332,9 +339,9 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
               ))}
             </section>
           )}
-          {!outdated && introduction.coverage && (
+          {!legacySchema && introduction.coverage && (
             <details className="reading-card-coverage">
-              <summary>AI 已检查的必要要点 · 仍待你核对</summary>
+              <summary>{outdated ? "此前 AI 已检查的必要要点 · 尚未更新核对" : "AI 已检查的必要要点 · 仍待你核对"}</summary>
               <ul>{introduction.coverage.map((entry) => (
                 <li key={entry.aspect}>
                   <span>{coverageLabels[entry.aspect] || entry.aspect}</span>
@@ -344,7 +351,7 @@ export function IntroductionPanel({ paperId, onCitation, onAsk }: {
             </details>
           )}
           <div className="introduction-footer">
-            <p>引用来自当前论文，已通过来源校验。{task?.support_status === "ai_checked" && !showingPrevious ? "AI 已检查原文支持关系；" : ""}简介仍待你对照原文核对。页码按 PDF 文件顺序计算。</p>
+            <p>引用来自当前论文，已通过来源校验。{task?.support_status === "ai_checked" && !showingPrevious ? (outdated ? "此前 AI 已检查原文支持关系；" : "AI 已检查原文支持关系；") : ""}简介仍待你对照原文核对。页码按 PDF 文件顺序计算。</p>
             <button type="button" className="text-button" onClick={onAsk}>还有不明白的地方？继续向论文提问 →</button>
           </div>
         </>

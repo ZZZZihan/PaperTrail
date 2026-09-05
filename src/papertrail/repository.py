@@ -103,12 +103,25 @@ class Repository:
     def create_introduction(self, paper_id: UUID, request_id: UUID, *, refresh_if_outdated=False):
         from papertrail.introduction import INTRODUCTION_QUESTION
 
-        return self._create_task(
+        row, created = self._create_task(
             paper_id,
             request_id,
             INTRODUCTION_QUESTION,
             "introduction",
             refresh_if_outdated=refresh_if_outdated,
+        )
+        with self.connect() as conn:
+            return self._introduction_view(conn, row), created
+
+    @staticmethod
+    def _introduction_outdated(row: dict) -> bool:
+        from papertrail.introduction import INTRODUCTION_SCHEMA_VERSION, INTRODUCTION_VERSION
+
+        introduction = row.get("introduction") or {}
+        trace = row.get("trace") or {}
+        return (
+            introduction.get("schema_version") != INTRODUCTION_SCHEMA_VERSION
+            or trace.get("pipeline_version") != INTRODUCTION_VERSION
         )
 
     def _create_task(
@@ -142,8 +155,6 @@ class Repository:
             if not conn.execute("SELECT id FROM papers WHERE id = %s", (paper_id,)).fetchone():
                 raise ImportFailure("not_found", "找不到这篇论文，请返回论文库。", 404)
             if kind == "introduction":
-                from papertrail.introduction import INTRODUCTION_SCHEMA_VERSION
-
                 existing = conn.execute(
                     "SELECT * FROM questions WHERE paper_id = %s AND kind = 'introduction' "
                     "ORDER BY created_at DESC, id DESC LIMIT 1",
@@ -153,11 +164,7 @@ class Repository:
                     existing["status"] in {"pending", "running"}
                     or (
                         existing["status"] == "answered"
-                        and (
-                            not refresh_if_outdated
-                            or (existing.get("introduction") or {}).get("schema_version")
-                            == INTRODUCTION_SCHEMA_VERSION
-                        )
+                        and (not refresh_if_outdated or not self._introduction_outdated(existing))
                     )
                 )
                 if reusable:
@@ -205,17 +212,25 @@ class Repository:
                 "ORDER BY created_at DESC, id DESC LIMIT 1",
                 (paper_id,),
             ).fetchone()
-            if row and row["status"] != "answered":
-                previous = conn.execute(
-                    "SELECT id, introduction FROM questions WHERE paper_id = %s "
-                    "AND kind = 'introduction' AND status = 'answered' "
-                    "ORDER BY created_at DESC, id DESC LIMIT 1",
-                    (paper_id,),
-                ).fetchone()
-                if previous:
-                    row["previous_introduction"] = previous["introduction"]
-                    row["previous_introduction_id"] = previous["id"]
-            return row
+            return self._introduction_view(conn, row) if row else None
+
+    def _introduction_view(self, conn, row: dict) -> dict:
+        # Read-only metadata follows the card actually displayed, including a previous
+        # successful result while its explicit update is pending or has failed.
+        shown = row if row["status"] == "answered" else None
+        if shown is None:
+            previous = conn.execute(
+                "SELECT id, introduction, trace FROM questions WHERE paper_id = %s "
+                "AND kind = 'introduction' AND status = 'answered' "
+                "ORDER BY created_at DESC, id DESC LIMIT 1",
+                (row["paper_id"],),
+            ).fetchone()
+            if previous:
+                row["previous_introduction"] = previous["introduction"]
+                row["previous_introduction_id"] = previous["id"]
+                shown = previous
+        row["introduction_outdated"] = bool(shown and self._introduction_outdated(shown))
+        return row
 
     def progress_question(self, question_id: UUID, stage: str) -> None:
         with self.connect() as conn:
