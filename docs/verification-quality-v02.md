@@ -98,16 +98,27 @@ Ruff、TypeScript/Vite 构建、HTTP/OpenAPI 冒烟及差异检查。
 日志和旧失败日志已归档于 `data/diagnostics/quality-v02/checks-248a50d/`，manifest 保存 SHA256。
 
 已请求将原累计上限从 160 增至 167，仅用于原 react-03 最多 3 次及 ReAct v6 研读卡最多 4 次。
-尚未获得批准时不执行，也不改本机上限；真实回归和成功卡的浏览器验收保持 pending。
+2026-09-05 09:13 UTC 用户明确批准上述测试范围；随后核对同 scope 已用 160、无活跃任务，
+仅把本机累计上限改为 167，模型和模式保持。授权记录为
+`data/diagnostics/quality-v02/authorization-167/authorization.json`。后续结果单独记录，不覆盖首次失败。
 
 ## 额度与评测范围
 
 本轮开始前同 scope 累计 153/160；上述两次运行共新增 7 次，现为 **160/160**，无活跃模型任务。
 达到授权上限后不再真实调用，不换 scope、不清账本、不将未知费用算作免费。
-下一轮真实修复验证需要新增授权；离线实现、检查、来源准备和交接继续推进。
+以上为新增授权前的历史账本状态。用户随后批准最多 7 次代表性修复测试，当前上限 167；
+执行完成后按实际结果记录使用量，不执行 20 题全量留出评测。
 
 候选留出集已准备 4 篇、20 题，含 62 个答案点、29 个条件、46 个上下文；
 模型运行为 **0/20**，人工核对 pending，未用来调参。这是来源与规则准备，不能宣称新论文准确率。
 
 本地入口仍为 http://127.0.0.1:8000/，目前可读原 PDF、旧成功简介及所有历史结果。
 试读步骤见 [人工试读清单](manual-trial-v02.md)。人工产品认可和学习掌握仍由用户实际反馈记录。
+
+## 远端 CI 补充
+
+文档交付 `681d5eeaa4415f8cd3148813019688d2b9730ba1` 的
+[push CI](https://github.com/ZZZZihan/PaperTrail/actions/runs/33956961759) 与
+[PR CI](https://github.com/ZZZZihan/PaperTrail/actions/runs/33956963082) 均成功。
+已读取 PR CI 实际日志：310 项后端测试通过，Ruff、TypeScript/Vite、已安装包 HTTP/OpenAPI 冒烟及差异检查通过；
+CI 使用 PostgreSQL 17 测试服务。这是工程检查，不代表尚未执行的最终模型效果。
