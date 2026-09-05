@@ -12,7 +12,7 @@ from test_introduction import introduction_output
 from papertrail.budget import Budget, CallLedger
 from papertrail.errors import ImportFailure
 from papertrail.main import create_app
-from papertrail.model import ModelClient
+from papertrail.model import ModelClient, ModelConfig
 from papertrail.repository import Repository
 
 
@@ -25,6 +25,7 @@ def configure_fake_model(monkeypatch, *, cap=10):
         "PAPERTRAIL_MODEL_BUDGET_SCOPE": "introduction-test",
         "PAPERTRAIL_MODEL_MAX_CALLS": str(cap),
         "PAPERTRAIL_MODEL_MAX_OUTPUT_TOKENS": "1800",
+        "PAPERTRAIL_MODEL_TIMEOUT": "45",
     }.items():
         monkeypatch.setenv(key, value)
     requests = []
@@ -72,6 +73,11 @@ def test_intro_persists_across_refresh_restart_and_never_enters_qa_history(
     assert row["status"] == "answered" and row["kind"] == "introduction"
     assert row["introduction"]["terms"][0]["citations"][0]["paper_id"] == paper["id"]
     assert len(row["claims"]) == 7 and len(requests) == 2
+    assert row["trace"]["model_config"]["timeout_seconds"] == 90
+    # The introduction adjusts its own runtime config; ordinary QA still reads the
+    # existing provider settings, and the shared pipeline deadline remains 180s.
+    assert ModelConfig.from_env().timeout == 45
+    assert ModelConfig.from_env().max_output_tokens == 1800
     assert all(payload["max_tokens"] == 5000 for payload in requests)
     assert all(
         call["details"]["max_output_tokens"] == 5000 for call in row["trace"]["ledger"]["calls"]

@@ -24,7 +24,11 @@ class QuestionService:
         self._run(question_id, paper_id, INTRODUCTION_QUESTION, kind="introduction")
 
     def _run(self, question_id: UUID, paper_id: UUID, question: str, *, kind: str) -> None:
-        from papertrail.introduction import INTRODUCTION_MAX_OUTPUT_TOKENS, introduce_paper
+        from papertrail.introduction import (
+            INTRODUCTION_CALL_TIMEOUT,
+            INTRODUCTION_MAX_OUTPUT_TOKENS,
+            introduce_paper,
+        )
         from papertrail.model import ModelClient, ModelConfig
         from papertrail.qa import answer_question
 
@@ -44,6 +48,7 @@ class QuestionService:
             if kind == "introduction" and config.configured:
                 config = replace(
                     config,
+                    timeout=max(config.timeout, INTRODUCTION_CALL_TIMEOUT),
                     max_output_tokens=max(config.max_output_tokens, INTRODUCTION_MAX_OUTPUT_TOKENS),
                 )
             client = ModelClient(
