@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "dataset_id": "papertrail-candidate-holdout-v0.2",
+  "frozen_denominators": {
+    "papers": 4,
+    "questions": 20,
+    "answerable": 16,
+    "insufficient": 4,
+    "answer_points": 62,
+    "required_conditions": 29,
+    "contexts": 46
+  },
+  "preparation_status": "AI-prepared; all human checks pending",
+  "classification_rules": {
+    "complete_supported_answer": "All frozen answer points and relevant required conditions must be correctly stated, grounded in allowed evidence and present in answer prose. Additional unsupported claims make the answer ineligible. Source IDs existing is a separate engineering check.",
+    "partial_answer": "At least one material answer point/condition is missing or wrong even if every stated claim has support. Conditions hidden only in quoted evidence do not count as retained in the answer.",
+    "false_premise": "The four false-premise questions are answerable with counterevidence. A generic insufficient response counts as false refusal. Distinguish observed results and author conjectures.",
+    "insufficient_evidence": "For four insufficient questions, scope the lack of evidence to the searched/checked source. Optional supported near-miss facts are allowed, but supplying the requested unsupported value/comparison counts as unsupported answering.",
+    "alternative_evidence": "Equivalent correct evidence elsewhere in the same frozen PDF is allowed. Stored contexts are sufficient reference evidence, not mandatory exact-quote matches.",
+    "table_probe": "Four table/caption/footnote items are capability probes and stay in the same answerable denominator. Report their subgroup separately; do not silently exclude parsing failures."
+  },
+  "metrics": {
+    "complete_supported_answers": {
+      "numerator": "Answerable questions with all answer points and conditions correctly covered and all stated factual claims supported",
+      "denominator": 16
+    },
+    "fact_support": {
+      "numerator": "Supported atomic factual claims actually output",
+      "denominator": "All atomic factual claims actually output; independent semantic reviewer splits conjunctions when separately verifiable",
+      "empty_rule": "N/A if zero claims; accompany with answer coverage and refusal rates; never report 100% for empty output"
+    },
+    "necessary_condition_coverage": {
+      "numerator": "Frozen required_conditions whose content is correct, supported and explicit in answer prose",
+      "denominator": 29,
+      "overlap_rule": "Each condition ID counted once here; its overlap with answer_points is intentional across separate metrics, never added into one combined score"
+    },
+    "retrieval_sufficiency": {
+      "numerator": "Answerable questions whose actually retrieved contexts collectively support all frozen answer points and conditions",
+      "denominator": 16,
+      "rule": "Judge original retrieved contexts semantically, allowing equivalent evidence; keyword/locator hit rate is only a separate locator diagnostic"
+    },
+    "false_refusal": {
+      "numerator": "Answerable questions ending insufficient without delivering the answer",
+      "denominator": 16
+    },
+    "unsupported_answering": {
+      "numerator": "Insufficient questions where requested missing facts are asserted without adequate evidence",
+      "denominator": 4
+    },
+    "engineering_failures": {
+      "numerator": "Provider, timeout, parser, validation, interruption or unavailable-evidence failures",
+      "denominator": 20,
+      "rule": "Keep all attempted selections/failures in all applicable denominators; unrun questions are unrun, not passed or failed"
+    },
+    "usage": {
+      "fields": [
+        "wall_clock_seconds_per_question",
+        "run_total_seconds",
+        "persistent_scope",
+        "ledger_before",
+        "ledger_after",
+        "model_calls",
+        "input_tokens",
+        "output_tokens",
+        "total_tokens",
+        "known_cost_or_unknown"
+      ],
+      "rule": "Use the same authorized provider_quota ledger; no run is authorized by dataset preparation. Preserve failed attempts and exact run/code/model/prompt hashes."
+    }
+  },
+  "execution_protocol": [
+    "Freeze this exact dataset before model use. Record dataset checksums and source hashes in each immutable run.",
+    "Run only an explicitly recorded selection that fits live remaining allowance. Report n selected/n total and unrun IDs; no all-20 score from a subset.",
+    "A separate evaluation agent may inspect labels after outputs are fixed; an application implementation agent must not use holdout failures or reference labels for tuning while preserving holdout status.",
+    "If any item or paper informs tuning, retain all history, mark the complete affected paper as development use in a separate append-only usage event, and replace it with a new independently frozen paper before claiming a four-paper holdout score.",
+    "Do not overwrite these frozen files or recompute hashes to accept drift. Human corrections or changed expectations require a new version and an explicit change record.",
+    "Label preparation-agent familiarity and human-pending state in any report. Candidate holdout does not prove absence of model-pretraining contamination."
+  ]
+}
