@@ -8,6 +8,8 @@
 
 ## 按实际阶段工作
 
+- 2026-09-06 用户要求模型连通性及真实浏览器端到端测试，沿原 scope 分别新增 3 和 10 次，当前 Sol/provider_quota 累计 407/407，费用未知，无活跃任务。业务代码为 8e2bb06；新正常问答与 Reflexion v10 卡通过独立原文核对，不足题返回背景与 partial_answer，预设不足行为未通过。真实 app+PG 重启后 7 论文/168 页/145 任务/407 调用/1 alias 一致。详见 docs/verification-live-e2e-2026-09-06.md；下方394及此前上限均保留为历史，不重置scope或账本。当前测试窗口已使用完，未来新增调用按新任务授权与实时配置安排。
+
 - 2026-09-05 用户明确临时不限量使用当前 Goal 必要测试，原167阻塞已解除并完成本轮实测。临时窗口现已关闭，`PAPERTRAIL_MODEL_MAX_CALLS=394`、同scope实际394/394，新增227次；Sol、provider_quota、原scope及历史均保持，费用未知。QA仍none，简介显式low。下方160/167/unlimited是分阶段历史，不应重置scope或账本。未来新增调用按新的任务授权和当前实际配置安排。
 - 当前由用户的“准确性与专业度”Goal 完成 COL-19 本轮本地工程与实测，任务交付 In Review，分支 `codex/col-19-paper-introduction-demo`，PR 为 draft、未合并。本轮以 docs/reading-quality-v02.md 与 docs/paper-introduction-demo.md 为规格，实际版本、运行及用量统一见 docs/verification-quality-v02.md。已实现问答 coverage/partial_answer 和研读卡；简介自 v6 起使用独立 300 秒总期限、至少 120 秒单次窗口、每项最多 8 个原文片段，仍最多 4 次调用/1 次修订，QA 仍 180 秒/每条最多 4 个引用：必要要点与事实支持分别检查，内容来源分四类，旧回答不回填成绩，旧简介仅在主动升级时重新生成，失败仍保留旧卡可读。
 - 当前真实进展：QA v7最多两条词覆盖补充（仍12段/20k），旧15题独立8/10完整、17/18要点、11/11条件、72/73已发布事实有据。新4篇20题留出4/16严格完整、43/62点、18/29条件、135/135已发布事实、3/20超时，未用于调参；质量不足如实保留。简介v10/Sol low的ReAct新卡独立8/8本项支持、8/8来源、5/5覆盖；两个low运行中一个完整成功，首个ID/网络失败保留，不能泛化low提升。核心b619942的make check 375项通过及远端CI通过，浏览器和app+PG重启后7论文168页141任务394调用1alias及PDF全部一致。工程和AI诊断完成，人工产品认可及学习验收pending；实际版本/分轮结果/用量统一见 docs/verification-quality-v02.md。
