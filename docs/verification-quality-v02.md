@@ -347,3 +347,38 @@ v9 的 `make check` 335 passed / 退出 0，日志 `data/diagnostics/quality-v02
 `4394efa22fe1ae303c19ffdbb5780b289a94cc89da09abe048211e3c20acb467`。
 上述两批后同账本累计 285 次，无活跃模型任务，费用未知。
 这是一份明确失败诊断，当前仍缺完整独立支持的新发布卡，Goal 工程完成继续 pending。
+
+
+### QA v7 全旧集与新留出首次运行
+
+QA 核心 `176c15d0e64091db6226a13facb149e27a7bd627`，应用/运行源码 `606f97be75e4d105af5825e665162bc34545c5b3`。
+`make check` 349 项后端测试通过，Ruff/格式、TypeScript/Vite、安装包和 HTTP smoke 均通过；
+日志归档 `data/diagnostics/quality-v02/checks-176c15d/`，SHA-256
+`3b4b0bc49ec8901d4ea7cbcb3eef6ec58d39ddec887f3300db7c9c40bb014773`。
+[606f97b 的 PR CI](https://github.com/ZZZZihan/PaperTrail/actions/runs/33967982647) 与
+[push CI](https://github.com/ZZZZihan/PaperTrail/actions/runs/33967980051) 均成功。
+
+旧集 RUN `20260905T130637.505954Z-480131ece73e4699b0c61029df13db68`：
+8 answered、3 partial_answer、4 insufficient_evidence。独立完整有据 8/10，原点 17/18，
+必要条件 11/11，原子事实 72/73，可答检索充分 10/10，误拒 0/10，不足题无据输出 1/5，
+工程失败 0/15，23/23 实际引用存在与归属通过。45 calls、197,710 tokens、逐题耗时合计 393.813 秒，费用未知。
+[冻结独立摘要](../evals/quality-v0.2/development-review-2026-09-05-run130637.json) 保留逐题结果及哈希。
+
+react-03 正文写全冻结模型和人工轨迹，react-04 明写错误分类，Toolformer 三道可答题完整。
+本轮 react-03 的冻结片段已经在 `merged_selected`，`supplementation.decisions=[]`；
+因此该次成功不能单独归因于词补充插入。固定旧输入的离线增益与此次实际结果分开记录。
+剩余问题：reflexion-01 遗漏短期轨迹如何帮助下一步决策；reflexion-02 正文与必要条件完整，
+应用仍误判 partial；reflexion-05 的“本文列明的其他实验”遗漏附录 WebShop，范围断言不支持，
+且未直接说明目标正确率无法确定。其余四道不足题恰当。不得把 11/11 条件覆盖写成全部回答完整。
+
+确认零活跃任务且同账本累计 330 次后，冻结 QA v7 并首次执行独立 4 篇 20 题：
+RUN `20260905T131628.421861Z-e06bbd03af5d47e280cdbdeb6db17f10`，
+运行前证据 `data/diagnostics/holdout-v0.2/model-usage/first-use-20260905T131628Z-b0688ae1/preflight.json`
+记录五份冻结文件哈希、源码、模型、预算范围和不用于调参的用途；后补 execution link 单独留存，不修改原 preflight。
+所有 20 题已终态：7 answered、5 partial_answer、5 insufficient_evidence、3 failed。
+应用状态不是独立成绩；独立核对进行中，三个失败保留原分母，不自动重试。
+58 calls、已知用量小计 261,342 tokens（输入 237,223、输出 24,119），3 次用量未知，全部费用未知；
+不能将已知小计写成精确总用量。结束时只读核对累计 388 次、零活跃、临时 unlimited。
+
+为隔离研读卡核对问题，下一步仅在旧 ReAct 开发样例对比简介专属 low 推理参数；
+同 Sol、scope、提示正文、评分和每任务边界保持，QA 默认参数不变。此对比不读取留出答案用于实现。
