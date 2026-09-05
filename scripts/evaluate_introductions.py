@@ -52,6 +52,7 @@ def check_citations(result: dict, paper: dict, source: dict) -> dict:
         {"text": f"{t['term']}：{t['explanation']}", "citations": t["citations"]}
         for t in intro["terms"]
     ]
+    claims += intro.get("learning_aids", [])
     for index, claim in enumerate(claims):
         if not claim.get("citations"):
             errors.append(f"claim_{index}:missing_citations")
@@ -76,7 +77,7 @@ def check_citations(result: dict, paper: dict, source: dict) -> dict:
     }
 
 
-def execute(client, source: dict, run) -> dict:
+def execute(client, source: dict, run, *, refresh_if_outdated=False) -> dict:
     source_id = source["paper"]["id"]
     directory = run / source_id
     paper = upload_source(client, source)["paper"]
@@ -92,9 +93,18 @@ def execute(client, source: dict, run) -> dict:
             "started_at": now(),
             "previous_id": previous["id"] if previous else None,
             "rubric": "docs/paper-introduction-demo.md",
+            "refresh_if_outdated": refresh_if_outdated,
         },
     )
-    result = request_json(client, "POST", path, json={"request_id": request_id})
+    result = request_json(
+        client,
+        "POST",
+        path,
+        json={
+            "request_id": request_id,
+            "refresh_if_outdated": refresh_if_outdated,
+        },
+    )
     write_once(directory / "submitted.json", result)
     reused = bool(previous and previous["id"] == result["id"])
     deadline = time.monotonic() + 240
@@ -143,6 +153,7 @@ def main() -> int:
     mode.add_argument("--prepare-only", action="store_true")
     mode.add_argument("--run", action="store_true")
     parser.add_argument("--ids", default="reflexion,react,toolformer")
+    parser.add_argument("--refresh-if-outdated", action="store_true")
     parser.add_argument("--base-url", type=local_url, default="http://127.0.0.1:8000")
     args = parser.parse_args()
     run = (
@@ -159,6 +170,7 @@ def main() -> int:
             "git": git_state(),
             "mode": "run" if args.run else "prepare_only",
             "ids": args.ids.split(","),
+            "refresh_if_outdated": args.refresh_if_outdated,
             "base_url": args.base_url,
             "retry_policy": "No automatic retry; every invocation preserves new artifacts",
         },
@@ -175,7 +187,12 @@ def main() -> int:
                 base_url=args.base_url, timeout=190, follow_redirects=False
             ) as client:
                 for source_id in selected:
-                    record = execute(client, sources[source_id], run)
+                    record = execute(
+                        client,
+                        sources[source_id],
+                        run,
+                        refresh_if_outdated=args.refresh_if_outdated,
+                    )
                     records.append(record)
                     if (
                         record["application_status"] != "answered"

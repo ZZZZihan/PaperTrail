@@ -1040,6 +1040,7 @@ main {
   margin-top: 8px;
 }
 .question-failed .question-meta > span,
+.question-partial_answer .question-meta > span,
 .question-insufficient_evidence .question-meta > span {
   color: #9b704b;
 }
@@ -1127,6 +1128,31 @@ main {
 .answer-note {
   font-size: 11px;
   color: #6b7c61;
+}
+.answer-coverage {
+  margin: 16px 0;
+  padding: 13px;
+  border: 1px solid #e2e6d6;
+  border-radius: 5px;
+  background: #f5f6ec;
+  font-size: 11px;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+.answer-coverage strong {
+  color: #5e7b50;
+}
+.answer-coverage ul {
+  margin: 8px 0;
+  padding-left: 18px;
+}
+.answer-coverage li + li {
+  margin-top: 6px;
+}
+.answer-coverage small {
+  display: block;
+  color: #77816a;
+  font-size: 10px;
 }
 .answer-insufficient,
 .answer-failure {

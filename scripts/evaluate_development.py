@@ -26,7 +26,7 @@ import httpx2 as httpx
 from pypdf import PdfReader
 
 ROOT = Path(__file__).resolve().parents[1]
-TERMINAL = {"answered", "insufficient_evidence", "failed"}
+TERMINAL = {"answered", "partial_answer", "insufficient_evidence", "failed"}
 REVIEW = {"status": "pending", "reviewer": None, "notes": None}
 
 
@@ -187,7 +187,7 @@ def citation_check(result: dict, paper_id: str, source: dict) -> dict:
     claims = result.get("claims", [])
     if result.get("paper_id") != paper_id:
         errors.append("response_paper_mismatch")
-    if result.get("status") == "answered" and not claims:
+    if result.get("status") in {"answered", "partial_answer"} and not claims:
         errors.append("answered_without_claims")
     for claim_index, claim in enumerate(claims):
         if not claim.get("citations"):

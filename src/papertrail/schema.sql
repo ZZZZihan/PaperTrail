@@ -61,3 +61,9 @@ CREATE TABLE IF NOT EXISTS question_request_aliases (
 CREATE INDEX IF NOT EXISTS questions_introduction_paper_created
     ON questions(paper_id, created_at DESC, id DESC) WHERE kind = 'introduction';
 INSERT INTO schema_version(version) VALUES (3) ON CONFLICT DO NOTHING;
+
+ALTER TABLE questions ADD COLUMN IF NOT EXISTS coverage jsonb;
+ALTER TABLE questions DROP CONSTRAINT IF EXISTS questions_status_check;
+ALTER TABLE questions ADD CONSTRAINT questions_status_check CHECK (status IN
+    ('pending', 'running', 'answered', 'partial_answer', 'insufficient_evidence', 'failed'));
+INSERT INTO schema_version(version) VALUES (4) ON CONFLICT DO NOTHING;

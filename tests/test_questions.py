@@ -137,7 +137,10 @@ def test_lost_guard_stops_model_calls_and_new_questions_but_keeps_history_readab
                         {
                             "finish_reason": "stop",
                             "message": {
-                                "content": '{"search_queries":["Alpha evidence physical page one"]}'
+                                "content": (
+                                    '{"search_queries":["Alpha evidence physical page one"],'
+                                    '"requirements":["What is Alpha evidence?"]}'
+                                )
                             },
                         }
                     ],

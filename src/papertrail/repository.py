@@ -100,12 +100,26 @@ class Repository:
     def create_question(self, paper_id: UUID, request_id: UUID, question: str):
         return self._create_task(paper_id, request_id, question, "qa")
 
-    def create_introduction(self, paper_id: UUID, request_id: UUID):
+    def create_introduction(self, paper_id: UUID, request_id: UUID, *, refresh_if_outdated=False):
         from papertrail.introduction import INTRODUCTION_QUESTION
 
-        return self._create_task(paper_id, request_id, INTRODUCTION_QUESTION, "introduction")
+        return self._create_task(
+            paper_id,
+            request_id,
+            INTRODUCTION_QUESTION,
+            "introduction",
+            refresh_if_outdated=refresh_if_outdated,
+        )
 
-    def _create_task(self, paper_id: UUID, request_id: UUID, question: str, kind: str):
+    def _create_task(
+        self,
+        paper_id: UUID,
+        request_id: UUID,
+        question: str,
+        kind: str,
+        *,
+        refresh_if_outdated=False,
+    ):
         self.require_service_guard()
         self.expire_questions()
         with self.connect() as conn:
@@ -128,13 +142,25 @@ class Repository:
             if not conn.execute("SELECT id FROM papers WHERE id = %s", (paper_id,)).fetchone():
                 raise ImportFailure("not_found", "找不到这篇论文，请返回论文库。", 404)
             if kind == "introduction":
+                from papertrail.introduction import INTRODUCTION_SCHEMA_VERSION
+
                 existing = conn.execute(
                     "SELECT * FROM questions WHERE paper_id = %s AND kind = 'introduction' "
-                    "AND status IN ('pending', 'running', 'answered') "
                     "ORDER BY created_at DESC, id DESC LIMIT 1",
                     (paper_id,),
                 ).fetchone()
-                if existing:
+                reusable = existing and (
+                    existing["status"] in {"pending", "running"}
+                    or (
+                        existing["status"] == "answered"
+                        and (
+                            not refresh_if_outdated
+                            or (existing.get("introduction") or {}).get("schema_version")
+                            == INTRODUCTION_SCHEMA_VERSION
+                        )
+                    )
+                )
+                if reusable:
                     conn.execute(
                         "INSERT INTO question_request_aliases(request_id, question_id) "
                         "VALUES (%s, %s)",
@@ -174,11 +200,22 @@ class Repository:
     def introduction(self, paper_id: UUID) -> dict | None:
         self.expire_questions()
         with self.connect() as conn:
-            return conn.execute(
+            row = conn.execute(
                 "SELECT * FROM questions WHERE paper_id = %s AND kind = 'introduction' "
                 "ORDER BY created_at DESC, id DESC LIMIT 1",
                 (paper_id,),
             ).fetchone()
+            if row and row["status"] != "answered":
+                previous = conn.execute(
+                    "SELECT id, introduction FROM questions WHERE paper_id = %s "
+                    "AND kind = 'introduction' AND status = 'answered' "
+                    "ORDER BY created_at DESC, id DESC LIMIT 1",
+                    (paper_id,),
+                ).fetchone()
+                if previous:
+                    row["previous_introduction"] = previous["introduction"]
+                    row["previous_introduction_id"] = previous["id"]
+            return row
 
     def progress_question(self, question_id: UUID, stage: str) -> None:
         with self.connect() as conn:
@@ -193,7 +230,7 @@ class Repository:
             conn.execute(
                 "UPDATE questions SET status = %s, stage = 'complete', claims = %s, "
                 "message = %s, error_code = %s, support_status = %s, human_review = %s, "
-                "trace = %s, introduction = %s, completed_at = now() "
+                "trace = %s, introduction = %s, coverage = %s, completed_at = now() "
                 "WHERE id = %s AND status IN ('pending', 'running')",
                 (
                     result["status"],
@@ -204,6 +241,7 @@ class Repository:
                     Jsonb(result.get("human_review")),
                     Jsonb(result.get("trace", {})),
                     Jsonb(result.get("introduction") if result["status"] == "answered" else None),
+                    Jsonb(result.get("coverage")),
                     question_id,
                 ),
             )

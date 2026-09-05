@@ -96,7 +96,17 @@ async def mock_completion(request: httpx.Request) -> httpx.Response:
                     "reason": "离线界面测试固定判定，不是真实模型语义检查。",
                 }
                 for index, _ in enumerate(data["claims"])
-            ]
+            ],
+            "coverage": [
+                {
+                    "requirement_index": index,
+                    "covered": bool(data["claims"]) and index == 0,
+                    "claim_indices": [0] if data["claims"] and index == 0 else [],
+                    "reason": "离线界面测试固定覆盖判定。",
+                }
+                for index, _ in enumerate(data["requirements"])
+            ],
+            "additional_requirements": [],
         }
     elif "passages" in data:
         if "证据不足" in question:
@@ -131,7 +141,11 @@ async def mock_completion(request: httpx.Request) -> httpx.Response:
             await asyncio.sleep(2)  # The real client cancels this at its 0.25-second deadline.
         if "失败" in question:
             return httpx.Response(503, json={"error": "OFFLINE injected service failure"})
-        result = {"search_queries": ["Omega physical page three OFFLINE synthetic UI fixture"]}
+        result = {
+            "search_queries": ["Omega physical page three OFFLINE synthetic UI fixture"],
+            "requirements": ["Omega 位于哪一页？"]
+            + (["试验轮数是多少？"] if "部分回答" in question else []),
+        }
     return httpx.Response(
         200,
         json={

@@ -34,6 +34,7 @@ def test_fixture_pdf_preserves_physical_page_three_and_environment_is_isolated(t
     ("question", "status", "code"),
     [
         ("正常", "answered", None),
+        ("部分回答", "partial_answer", None),
         ("超时", "failed", "model_timeout"),
         ("失败", "failed", "model_failure"),
         ("无效引用", "failed", "invalid_citation"),
@@ -60,7 +61,8 @@ def test_fixture_exercises_production_pipeline_without_real_network(question, st
     )
     assert result["status"] == status
     assert result["error_code"] == code
-    if status == "answered":
+    if status in {"answered", "partial_answer"}:
         assert result["claims"][0]["citations"][0]["page_index"] == 2
         assert "离线界面测试片段" in result["claims"][0]["text"]
         assert fixture.FIXTURE_MODEL == result["trace"]["calls"][0]["returned_model"]
+        assert result["coverage"]["status"] == ("complete" if status == "answered" else "partial")
