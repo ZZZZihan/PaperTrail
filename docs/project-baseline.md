@@ -1,5 +1,7 @@
 # PaperTrail：AI Native 论文研读助手
 
+当前更新（2026-09-05）：用户授权推进 [COL-18 单篇证据问答 v0.1](https://linear.app/colife/issue/COL-18)，范围与完成条件以 [本轮规格](evidence-qa-v01.md) 为准。固定前后端问答链路已进入集成验证，公开开发集由 AI 准备，真实模型验证待配置。下方 v0.2 保留为历史路线；P0 人工需求/样例、产品效果与学习验收不因工程开发自动完成。
+
 版本：v0.2 · 日期：2026-09-05 · GitHub 交接同步
 
 状态：项目名与公开仓库已确定为 [PaperTrail](https://github.com/ZZZZihan/PaperTrail)；已建立 [Linear 项目](https://linear.app/colife/project/papertrail-论文研读-agent-93a0ba2ee811)、P0—P5 里程碑及 P0 任务。当前仍处于需求、样例与设计阶段，产品实现、评测结果和上线状态尚未建立。

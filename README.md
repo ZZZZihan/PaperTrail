@@ -2,7 +2,9 @@
 
 AI Native 论文研读 Agent：辅助论文理解、基于原文证据的问答与阅读笔记，作为 Agent 全栈开发学习与求职实践项目。
 
-**当前阶段：已实现首个本地功能，待用户验收。** 可上传文本 PDF、保存原件与逐页文字，在网页中对照原 PDF 和提取结果；支持哈希去重、空白页保留与明确失败提示。P0 真实阅读需求、人工问答样例、模型问答与部署仍待完成。
+**当前阶段：单篇论文证据问答 v0.1 已进入集成与开发验证，真实模型验证待本地配置。** 在原 PDF 导入上增加中文提问、固定检索与模型生成、引用来源校验、AI 支持检查及持久问答历史。页面保留原文与逐页文字，点击引用可回到对应 PDF 物理页。未配置模型及获准预算时不会生成模拟答案。
+
+本轮主任务 [COL-18](https://linear.app/colife/issue/COL-18)；[行为规格与数据流](docs/evidence-qa-v01.md)、[3 篇 15 题开发诊断](docs/development-diagnostics.md)、[约 25 分钟人工清单与反馈模板](docs/manual-trial-v01.md)、[本轮验证与剩余依赖](docs/verification-col-18.md)。AI 准备样例与用户人工核对分别记录，P0 真实需求、产品效果及学习验收继续待完成。
 
 ## 本地启动
 
@@ -11,20 +13,22 @@ AI Native 论文研读 Agent：辅助论文理解、基于原文证据的问答�
 ```bash
 make setup
 make check
-make dev
+make serve
 ```
 
-`make setup` 安装锁定的 Python 与网页依赖，在不存在时复制 `.env.example`。`make dev` 构建网页、启动专用本地 PostgreSQL（127.0.0.1:55432），再启动应用。
+`make setup` 安装锁定的 Python 与网页依赖，在不存在时复制 `.env.example` 为 `.env.local`。`make serve` 构建网页、启动专用本地 PostgreSQL（127.0.0.1:55432），再启动无自动重载的试用服务；开发时可用 `make dev`。
 
 - **网页：<http://127.0.0.1:8000/>**，上传 PDF 后进入逐页核对。
 - 数据保存于忽略目录 `data/library/` 和 `data/postgres/`；刷新或重启后保留。
-- 在运行终端按 Ctrl+C 停止应用，`make db-stop` 停止项目数据库；下次 `make dev` 继续使用原有数据。
+- 在运行终端按 Ctrl+C 停止应用，`make db-stop` 停止项目数据库；下次 `make serve` 继续使用原有论文和问答历史。
 
 - 存活检查：<http://127.0.0.1:8000/health>，返回 `{"status":"ok"}`。
 - 开发接口文档：<http://127.0.0.1:8000/docs>。
 - OpenAPI：<http://127.0.0.1:8000/openapi.json>。
 
-`/health` 仅表示存活。实际文档功能、限制与验证见 [PDF 导入规格](docs/pdf-import.md)、[本地开发说明](docs/local-development.md)和[本轮验证记录](docs/verification-col-16.md)。当前无需模型密钥。
+`/health` 仅表示存活。模型配置状态可在论文问答区查看；密钥、模型地址/名称、预算与币种及每百万 token 单价仅配置于忽略的 `.env.local`，详见 [本地开发说明](docs/local-development.md)。没有模型配置时仍可上传和阅读 PDF、查看历史。
+
+原导入证据见 [COL-16 验证记录](docs/verification-col-16.md)；它不代表问答或模型质量已经通过。
 
 ## 目标与第一版
 
@@ -52,6 +56,6 @@ PaperTrail 是独立的产品与求职项目；学术选题、开题和发表研
 | P4 多篇比较与恢复 | 2—5 篇比较、持久任务、重试、取消与恢复 |
 | P5 试用与求职交付 | 身份与数据隔离、部署、独立展示评测、试用反馈和演示 |
 
-已落实 Python / FastAPI、PostgreSQL、pypdf、TypeScript / React 与 PDF.js 的本地链路。pgvector、模型、预算与部署环境待对应任务确定。原文件来源与物理页码会继续用于后续证据问答。
+已落实 Python / FastAPI、PostgreSQL、pypdf、TypeScript / React 与 PDF.js。v0.1 采用页内分块、查询转换和 BM25 固定检索；模型为可配置的 OpenAI 兼容接口。向量检索需依据开发诊断收益再决定，公网部署留待后续。原文件来源与物理页码用于引用归属校验。
 
 GitHub 保存规格、设计、代码、PR 和验证记录；Linear 维护任务状态、依赖与验收证据。更新时间：2026-09-05。

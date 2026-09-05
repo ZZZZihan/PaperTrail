@@ -1,8 +1,8 @@
 # 本地开发与运行
 
-## 当前功能（COL-16）
+## 当前功能（COL-18，真实模型验证待配置）
 
-本地 PDF 导入、持久保存、逐页核对已实现。关联分支 `codex/col-16-pdf-import`；[行为规格](pdf-import.md)、[实际验证记录](verification-col-16.md)。下方 COL-15 记录保留为历史。
+PDF 导入、持久保存、逐页核对已扩展为固定流程的单篇证据问答：中文查询转换、BM25 检索、结构化生成、引用程序校验、独立 AI 支持检查及持久历史。关联分支 `codex/col-18-evidence-qa-v01`；[问答规格](evidence-qa-v01.md)、[开发诊断](development-diagnostics.md)、[人工试用与反馈](manual-trial-v01.md)。模型服务与费用上限尚未提供，离线测试不代表真实问答验收。COL-16 的 [PDF 行为](pdf-import.md) 和 [验证记录](verification-col-16.md) 继续有效，下方 COL-15 记录保留为历史。
 
 ### 准备与启动
 
@@ -13,10 +13,10 @@
 ```bash
 make setup
 make check
-make dev
+make serve
 ```
 
-`make setup` 根据 `uv.lock` 与 `web/package-lock.json` 安装依赖，仅在缺失时创建 `.env.local`。`make dev` 构建网页、启动专用数据库，再启动 FastAPI。访问 <http://127.0.0.1:8000/>。按 Ctrl+C 停止应用；`make db-stop` 停止数据库。下次 `make dev` 继续使用已保存论文。
+`make setup` 根据 `uv.lock` 与 `web/package-lock.json` 安装依赖，仅在缺失时创建 `.env.local`。`make serve` 构建网页、启动专用数据库，再启动单进程 FastAPI。访问 <http://127.0.0.1:8000/>。按 Ctrl+C 停止应用；`make db-stop` 停止数据库。下次 `make serve` 继续使用已保存论文与问答。`make dev` 适合修改代码，自动重载会中断正在处理的问答。一个数据库仅允许一个应用进程，防止重复启动误恢复正在执行的任务。若数据库意外重启导致原 session 丢失，应用会拒绝新问题及后续模型调用，必须重启应用后继续；历史和原文仍可读取。
 
 本地 PostgreSQL 仅监听 `127.0.0.1:55432`，数据位于 `data/postgres/`，角色和数据库名均为 `papertrail`，本地开发使用 trust 认证。该配置用于当前单用户开发，不作为多人服务配置。脚本不会启动或停止其他项目的数据库。首次安装 Homebrew 创建的默认集群并未用于本项目。
 
@@ -25,9 +25,35 @@ make dev
 `.env.example` 列出监听地址、数据库连接、数据目录、大小/页数/时限。已有 `.env.local` 不覆盖，缺失的 PaperTrail 配置使用相同默认值。修改监听端口使用 `UVICORN_PORT`。
 
 - `data/library/papers/` 保存 PDF 原件，系统 UUID 命名；`staging/` 用于上传临时文件。
-- PostgreSQL 保存文件哈希、原始名称、解析版本和逐页文本；使用版本 1 的 SQL 建表，启动时幂等执行。
+- PostgreSQL 保存文件哈希、原始名称、解析版本、逐页文本、问题/回答/引用及模型调用账本；版本 2 增量添加问答和账本表，保留版本 1 论文数据。
 - 如需备份，保留完整数据库及 `data/library/` 两部分。只拷贝 PDF 不会带回页面记录，删除 `data/` 会丢失论文及数据库。
 - `data/`、PDF、配置、虚拟环境、网页产物及浏览器证据不提交 Git；锁文件和结构 SQL 纳入 Git。
+
+### 接入真实模型与费用
+
+在本机编辑被 Git 忽略的 `.env.local`，补齐 `.env.example` 中的以下项，然后重启应用：
+
+| 配置 | 含义 |
+| --- | --- |
+| `PAPERTRAIL_MODEL_BASE_URL` | OpenAI 兼容服务根路径，例如 `https://api.deepseek.com/v1`；客户端追加 `/chat/completions` |
+| `PAPERTRAIL_MODEL_NAME` / `PAPERTRAIL_MODEL_API_KEY` | 获准的模型名称与本地密钥 |
+| `PAPERTRAIL_MODEL_BUDGET` / `PAPERTRAIL_MODEL_CURRENCY` | 本轮获准额度与币种；未配置时拒绝调用 |
+| `PAPERTRAIL_MODEL_INPUT_PRICE_PER_MILLION` / `PAPERTRAIL_MODEL_OUTPUT_PRICE_PER_MILLION` | 同币种每百万 token 保守输入/输出单价，用于调用前预留及用量后估算 |
+| `PAPERTRAIL_MODEL_BUDGET_SCOPE` | 本轮账本范围，默认 `v01-development`；不要通过换值绕过已经消耗的额度 |
+
+每题最多三次固定调用，单次默认 45 秒，总期限 180 秒；输出默认限制 1800 tokens。`PAPERTRAIL_MODEL_THINKING` 默认空，仅在服务支持时设 `disabled` 或 `enabled`。本轮建议非推理模式，避免思考 token 占用结构化输出额度。服务必须支持 JSON 输出；未配置时可浏览 PDF 与历史，不生成模拟答案。
+
+每次调用前在持久账本预留输入保守上界及最大输出费用；成功返回用量后按配置单价估算，网络失败且用量未知则保留预留额。费用是配置单价计算的估算，不是供应商账单；特殊费用、不同计费规则或错误单价可能导致偏差。应使用普通文本 token 计费模型和供应商侧额度限制。服务、价格、额度得到用户授权后再运行真实诊断。
+
+固定来源准备（零模型调用）：
+
+```bash
+uv run --locked python scripts/fetch_diagnostic_papers.py
+uv run --locked python scripts/fetch_diagnostic_papers.py --verify-only
+uv run --locked python scripts/evaluate_development.py --prepare-only
+```
+
+真实诊断通过运行中的应用 API 发起，使用相同预算账本：`uv run --locked python scripts/evaluate_development.py --run`。结果写入不复用的 `data/diagnostics/runs/`，具体核对步骤见 [开发诊断说明](development-diagnostics.md)。
 
 ### 前端与检查
 
@@ -35,7 +61,7 @@ make dev
 
 开发前端时可在另一个终端运行 `npm run dev --prefix web`，默认代理 `/api` 到 `127.0.0.1:8000`。若后端端口改变，需相应修改 `web/vite.config.ts`；日常用 `make dev` 无需单独启动前端。
 
-`make check` 运行 Ruff、前端类型检查与生产构建、18 项业务测试、HTTP/OpenAPI 冒烟和 `git diff --check`。本地测试自动启动临时 PostgreSQL 集群并清理；不会清空开发论文库。CI 使用 PostgreSQL 17 服务，检查脚本创建独立 UUID 命名数据库再删除它；需 `PAPERTRAIL_TEST_ADMIN_URL` 指向专用测试服务。CI 是否通过以实际远端运行记录为准。
+`make check` 运行 Ruff、前端类型检查与生产构建、业务测试、HTTP/OpenAPI 冒烟和 `git diff --check`。本地测试自动启动临时 PostgreSQL 集群并清理；不会清空开发论文库。CI 使用 PostgreSQL 17 服务，检查脚本创建独立 UUID 命名数据库再删除它；需 `PAPERTRAIL_TEST_ADMIN_URL` 指向专用测试服务。CI 是否通过以实际远端运行记录为准。
 
 学习入口：`src/papertrail/ingestion.py` 解释文件怎样进入系统；`repository.py` 解释文件与数据库的事务边界；`web/src/main.tsx` 解释页面怎样发起请求、读取逐页结果。正文/图表质量限制见验证记录。
 
