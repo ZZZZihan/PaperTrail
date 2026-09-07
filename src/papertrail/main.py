@@ -84,6 +84,11 @@ class Claim(BaseModel):
     citations: list[Citation]
 
 
+class QuestionClaim(Claim):
+    # Historical rows have not had their relevance checked; do not infer a role.
+    role: Literal["answer", "background"] | None = None
+
+
 class IntroductionInput(BaseModel):
     request_id: UUID
     refresh_if_outdated: bool = False
@@ -123,7 +128,7 @@ class Question(BaseModel):
         "pending", "running", "answered", "partial_answer", "insufficient_evidence", "failed"
     ]
     stage: str
-    claims: list[Claim]
+    claims: list[QuestionClaim]
     message: str
     error_code: str | None
     support_status: str | None

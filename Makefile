@@ -1,4 +1,4 @@
-.PHONY: setup dev serve check check-e2e db-start db-stop web-build
+.PHONY: setup dev serve check check-e2e check-browser db-start db-stop web-build
 
 setup:
 	uv sync --locked
@@ -33,3 +33,7 @@ check:
 # Real HTTP and PostgreSQL, with an explicitly offline model in a disposable fixture.
 check-e2e: web-build
 	uv run --locked python scripts/check_e2e.py --evidence output/e2e/latest.json
+
+# Real Chromium against the same disposable OFFLINE app; requires Playwright Chromium.
+check-browser: web-build
+	uv run --locked python scripts/check_browser.py

@@ -14,9 +14,16 @@ def review():
     return {
         "verdicts": [{"claim_index": 0, "supported": True, "reason": "数据集有据。"}],
         "coverage": [
-            {"requirement_index": 0, "covered": True, "claim_indices": [0], "reason": "已回答。"},
+            {
+                "requirement_index": 0,
+                "kind": "requested",
+                "covered": True,
+                "claim_indices": [0],
+                "reason": "已回答。",
+            },
             {
                 "requirement_index": 1,
+                "kind": "requested",
                 "covered": False,
                 "claim_indices": [],
                 "reason": "正文未说明。",
@@ -45,6 +52,7 @@ def test_checker_can_find_qualification_omitted_by_planner():
     raw["additional_requirements"] = [
         {
             "requirement": "实验适用范围？",
+            "kind": "qualification",
             "covered": False,
             "claim_indices": [],
             "reason": "引用包含限定，正文遗漏。",
@@ -125,3 +133,143 @@ def test_rejected_fact_removed_but_supported_partial_answer_retained():
     assert result["status"] == "partial_answer" and len(result["claims"]) == 1
     assert "所有任务" not in result["claims"][0]["text"]
     assert len(result["trace"]["candidate_claims"]) == 2
+
+
+@pytest.mark.parametrize("kind", ["background", "qualification"])
+def test_supported_context_alone_cannot_answer_an_unavailable_request(kind):
+    raw = review()
+    raw["coverage"][0]["kind"] = kind
+    result = answer_question(
+        PAPER,
+        PAGES,
+        "试验轮数？",
+        client=pipeline_client(requirements=["数据集？", "试验轮数？"], verify=raw),
+    )
+    assert result["status"] == "insufficient_evidence"
+    assert result["coverage"]["status"] == "unanswered"
+    assert result["claims"][0]["role"] == "background"
+    assert "试验轮数？：在当前已检索证据中未找到足够支持。" in result["message"]
+    assert "数据集？" not in result["message"]
+    assert result["message"].endswith("结论：证据不足。")
+
+
+def test_real_partial_detail_is_retained_even_when_whole_requested_item_is_uncovered():
+    raw = review()
+    raw["coverage"] = [raw["coverage"][0]]
+    raw["coverage"][0].update(covered=False, reason="列出了数据集，但遗漏所求试验轮数。")
+    result = answer_question(
+        PAPER,
+        PAGES,
+        "数据集和试验轮数？",
+        client=pipeline_client(requirements=["数据集和试验轮数？"], verify=raw),
+    )
+    assert result["status"] == "partial_answer"
+    assert result["claims"][0]["role"] == "answer"
+    assert not result["coverage"]["items"][0]["covered"]
+
+
+def test_uncovered_optional_background_does_not_demote_a_complete_requested_answer():
+    raw = review()
+    raw["coverage"][1]["kind"] = "background"
+    result = answer_question(
+        PAPER,
+        PAGES,
+        "数据集？",
+        client=pipeline_client(requirements=["数据集？", "试验轮数？"], verify=raw),
+    )
+    assert result["status"] == "answered"
+    assert result["coverage"]["status"] == "complete"
+
+
+def test_checker_can_recover_requested_item_omitted_by_planner():
+    raw = review()
+    missing = raw["coverage"].pop()
+    del missing["requirement_index"]
+    missing["requirement"] = "试验轮数？"
+    raw["additional_requirements"] = [missing]
+    raw["coverage"][0]["kind"] = "background"
+    result = answer_question(PAPER, PAGES, "试验轮数？", client=pipeline_client(verify=raw))
+    assert result["status"] == "insufficient_evidence"
+    assert result["coverage"]["items"][-1]["origin"] == "retrieved_context"
+    assert "试验轮数？" in result["message"]
+
+
+@pytest.mark.parametrize("kind", [None, True, [], {}, "answer", "", 1])
+@pytest.mark.parametrize("additional", [False, True])
+def test_missing_or_invalid_scope_classification_fails_closed(kind, additional):
+    raw = review()
+    if additional:
+        raw["additional_requirements"] = [
+            {"requirement": "限定？", "covered": False, "claim_indices": [], "reason": "缺项。"}
+        ]
+        item = raw["additional_requirements"][0]
+    else:
+        item = raw["coverage"][0]
+        del item["kind"]
+    if kind is not None:
+        item["kind"] = kind
+    result = answer_question(
+        PAPER,
+        PAGES,
+        "数据集和试验轮数？",
+        client=pipeline_client(requirements=["数据集？", "试验轮数？"], verify=raw),
+    )
+    assert result["status"] == "failed" and result["error_code"] == "verification_failed"
+    assert result["claims"] == []
+
+
+def test_checker_cannot_classify_away_all_requested_items():
+    raw = review()
+    for item in raw["coverage"]:
+        item["kind"] = "background"
+    result = answer_question(
+        PAPER,
+        PAGES,
+        "数据集和试验轮数？",
+        client=pipeline_client(requirements=["数据集？", "试验轮数？"], verify=raw),
+    )
+    assert result["status"] == "failed" and result["error_code"] == "verification_failed"
+    assert result["claims"] == []
+
+
+def test_rejected_requested_fact_cannot_be_rescued_by_retained_background():
+    raw = review()
+    raw["verdicts"].append({"claim_index": 1, "supported": False, "reason": "请求事实无据。"})
+    raw["coverage"][0]["kind"] = "background"
+    raw["coverage"][1].update(covered=True, claim_indices=[1])
+
+    def generate(value):
+        other = deepcopy(value["claims"][0])
+        other["text"] = "试验执行了一百轮。"
+        value["claims"].append(other)
+        return value
+
+    result = answer_question(
+        PAPER,
+        PAGES,
+        "试验轮数？",
+        client=pipeline_client(
+            requirements=["数据集？", "试验轮数？"], generate=generate, verify=raw
+        ),
+    )
+    assert result["status"] == "insufficient_evidence"
+    assert len(result["claims"]) == 1 and result["claims"][0]["role"] == "background"
+    assert not result["coverage"]["items"][1]["covered"]
+    assert result["coverage"]["items"][1]["claim_indices"] == []
+    assert "试验轮数？" in result["message"]
+
+
+def test_no_retrieval_lists_every_unavailable_requested_item_without_checking_a_model():
+    requirements = ["GPU 型号？", "GPU 数量？", "总训练电费？"]
+    result = answer_question(
+        PAPER,
+        PAGES,
+        "训练硬件与成本？",
+        client=pipeline_client(requirements=requirements, search=["xyzzy"]),
+    )
+    assert result["status"] == "insufficient_evidence" and result["claims"] == []
+    for item in requirements:
+        assert f"{item}：在当前已检索证据中未找到足够支持。" in result["message"]
+    assert result["message"].endswith("证据不足。")
+    assert result["coverage"]["review_source"] == "not_checked"
+    assert result["trace"]["call_count"] == 1

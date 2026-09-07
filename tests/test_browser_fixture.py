@@ -73,6 +73,94 @@ def test_fixture_exercises_production_pipeline_without_real_network(question, st
         assert result["coverage"]["status"] == ("complete" if status == "answered" else "partial")
 
 
+def assert_gpu_insufficiency(result, paper_id):
+    """The observed six-item plan cannot turn supported background into an answer."""
+    assert result["status"] == "insufficient_evidence" and result["error_code"] is None
+    assert result["trace"]["requirements"] == list(fixture.GPU_REQUIREMENTS)
+    assert result["coverage"]["status"] == "unanswered"
+    items = result["coverage"]["items"]
+    assert len(items) == 6
+    assert all(item["kind"] == "background" and item["covered"] for item in items[:3])
+    assert all(item["kind"] == "requested" and not item["covered"] for item in items[3:])
+    assert all(item in result["message"] for item in fixture.GPU_REQUIREMENTS[3:])
+    assert "当前已检索证据" in result["message"]
+    assert result["message"].endswith("证据不足。")
+    assert len(result["claims"]) == 2
+    assert all(claim["role"] == "background" for claim in result["claims"])
+    citations = [citation for claim in result["claims"] for citation in claim["citations"]]
+    assert [(citation["paper_id"], citation["page_index"]) for citation in citations] == [
+        (paper_id, 0),
+        (paper_id, 2),
+    ]
+    assert [citation["quote"] for citation in citations] == [
+        fixture.GPU_MODEL_BACKGROUND,
+        fixture.GPU_SETUP_BACKGROUND,
+    ]
+    assert result["trace"]["call_count"] == len(result["trace"]["calls"]) == 3
+    assert all(call["model"] == fixture.FIXTURE_MODEL for call in result["trace"]["calls"])
+
+
+def test_gpu_background_fixture_replays_live_plan_without_real_network():
+    reader = PdfReader(BytesIO(fixture.synthetic_pdf()))
+    pages = [
+        {"page_index": index, "text": page.extract_text()}
+        for index, page in enumerate(reader.pages)
+    ]
+    model = ModelClient(
+        ModelConfig(
+            base_url="https://offline-fixture.invalid/v1",
+            api_key="OFFLINE-NO-CREDENTIAL",
+            model_name=fixture.FIXTURE_MODEL,
+        ),
+        transport=httpx.MockTransport(fixture.mock_completion),
+    )
+    result = answer_question(
+        {"id": "offline-paper", "sha256": "offline-hash"},
+        pages,
+        fixture.GPU_QUESTION,
+        client=model,
+    )
+    assert_gpu_insufficiency(result, "offline-paper")
+
+
+def test_gpu_background_api_retains_explicit_missing_items_citations_and_saved_result(
+    client, monkeypatch, tmp_path
+):
+    for key, value in fixture.fixture_environment(tmp_path, 12345).items():
+        if key.startswith("PAPERTRAIL_MODEL_"):
+            monkeypatch.setenv(key, value)
+    calls = []
+
+    async def observed(request):
+        calls.append(request)
+        return await fixture.mock_completion(request)
+
+    monkeypatch.setattr(
+        "papertrail.model.ModelClient",
+        lambda config, **kwargs: ModelClient(
+            config, transport=httpx.MockTransport(observed), **kwargs
+        ),
+    )
+    paper = client.post(
+        "/api/papers",
+        files={"file": ("OFFLINE-gpu-background.pdf", fixture.synthetic_pdf(), "application/pdf")},
+    ).json()["paper"]
+    path = f"/api/papers/{paper['id']}/questions"
+    body = {"question": fixture.GPU_QUESTION, "request_id": str(uuid4())}
+    submitted = client.post(path, json=body)
+    assert submitted.status_code == 202
+    result = client.get(f"{path}/{submitted.json()['id']}").json()
+    assert_gpu_insufficiency(result, paper["id"])
+    assert len(calls) == 3
+    assert client.get(path).json() == [result]
+    assert client.post(path, json=body).json() == result
+    assert len(calls) == 3  # History, refresh and request reuse must never call the model.
+    for claim in result["claims"]:
+        citation = claim["citations"][0]
+        page = client.get(f"/api/papers/{paper['id']}/pages/{citation['page_index']}").json()
+        assert citation["quote"] in page["text"]
+
+
 @pytest.mark.parametrize(
     ("scenario", "status", "error_code", "stages"),
     [

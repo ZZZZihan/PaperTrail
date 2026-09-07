@@ -29,6 +29,7 @@ def pipeline_client(*, generate=None, verify=None, search=None, requirements=Non
                     "coverage": [
                         {
                             "requirement_index": i,
+                            "kind": "requested",
                             "covered": bool(data["claims"]),
                             "claim_indices": [0] if data["claims"] else [],
                             "reason": "测试覆盖判断。",
@@ -183,6 +184,7 @@ def test_semantically_unsupported_claim_is_withheld_despite_valid_quote():
             "coverage": [
                 {
                     "requirement_index": 0,
+                    "kind": "requested",
                     "covered": False,
                     "claim_indices": [],
                     "reason": "无支持。",
@@ -351,6 +353,7 @@ def test_pipeline_sends_authoritative_recovered_quote_to_support_check():
                 "coverage": [
                     {
                         "requirement_index": 0,
+                        "kind": "requested",
                         "covered": True,
                         "claim_indices": [0],
                         "reason": "正文完整。",

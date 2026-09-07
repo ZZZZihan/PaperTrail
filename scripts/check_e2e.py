@@ -23,7 +23,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import httpx2 as httpx
-from browser_fixture import FIXTURE_MODEL, OMEGA
+from browser_fixture import FIXTURE_MODEL, GPU_QUESTION, GPU_REQUIREMENTS, OMEGA
 
 ROOT = Path(__file__).resolve().parents[1]
 TERMINAL = {"answered", "partial_answer", "insufficient_evidence", "failed"}
@@ -238,6 +238,68 @@ class ApiChecks:
             self.passed(
                 f"Question outcome: {keyword} -> {status}", error_code=code, calls=call_count
             )
+
+        gpu_body = {"question": GPU_QUESTION, "request_id": str(uuid4())}
+        submitted = self.request("POST", questions_path, 202, json=gpu_body).json()
+        gpu_row = self.wait_question(questions_path, submitted["id"])
+        require(
+            gpu_row["status"] == "insufficient_evidence" and gpu_row["error_code"] is None,
+            "GPU model/count/electricity background was incorrectly presented as an answer.",
+        )
+        require(
+            gpu_row["trace"]["requirements"] == list(GPU_REQUIREMENTS),
+            "The live failure's six planned requirements were not replayed.",
+        )
+        require(
+            gpu_row["coverage"]["status"] == "unanswered",
+            "Covered contextual background incorrectly counted as requested coverage.",
+        )
+        items = gpu_row["coverage"]["items"]
+        require(
+            len(items) == 6
+            and all(item["kind"] == "background" and item["covered"] for item in items[:3])
+            and all(item["kind"] == "requested" and not item["covered"] for item in items[3:]),
+            "GPU missing items or their distinction from contextual background changed.",
+        )
+        require(
+            all(item in gpu_row["message"] for item in GPU_REQUIREMENTS[3:])
+            and "当前已检索证据" in gpu_row["message"]
+            and gpu_row["message"].endswith("证据不足。"),
+            "Insufficiency must explicitly list GPU model, count, electricity and conclude.",
+        )
+        require(
+            len(gpu_row["claims"]) == 2
+            and all(claim["role"] == "background" for claim in gpu_row["claims"]),
+            "Supported contextual claims must remain available only as secondary background.",
+        )
+        for claim in gpu_row["claims"]:
+            require(bool(claim["citations"]), "Cited contextual background lost its citations.")
+            for citation in claim["citations"]:
+                require(
+                    citation["paper_id"] == paper_id
+                    and citation["quote"] in pages[citation["page_index"]]["text"],
+                    "GPU contextual citation no longer matches this paper's source text.",
+                )
+        require(
+            gpu_row["trace"]["call_count"] == len(gpu_row["trace"]["calls"]) == 3
+            and all(call["model"] == FIXTURE_MODEL for call in gpu_row["trace"]["calls"]),
+            "GPU regression unexpectedly changed call count or used a real model.",
+        )
+        require(
+            self.request("POST", questions_path, 202, json=gpu_body).json() == gpu_row,
+            "GPU request reuse changed its saved terminal result.",
+        )
+        rows.append(gpu_row)
+        bodies.append(gpu_body)
+        self.passed(
+            "GPU model/count/electricity: three explicit missing items and secondary cited context",
+            question_id=gpu_row["id"],
+            result_status=gpu_row["status"],
+            coverage_status=gpu_row["coverage"]["status"],
+            requested_missing=3,
+            contextual_claims=2,
+            calls=3,
+        )
 
         reused = self.request("POST", questions_path, 202, json=bodies[0]).json()
         require(reused == rows[0], "Same request ID changed its completed result or trace.")

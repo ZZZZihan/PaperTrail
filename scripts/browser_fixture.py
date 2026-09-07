@@ -34,6 +34,21 @@ from pypdf.generic import DictionaryObject, NameObject, StreamObject
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_MODEL = "OFFLINE-UI-FIXTURE-NOT-A-REAL-MODEL"
 OMEGA = "Omega on physical page three. This is an OFFLINE synthetic UI fixture."
+GPU_QUESTION = (
+    "ReAct 论文是否报告了 GPT-4 模型训练所使用的 GPU 型号、数量和总训练电费？请给出具体数值。"
+)
+# Replay the six planner items in the 2026-09-06 failure, including its three
+# contextual distractions. All passages and model outputs below are synthetic.
+GPU_REQUIREMENTS = (
+    "论文是否使用或训练了 GPT-4？",
+    "实验所用模型的具体身份是什么？",
+    "模型参数是冻结的还是经过更新训练？",
+    "论文是否报告了训练所用 GPU 的具体型号？",
+    "论文是否报告了训练所用 GPU 的确切数量？",
+    "论文是否报告了总训练电费及其具体数值？",
+)
+GPU_MODEL_BACKGROUND = "OFFLINE background: PaLM main experiments; GPT-3 appendix experiments."
+GPU_SETUP_BACKGROUND = "OFFLINE background: frozen PaLM prompting; smaller PaLM models fine-tuned."
 INTRODUCTION_SCENARIOS = (
     "success",
     "revision",
@@ -54,9 +69,11 @@ def synthetic_pdf(introduction_scenario: str | None = None) -> bytes:
     writer.add_metadata({"/Title": "OFFLINE synthetic PaperTrail browser fixture"})
     for text in (
         "Alpha evidence on physical page one. Synthetic text, not a research paper."
-        + (f" {SCENARIO_PREFIX}{introduction_scenario}." if introduction_scenario else ""),
+        + (f" {SCENARIO_PREFIX}{introduction_scenario}." if introduction_scenario else "")
+        + "\n"
+        + GPU_MODEL_BACKGROUND,
         "",
-        OMEGA,
+        OMEGA + "\n" + GPU_SETUP_BACKGROUND,
     ):
         page = writer.add_blank_page(width=595, height=842)
         if text:
@@ -75,7 +92,8 @@ def synthetic_pdf(introduction_scenario: str | None = None) -> bytes:
                 }
             )
             content = StreamObject()
-            content.set_data(f"BT /F1 11 Tf 35 760 Td ({text}) Tj ET".encode("ascii"))
+            lines = " 0 -18 Td ".join(f"({line}) Tj" for line in text.splitlines())
+            content.set_data(f"BT /F1 11 Tf 35 760 Td {lines} ET".encode("ascii"))
             page[NameObject("/Contents")] = writer._add_object(content)
     output = BytesIO()
     writer.write(output)
@@ -230,6 +248,7 @@ async def mock_completion(request: httpx.Request) -> httpx.Response:
     assert request.url.host == "offline-fixture.invalid"
     data = json.loads(json.loads(request.content)["messages"][1]["content"])
     question = data.get("question", "")
+    gpu_case = question == GPU_QUESTION
     if "claim_fields" in data or ("passages" in data and "question" not in data):
         result = await mock_introduction(data)
         if isinstance(result, httpx.Response):
@@ -247,8 +266,15 @@ async def mock_completion(request: httpx.Request) -> httpx.Response:
             "coverage": [
                 {
                     "requirement_index": index,
-                    "covered": bool(data["claims"]) and index == 0,
-                    "claim_indices": [0] if data["claims"] and index == 0 else [],
+                    "kind": "background" if gpu_case and index < 3 else "requested",
+                    "covered": bool(data["claims"]) and (index < 3 if gpu_case else index == 0),
+                    "claim_indices": (
+                        ([0], [0, 1], [1])[index]
+                        if gpu_case and index < 3
+                        else [0]
+                        if not gpu_case and data["claims"] and index == 0
+                        else []
+                    ),
                     "reason": "离线界面测试固定覆盖判定。",
                 }
                 for index, _ in enumerate(data["requirements"])
@@ -256,7 +282,37 @@ async def mock_completion(request: httpx.Request) -> httpx.Response:
             "additional_requirements": [],
         }
     elif "passages" in data:
-        if "证据不足" in question:
+        if gpu_case:
+            result = {
+                "status": "answered",
+                "message": "",
+                "claims": [
+                    {
+                        "text": text,
+                        "citations": [
+                            {
+                                "chunk_id": next(
+                                    passage["chunk_id"]
+                                    for passage in data["passages"]
+                                    if quote in passage["text"]
+                                ),
+                                "quote": quote,
+                            }
+                        ],
+                    }
+                    for text, quote in (
+                        (
+                            "OFFLINE 合成背景：主实验使用 PaLM，附录实验使用 GPT-3。",
+                            GPU_MODEL_BACKGROUND,
+                        ),
+                        (
+                            "OFFLINE 合成背景：PaLM 提示实验冻结参数，较小的 PaLM 模型经过微调。",
+                            GPU_SETUP_BACKGROUND,
+                        ),
+                    )
+                ],
+            }
+        elif "证据不足" in question:
             result = {"status": "insufficient_evidence", "claims": [], "message": ""}
         else:
             passage = next((p for p in data["passages"] if OMEGA in p["text"]), None)
@@ -289,9 +345,17 @@ async def mock_completion(request: httpx.Request) -> httpx.Response:
         if "失败" in question:
             return httpx.Response(503, json={"error": "OFFLINE injected service failure"})
         result = {
-            "search_queries": ["Omega physical page three OFFLINE synthetic UI fixture"],
-            "requirements": ["Omega 位于哪一页？"]
-            + (["试验轮数是多少？"] if "部分回答" in question else []),
+            "search_queries": [
+                "PaLM GPT-3 frozen fine-tuned OFFLINE background"
+                if gpu_case
+                else "Omega physical page three OFFLINE synthetic UI fixture"
+            ],
+            "requirements": (
+                list(GPU_REQUIREMENTS)
+                if gpu_case
+                else ["Omega 位于哪一页？"]
+                + (["试验轮数是多少？"] if "部分回答" in question else [])
+            ),
         }
     return httpx.Response(
         200,

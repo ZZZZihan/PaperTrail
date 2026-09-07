@@ -1154,6 +1154,32 @@ main {
   color: #77816a;
   font-size: 10px;
 }
+.answer-background {
+  margin: 16px 0;
+  padding: 13px;
+  border: 1px solid #e5e5dd;
+  border-radius: 5px;
+  background: #f8f8f3;
+}
+.answer-background h3 {
+  font-size: 12px;
+  color: #737e6b;
+}
+.background-note,
+.background-coverage {
+  font-size: 10px;
+  line-height: 1.85;
+  color: #7a8372;
+  margin: 8px 0 12px;
+}
+.background-coverage {
+  padding-left: 18px;
+  margin-bottom: 0;
+}
+.answer-insufficient-conclusion {
+  margin-top: 12px;
+  white-space: pre-wrap;
+}
 .answer-insufficient,
 .answer-failure {
   font-size: 12px;
