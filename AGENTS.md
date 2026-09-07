@@ -8,6 +8,8 @@
 
 ## 按实际阶段工作
 
+- 2026-09-07 已按用户要求完成 9 月 6 日 GPU/数量/电费不足失败的离线质量修复。实现 `78b03e54afef75f5f4a2b3bfcc5e394a4502a6cf`，QA v8 严格区分 requested/qualification/background，核心无据逐项说明并以 insufficient_evidence 结束，背景引用作为辅助保留。407 项后端、16 项离线 API E2E 与 7 组浏览器断言通过，真实调用新增 0；scope/配置/旧结果未修改。新提示真实模型分类与支持判断尚未验证，不改写下方真实失败 0/1。详见 docs/verification-requested-facts-2026-09-07.md；COL-19 继续 In Review，本次未推送或合并。
+
 - 2026-09-06 用户要求模型连通性及真实浏览器端到端测试，沿原 scope 分别新增 3 和 10 次，当前 Sol/provider_quota 累计 407/407，费用未知，无活跃任务。业务代码为 8e2bb06；新正常问答与 Reflexion v10 卡通过独立原文核对，不足题返回背景与 partial_answer，预设不足行为未通过。真实 app+PG 重启后 7 论文/168 页/145 任务/407 调用/1 alias 一致。详见 docs/verification-live-e2e-2026-09-06.md；下方394及此前上限均保留为历史，不重置scope或账本。当前测试窗口已使用完，未来新增调用按新任务授权与实时配置安排。
 
 - 2026-09-05 用户明确临时不限量使用当前 Goal 必要测试，原167阻塞已解除并完成本轮实测。临时窗口现已关闭，`PAPERTRAIL_MODEL_MAX_CALLS=394`、同scope实际394/394，新增227次；Sol、provider_quota、原scope及历史均保持，费用未知。QA仍none，简介显式low。下方160/167/unlimited是分阶段历史，不应重置scope或账本。未来新增调用按新的任务授权和当前实际配置安排。

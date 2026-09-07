@@ -1,5 +1,15 @@
 # PaperTrail：Codex 开发交接
 
+## 2026-09-07 核心请求与辅助背景的离线修复
+
+实现 `78b03e54afef75f5f4a2b3bfcc5e394a4502a6cf`，问答 `evidence-qa-v8-requested-facts`。
+核对阶段区分 requested/qualification/background，背景单独有据不再获得部分回答状态；
+GPU 型号、数量、总训练电费精确案例逐项列明缺项，保留辅助引文，最终 insufficient_evidence。
+407 项后端测试、16 项离线 API E2E（含 app+PG 重启）和 7 组浏览器断言通过。
+真实新增调用 0，scope/配置/旧历史未修改；旧真实失败保持，真实模型适配与质量未验证。
+新浏览器入口 `make check-browser`，具体证据、精确提交和复现方式见
+[本轮验证](verification-requested-facts-2026-09-07.md)。COL-19 仍 In Review，提交仅在本地，产品与学习验收 pending。
+
 ## 2026-09-06 真实端到端测试补充
 
 实际业务代码 `8e2bb06`，本轮未改检索、模型提示或业务代码。用户要求模型连通性与真实端到端测试后，同一账本先从 394 到 397，再用 10 次调用到 **407/407**；全部历史、Sol、provider_quota 与 scope 保留。新正常问答完整有据，Reflexion v10 新卡独立 8/8 本项支持、5/5 覆盖；不足题没有编造 GPU/电费，但返回相关背景及 partial_answer，预设不足行为未通过。真实 app+PG 重启后 7 论文、168 页、145 任务、407 调用、1 alias 完全一致。具体结果、失败、任务 ID 与浏览器证据见 [本轮验证](verification-live-e2e-2026-09-06.md)。下方 394/394 等均为历史阶段记录；新调用仍需依据当前任务授权和实际配置。COL-19 继续 In Review，人工产品与学习验收 pending。
