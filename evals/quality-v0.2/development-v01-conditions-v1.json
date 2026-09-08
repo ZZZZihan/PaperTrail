@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "dataset_id": "papertrail-development-v0.1",
+  "annotation_id": "development-v01-original-conditions-v1",
+  "evaluation_split": "development_regression_not_held_out",
+  "frozen_at": "2026-09-05T12:01:58.832447+00:00",
+  "freeze_scope": "Frozen before the next full 15-question application run on the current QA version. This separate supplement annotates conditions already required by the original questions and expected_answer_points; it changes no original question, expected answer, prior failure, source, or previous run. A score on any earlier run would be explicitly retrospective.",
+  "prepared_by": "Codex AI",
+  "human_review": {
+    "status": "pending",
+    "reviewer": null,
+    "reviewed_at": null
+  },
+  "source_binding": {
+    "questions_path": "evals/development-v0.1/questions.json",
+    "questions_sha256": "f1265203baa095d321d5cc413c5d52e98c740ca95de6db05e1c38f68f7a82112",
+    "manifest_path": "evals/development-v0.1/manifest.json",
+    "manifest_sha256": "876b348732b4047202f24e355f33b196ddbfde38841d03de6e51799abb7def82",
+    "inherited_rubric_path": "evals/quality-v0.2/react-03-conditions.json",
+    "inherited_rubric_sha256": "284769b50b9106d587b95d97a4a75044edf3a200eb43239c0cd9625194db1f4c",
+    "inherited_question_id": "react-03",
+    "inheritance_rule": "The original two condition IDs and text strings are copied exactly and must remain identical.",
+    "source_verification": "Original source PDF byte hashes and all 69 frozen extracted page text hashes verified against the original manifest; each original answerable evidence locator checked at its exact page/character offsets. AI read relevant original page context; no model API was called, and no new run outputs or held-out material were inspected.",
+    "papers": [
+      {
+        "paper_id": "react",
+        "version_id": "2210.03629v3",
+        "pdf_sha256": "f285b0971ae4a790e402fb93966bed3adde2cf0a04977d08b2b40d6ab0cace69"
+      },
+      {
+        "paper_id": "reflexion",
+        "version_id": "2303.11366v4",
+        "pdf_sha256": "6059b6f89fea9959bd3dab553fbb97756a3dfb1b15e3cbab2fbf3ab6664333bd"
+      },
+      {
+        "paper_id": "toolformer",
+        "version_id": "2302.04761v1",
+        "pdf_sha256": "6d7483d94653008e40c2058a1c22441c92e3713dae278b6361e8efc447c99522"
+      }
+    ]
+  },
+  "scoring_rules": [
+    "Keep original expected_answer_points unchanged; condition annotations do not replace the answer-point inventory.",
+    "Judge each condition on delivered answer prose, not on facts merely present in a quotation.",
+    "A condition may overlap an original answer point; within each metric count each frozen entry once.",
+    "An explicit empty condition list is allowed only with a per-question reviewed rationale; unknown conditions remain null.",
+    "The five insufficient questions retain null conditions and are excluded from the answerable condition denominator; their original insufficient_reason and unjustified-answer review remain active.",
+    "Application support/coverage verdicts, expected status matches and locator hits are not independent semantic grades."
+  ],
+  "annotation_audit": {
+    "react-01": {
+      "status": "ai_annotated_no_additional_conditions",
+      "rationale": "已核对原摘要和两条冻结要点：本题要求交错生成及推理/动作相互作用的机制，没有另一个会改变这两条机制含义的实验条件。空列表为逐题审查后的显式标注；两条机制仍必须按原答案点完整评分。",
+      "evidence_anchors": [
+        {
+          "page_index": 0,
+          "pdf_page_number": 1,
+          "section": "Abstract",
+          "short_locator": "in an interleaved manner",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        }
+      ],
+      "human_review": "pending"
+    },
+    "react-02": {
+      "status": "ai_annotated_conditions",
+      "rationale": "条件直接拆自原两条冻结答案点的存在/不存在分支；并未增加接口实现细节或额外任务。",
+      "evidence_anchors": [
+        {
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "section": "3.1 Setup / Action Space",
+          "short_locator": "ﬁrst 5 sentences",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        },
+        {
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "section": "3.1 Setup / Action Space",
+          "short_locator": "top-5 similar entities",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        }
+      ],
+      "human_review": "pending"
+    },
+    "react-03": {
+      "status": "ai_annotated_conditions",
+      "rationale": "逐字继承既有 react-03-conditions.json 的两个条件 ID 和文本。模型冻结、人工轨迹均为原冻结答案点已经要求的条件，正文遗漏不能由引文中存在代替。",
+      "evidence_anchors": [
+        {
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "section": "2 ReAct",
+          "short_locator": "PaLM-540B",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        },
+        {
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "section": "3.2 Methods / ReAct Prompting",
+          "short_locator": "6 and 3 cases",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        }
+      ],
+      "human_review": "pending"
+    },
+    "react-04": {
+      "status": "ai_annotated_no_additional_conditions",
+      "rationale": "已核对原 HotpotQA 错误分析和唯一冻结答案点：重复想法/动作、无法确定下一步并退出循环、作者归类为推理错误均是该答案点本身的内容；无另行实验阈值或设置条件。空列表不是将原点中的错误归类要求删除。",
+      "evidence_anchors": [
+        {
+          "page_index": 5,
+          "pdf_page_number": 6,
+          "section": "3.3 Results and Observations / B",
+          "short_locator": "repetitively generates the previous thoughts and\nactions",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        }
+      ],
+      "human_review": "pending"
+    },
+    "react-05": {
+      "status": "not_applicable_to_answer_condition_metric",
+      "rationale": "原题冻结为证据不足且无实质答案点；required_conditions 保留 null，不将未标注解释成没有条件。完整输出仍须独立核对无据作答，严格沿用原 insufficient_reason 和单篇来源范围；本次未重新证明整篇绝对不存在所求信息。",
+      "frozen_insufficient_reason": "AI 在冻结 PDF 的实验、附录及 cost/dollar/pricing/price 检索结果中未找到人民币模型调用单价、token 用量和每任务费用实测。附录购物轨迹中的商品美元价格不等于模型调用费。",
+      "human_review": "pending"
+    },
+    "reflexion-01": {
+      "status": "ai_annotated_no_additional_conditions",
+      "rationale": "已核对原记忆段落与两条冻结答案点：短期/长期内容及 Actor 用作决策上下文均仍按原点评分；原点未要求额外记忆容量、窗口数或特定模型条件，故经审查标为空。",
+      "evidence_anchors": [
+        {
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "section": "3 / Memory continuation",
+          "short_locator": "trajectory history serves as the short-term",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        },
+        {
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "section": "3 / Memory continuation",
+          "short_locator": "outputs from the Self-Reflection model",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        }
+      ],
+      "human_review": "pending"
+    },
+    "reflexion-02": {
+      "status": "ai_annotated_conditions",
+      "rationale": "两条件直接来自原题和原两条答案点；只标注简单启发式及累计 12 次试验边界，不把原始 130/134 改为新指标，不增加未冻结的模型配置要求。",
+      "evidence_anchors": [
+        {
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "section": "4.1 Sequential decision making / Results",
+          "short_locator": "130 out of 134 tasks",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        },
+        {
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "section": "4.1 Sequential decision making / Results",
+          "short_locator": "12 consecutive trials",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        }
+      ],
+      "human_review": "pending"
+    },
+    "reflexion-03": {
+      "status": "ai_annotated_conditions",
+      "rationale": "保留原答案点中的可能性与不能保证全局最优的边界，不把局部极小值风险改为必然失败。",
+      "evidence_anchors": [
+        {
+          "page_index": 8,
+          "pdf_page_number": 9,
+          "section": "5 Limitations",
+          "short_locator": "non-optimal local minima solutions",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        }
+      ],
+      "human_review": "pending"
+    },
+    "reflexion-04": {
+      "status": "not_applicable_to_answer_condition_metric",
+      "rationale": "原题冻结为证据不足且无实质答案点；required_conditions 保留 null，不将未标注解释成没有条件。完整输出仍须独立核对无据作答，严格沿用原 insufficient_reason 和单篇来源范围；本次未重新证明整篇绝对不存在所求信息。",
+      "frozen_insufficient_reason": "AI 在冻结 PDF 的 ALFWorld 设置、附录及 GPU/wall-clock/runtime 关键词检索中未找到所求墙钟耗时与 GPU 型号。试验轮数、任务数和 GPT-3 模型名不能替代这些数值。",
+      "human_review": "pending"
+    },
+    "reflexion-05": {
+      "status": "not_applicable_to_answer_condition_metric",
+      "rationale": "原题冻结为证据不足且无实质答案点；required_conditions 保留 null，不将未标注解释成没有条件。完整输出仍须独立核对无据作答，严格沿用原 insufficient_reason 和单篇来源范围；本次未重新证明整篇绝对不存在所求信息。",
+      "frozen_insufficient_reason": "指定来源只报告本文列出的决策、推理与代码基准；并未给出用户这篇中文医学论文、该场景题目集或正确率记录。不能把 ALFWorld、HotpotQA 或 HumanEval 得分迁移成这个新场景的实测。",
+      "human_review": "pending"
+    },
+    "toolformer-01": {
+      "status": "ai_annotated_conditions",
+      "rationale": "人工示例起点直接来自原第二条冻结答案点；不将自监督重新定义为无人工输入，也不加入示例数量等未冻结要求。",
+      "evidence_anchors": [
+        {
+          "page_index": 0,
+          "pdf_page_number": 1,
+          "section": "Abstract",
+          "short_locator": "which APIs to call",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        },
+        {
+          "page_index": 0,
+          "pdf_page_number": 1,
+          "section": "Abstract",
+          "short_locator": "self-supervised",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        }
+      ],
+      "human_review": "pending"
+    },
+    "toolformer-02": {
+      "status": "ai_annotated_conditions",
+      "rationale": "基准选择、加权后续 token 损失、降低方向和至少达到阈值均已经存在于原两条答案点；条件注释不要求额外公式推导或阈值数值。",
+      "evidence_anchors": [
+        {
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "section": "2 Approach / Filtering API Calls",
+          "short_locator": "not receiving the API call at all",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        },
+        {
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "section": "2 Approach / Filtering API Calls",
+          "short_locator": "receiving only\nits input",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        }
+      ],
+      "human_review": "pending"
+    },
+    "toolformer-03": {
+      "status": "ai_annotated_conditions",
+      "rationale": "该条件只保留原第二条答案点的固定版本报告范围；6.7B 来自本文第 8 节，不使用外部资料纠正固定预期。",
+      "evidence_anchors": [
+        {
+          "page_index": 10,
+          "pdf_page_number": 11,
+          "section": "8 Conclusion",
+          "short_locator": "6.7B parameter GPT-J model",
+          "context_requirement": "独立评分必须阅读该页对应段落的充分上下文及实际回答自己的引用；命中短定位片段不自动证明支持或完整覆盖。"
+        }
+      ],
+      "human_review": "pending"
+    },
+    "toolformer-04": {
+      "status": "not_applicable_to_answer_condition_metric",
+      "rationale": "原题冻结为证据不足且无实质答案点；required_conditions 保留 null，不将未标注解释成没有条件。完整输出仍须独立核对无据作答，严格沿用原 insufficient_reason 和单篇来源范围；本次未重新证明整篇绝对不存在所求信息。",
+      "frozen_insufficient_reason": "AI 在冻结 PDF 的实验设置与附录中找到子集和过滤流程说明，但未找到可恢复全部训练样本文档 ID 的清单或完整随机种子清单。方法与阈值描述不能替代逐项复现材料。",
+      "human_review": "pending"
+    },
+    "toolformer-05": {
+      "status": "not_applicable_to_answer_condition_metric",
+      "rationale": "原题冻结为证据不足且无实质答案点；required_conditions 保留 null，不将未标注解释成没有条件。完整输出仍须独立核对无据作答，严格沿用原 insufficient_reason 和单篇来源范围；本次未重新证明整篇绝对不存在所求信息。",
+      "frozen_insufficient_reason": "AI 未在冻结论文中找到三类工具的逐次美元价格测量。第 7 节还说明其调用决策没有计入各工具计算成本；不能用外部当前定价或从准确率表推导费用。",
+      "human_review": "pending"
+    }
+  },
+  "questions": {
+    "react-01": {
+      "required_conditions": []
+    },
+    "react-02": {
+      "required_conditions": [
+        {
+          "id": "entity-page-exists",
+          "text": "返回对应实体页面前 5 句的前提是该实体页面存在。"
+        },
+        {
+          "id": "entity-page-missing",
+          "text": "返回 5 个相近实体建议的前提是该实体页面不存在，建议来自 Wikipedia 搜索引擎。"
+        }
+      ]
+    },
+    "react-03": {
+      "required_conditions": [
+        {
+          "id": "frozen-model",
+          "text": "主要提示设置使用冻结的 PaLM-540B 模型。"
+        },
+        {
+          "id": "manual-trajectories",
+          "text": "HotpotQA 与 FEVER 所选案例的 ReAct few-shot 轨迹由人工编写。"
+        }
+      ]
+    },
+    "react-04": {
+      "required_conditions": []
+    },
+    "react-05": {
+      "required_conditions": null
+    },
+    "reflexion-01": {
+      "required_conditions": []
+    },
+    "reflexion-02": {
+      "required_conditions": [
+        {
+          "id": "simple-heuristic-setting",
+          "text": "130/134 个任务的结果对应使用简单启发式自我评估的 ALFWorld 实验条件。"
+        },
+        {
+          "id": "cumulative-twelve-trials",
+          "text": "该结果是经过 12 次连续试验的累计完成结果，不能作为第一次尝试的成功率。"
+        }
+      ]
+    },
+    "reflexion-03": {
+      "required_conditions": [
+        {
+          "id": "possible-local-minimum",
+          "text": "陷入非最优局部极小值是作者承认的可能风险，不能据此保证找到全局最优策略。"
+        }
+      ]
+    },
+    "reflexion-04": {
+      "required_conditions": null
+    },
+    "reflexion-05": {
+      "required_conditions": null
+    },
+    "toolformer-01": {
+      "required_conditions": [
+        {
+          "id": "few-human-api-examples",
+          "text": "自监督学习仍以每个 API 的少量人工示例为起点，并非完全没有人工输入。"
+        }
+      ]
+    },
+    "toolformer-02": {
+      "required_conditions": [
+        {
+          "id": "lower-of-two-baselines",
+          "text": "比较基准取不调用 API 与只给调用而不给结果这两种情形的较低后续 token 加权损失。"
+        },
+        {
+          "id": "threshold-and-direction",
+          "text": "仅当加入 API 调用及结果使损失相对该基准降低至少 tau_f 时保留调用；不能把执行成功本身视为保留条件。"
+        }
+      ]
+    },
+    "toolformer-03": {
+      "required_conditions": [
+        {
+          "id": "frozen-version-reporting",
+          "text": "参数规模按固定论文版本本文标注的 6.7B 报告，不以外部模型资料替换该数字。"
+        }
+      ]
+    },
+    "toolformer-04": {
+      "required_conditions": null
+    },
+    "toolformer-05": {
+      "required_conditions": null
+    }
+  }
+}

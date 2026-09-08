@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "dataset_id": "papertrail-development-v0.1",
+  "annotation_id": "react-03-original-condition-annotations-v1",
+  "evaluation_split": "development_regression_not_held_out",
+  "frozen_at": "2026-09-05T08:41:22Z",
+  "freeze_scope": "Frozen before the next react-03 quality-v0.2 application run. This annotates conditions already present in the original expected_answer_points; it neither replaces that question nor adds a new held-out question.",
+  "prepared_by": "Codex AI",
+  "human_review": {
+    "status": "pending",
+    "reviewer": null,
+    "reviewed_at": null
+  },
+  "source_binding": {
+    "questions_path": "evals/development-v0.1/questions.json",
+    "questions_sha256": "f1265203baa095d321d5cc413c5d52e98c740ca95de6db05e1c38f68f7a82112",
+    "manifest_path": "evals/development-v0.1/manifest.json",
+    "manifest_sha256": "876b348732b4047202f24e355f33b196ddbfde38841d03de6e51799abb7def82",
+    "paper_id": "react",
+    "version_id": "2210.03629v3",
+    "pdf_sha256": "f285b0971ae4a790e402fb93966bed3adde2cf0a04977d08b2b40d6ab0cace69",
+    "source_verification": "Local source PDF and all 33 extracted page text hashes matched the original manifest. Relevant page context was read by AI; no model API call was made."
+  },
+  "evidence_anchors": [
+    {
+      "condition_id": "frozen-model",
+      "page_index": 2,
+      "pdf_page_number": 3,
+      "section": "2 ReAct",
+      "short_locator": "a frozen\nlarge language model, PaLM-540B",
+      "context_requirement": "Read the surrounding paragraph identifying the main few-shot prompting setup; retain the distinction from other experiments."
+    },
+    {
+      "condition_id": "manual-trajectories",
+      "page_index": 3,
+      "pdf_page_number": 4,
+      "section": "3.2 Methods / ReAct Prompting",
+      "short_locator": "manually compose ReAct-format trajectories",
+      "context_requirement": "Read the surrounding HotpotQA and FEVER prompting paragraph, including the selected six and three training cases and their use as few-shot exemplars."
+    }
+  ],
+  "questions": {
+    "react-03": {
+      "required_conditions": [
+        {
+          "id": "frozen-model",
+          "text": "主要提示设置使用冻结的 PaLM-540B 模型。"
+        },
+        {
+          "id": "manual-trajectories",
+          "text": "HotpotQA 与 FEVER 所选案例的 ReAct few-shot 轨迹由人工编写。"
+        }
+      ]
+    }
+  }
+}

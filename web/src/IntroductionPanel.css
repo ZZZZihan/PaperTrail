@@ -1,0 +1,80 @@
+/* Reading-card attribution and audit cues, scoped to the introduction panel. */
+.introduction-panel-content .reading-card-basis {
+  display: inline-flex;
+  margin-top: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid #d8e4e2;
+  border-radius: 5px;
+  color: #315d55;
+  background: #f3f8f6;
+  font-size: 0.71rem;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.introduction-panel-content .reading-card-basis-author_interpretation {
+  color: #695335;
+  border-color: #e7dfcd;
+  background: #faf6ee;
+}
+.introduction-panel-content .reading-card-basis-teaching_example,
+.introduction-panel-content .reading-card-basis-system_inference {
+  color: #555273;
+  border-color: #dfdcea;
+  background: #f6f4fb;
+}
+.introduction-panel-content .reading-card-guide,
+.introduction-panel-content .reading-card-coverage,
+.introduction-panel-content .reading-card-legacy {
+  padding: 0.85rem 1rem;
+  margin: 1rem 0;
+  border: 1px solid #e0e5e1;
+  border-radius: 8px;
+  color: #616960;
+  background: #fafbf8;
+  font-size: 0.78rem;
+  line-height: 1.75;
+}
+.introduction-panel-content .reading-card-guide summary,
+.introduction-panel-content .reading-card-coverage summary {
+  cursor: pointer;
+  color: #495b52;
+}
+.introduction-panel-content .reading-card-guide p,
+.introduction-panel-content .reading-card-legacy p {
+  margin: 0.6rem 0 0;
+}
+.introduction-panel-content .reading-card-legacy .text-button {
+  margin-top: 0.5rem;
+}
+.introduction-panel-content .reading-card-coverage ul {
+  padding: 0;
+  list-style: none;
+  margin: 0.65rem 0 0;
+}
+.introduction-panel-content .reading-card-coverage li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid #e5e9e3;
+  padding: 0.35rem 0;
+}
+.introduction-panel-content .reading-card-coverage li > span:last-child {
+  flex-shrink: 0;
+  color: #526c60;
+}
+.introduction-panel-content .reading-card-aids {
+  margin: 1.5rem 0;
+  padding: 1rem 1.1rem;
+  border-left: 3px solid #c6c0d9;
+  background: #f8f7fb;
+  border-radius: 0 8px 8px 0;
+}
+.introduction-panel-content .reading-card-aids h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+.introduction-panel-content .reading-card-aids p {
+  color: #51535b;
+  font-size: 0.88rem;
+  line-height: 1.9;
+}

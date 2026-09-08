@@ -283,8 +283,10 @@ def test_allowed_ipv6_origin_remains_bracketed_without_endpoint_path():
     assert "private-route" not in json.dumps(client_config.public())
 
 
-@pytest.mark.parametrize("profile", ["compatible", "openai"])
-def test_explicit_profile_controls_payload_and_preserves_budget_upper_bound(profile):
+@pytest.mark.parametrize(
+    ("profile", "effort"), [("compatible", "none"), ("openai", "none"), ("openai", "low")]
+)
+def test_explicit_profile_controls_payload_and_preserves_budget_upper_bound(profile, effort):
     reservations = []
 
     def handler(request):
@@ -293,7 +295,7 @@ def test_explicit_profile_controls_payload_and_preserves_budget_upper_bound(prof
         assert payload["stream"] is False
         if profile == "openai":
             assert payload["max_completion_tokens"] == 1234
-            assert payload["reasoning_effort"] == "none"
+            assert payload["reasoning_effort"] == effort
             assert "max_tokens" not in payload
             assert "temperature" not in payload
             assert "thinking" not in payload
@@ -304,7 +306,7 @@ def test_explicit_profile_controls_payload_and_preserves_budget_upper_bound(prof
             assert "reasoning_effort" not in payload
         return response()
 
-    client_config = config(profile=profile, max_output_tokens=1234)
+    client_config = config(profile=profile, reasoning_effort=effort, max_output_tokens=1234)
     client = ModelClient(
         client_config, transport=httpx.MockTransport(handler), before_call=reservations.append
     )
@@ -317,7 +319,9 @@ def test_explicit_profile_controls_payload_and_preserves_budget_upper_bound(prof
         "max_completion_tokens" if profile == "openai" else "max_tokens"
     )
     assert public["temperature"] == (None if profile == "openai" else 0)
-    assert public["reasoning_effort"] == ("none" if profile == "openai" else None)
+    assert public["reasoning_effort"] == (effort if profile == "openai" else None)
+    assert client.calls[0]["reasoning_effort"] == public["reasoning_effort"]
+    assert reservations[0]["reasoning_effort"] == public["reasoning_effort"]
     assert public["thinking"] == ("not_sent" if profile == "openai" else "provider_default")
 
 
@@ -355,3 +359,56 @@ def test_profile_from_environment_and_default_do_not_guess_model_name(monkeypatc
     assert selected.configured
     assert selected.profile == "openai"
     assert selected.public()["output_token_parameter"] == "max_completion_tokens"
+
+
+@pytest.mark.parametrize("effort", [None, "", "medium", "invalid", True, []])
+def test_invalid_reasoning_effort_fails_before_network(effort):
+    requests = []
+    client = ModelClient(
+        config(profile="openai", reasoning_effort=effort),
+        transport=httpx.MockTransport(requests.append),
+    )
+    assert client.config.public()["configured"] is False
+    with pytest.raises(ModelError) as error:
+        client.complete_json("introduction_generate", MESSAGES)
+    assert error.value.code == "model_not_configured"
+    assert requests == client.calls == []
+
+
+@pytest.mark.parametrize(
+    ("details", "expected"),
+    [
+        (None, None),
+        ({}, None),
+        ({"reasoning_tokens": None}, None),
+        ({"reasoning_tokens": -1}, None),
+        ({"reasoning_tokens": True}, None),
+        ({"reasoning_tokens": 1.5}, None),
+        ({"reasoning_tokens": "5"}, None),
+        (["not-a-details-object"], None),
+        ({"reasoning_tokens": 0}, 0),
+        ({"reasoning_tokens": 7, "private": "do-not-log"}, 7),
+    ],
+)
+def test_reasoning_usage_is_optional_numeric_metadata_without_double_counting(details, expected):
+    records = []
+    usage = {
+        "prompt_tokens": 30,
+        "completion_tokens": 10,
+        "total_tokens": 40,
+        "completion_tokens_details": details,
+    }
+    client = ModelClient(
+        config(profile="openai", reasoning_effort="low"),
+        transport=httpx.MockTransport(lambda _: response(usage=usage)),
+        record_call=records.append,
+    )
+    client.complete_json("introduction_generate", MESSAGES)
+    call = records[0]
+    assert call["usage"] == {"prompt_tokens": 30, "completion_tokens": 10, "total_tokens": 40}
+    if expected is None:
+        assert "reasoning_tokens" not in call
+    else:
+        assert call["reasoning_tokens"] == expected
+    assert call["cost"] is None and call["cost_status"] == "unknown"
+    assert "do-not-log" not in json.dumps(call)

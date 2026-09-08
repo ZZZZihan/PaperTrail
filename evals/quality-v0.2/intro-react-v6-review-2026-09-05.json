@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "review_source": "ai",
+  "reviewed_at": "2026-09-05T09:22:48.126990+00:00",
+  "run_name": "20260905T091613.828372Z-d81fff94c0ad4af1b1a3e4a2543c96d2",
+  "run_code_sha": "b785a9667a717fc99125a5e02c1eaa3209b86982",
+  "core_code_sha": "248a50d04d7ffa00ad75eab11de366d786510f72",
+  "pipeline_version": "paper-introduction-v6",
+  "application_status": "answered",
+  "published_introduction_present": true,
+  "application_self_check_used_as_quality_evidence": false,
+  "independent_summary": {
+    "full_semantic_acceptance": false,
+    "reviewed_output_units": 8,
+    "own_citation_fully_supported_units": 7,
+    "partially_supported_units": 1,
+    "unsupported_units": 0,
+    "coverage_aspects_covered": 5,
+    "coverage_aspects_total": 5,
+    "terms_supported": 3,
+    "terms_reviewed": 3,
+    "necessary_conditions_in_body": {
+      "frozen_model": true,
+      "human_demonstration_trajectories": true
+    },
+    "basis_categories_present": {
+      "paper_statement": 8,
+      "author_interpretation": 0,
+      "teaching_example": 0,
+      "system_inference": 0
+    },
+    "absent_basis_categories_not_evaluated": true,
+    "body_characters": 408,
+    "citation_occurrences": 23,
+    "unique_citation_chunks": 18,
+    "all_citation_identity_checks_passed": true
+  },
+  "findings": [
+    {
+      "id": "result-fewshot-own-citation-gap",
+      "field": "evidence_and_limits",
+      "severity": "citation_support_gap",
+      "delivered_phrase": "在问答、事实核验、文字环境和网页购物的少样本测试中",
+      "paper_fact_true": true,
+      "own_citation_support_complete": false,
+      "reason": "主要观察、比较对象和失败边界均有本项依据：第3/5页支持问答与事实核验相对纯行动的结果，第3/8页支持两交互任务的少样本与训练型基线比较，第6页支持检索无效/循环，第9页支持大动作空间需更多示范与上下文长度限制。但首句把少样本限定同时加在全部四类任务上，而本项六段只有ALFWorld/WebShop明示一/二样本；HotpotQA/FEVER少样本证据在其他字段引用，未附本项，故按逐项自有引文规则为部分支持。",
+      "missing_source_options": [
+        {
+          "chunk_id": "pti_ce485c53486dc81da4663589fef0e063",
+          "physical_page": 3,
+          "supports": "主要冻结大模型的few-shot上下文设置"
+        },
+        {
+          "chunk_id": "pti_92d38402d160b5a8b4da2df41ce0b900",
+          "physical_page": 4,
+          "supports": "HotpotQA和FEVER的6/3人工few-shot示范"
+        }
+      ],
+      "minimum_fix": "将上述准确来源至少一项附到结果段自身；当前6项，可增为7项，仍不超过8引用上限。更新后的实际结果仍需按授权验证，不能编辑这次运行或将该意见视为应用已修复。",
+      "blocks_fully_supported_card_acceptance": true,
+      "does_not_negate": "真实调用成功、发布状态、五项基本覆盖、冻结/人工正文覆盖和引用身份检查均为已观察事实。"
+    }
+  ],
+  "run_path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/introduction-runs/20260905T091613.828372Z-d81fff94c0ad4af1b1a3e4a2543c96d2",
+  "terminal_sha256": "36f678b860a560caa24b452129a3339cc99c98edd2a7e1272f0f1b1557996862",
+  "source_pages_sha256": "6e4c7b00dc4633b09f58d06f2dc5b6efe74696c7d956c4788f81a42698466809",
+  "original_run_integrity": {
+    "original_manifest_entries_verified": 17,
+    "all_match": true,
+    "original_run_modified": false
+  },
+  "resource_observation": {
+    "model_calls": 2,
+    "elapsed_seconds": 55.486,
+    "prompt_tokens": 95005,
+    "completion_tokens": 2359,
+    "total_tokens": 97364,
+    "cost": null,
+    "cost_status": "unknown",
+    "additional_provider_calls_by_this_review": 0
+  },
+  "artifacts": [
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T091613.828372Z-d81fff94c0ad4af1b1a3e4a2543c96d2/intro-react-v6-independent-review.json",
+      "sha256": "8c0bf03fca2f5b7ca4752a3dd3a06bfd0576970294a83a58d25db4277c22b3de"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T091613.828372Z-d81fff94c0ad4af1b1a3e4a2543c96d2/intro-react-v6-review.sha256",
+      "sha256": "05af8b498a6eb70f550809dacb51dadff7fb38f6a72dc18fe32af51bc3f17eea"
+    }
+  ],
+  "human_review": {
+    "status": "pending",
+    "reviewer": null,
+    "reviewed_at": null
+  },
+  "product_acceptance": "pending",
+  "learning_acceptance": "pending",
+  "engineering_completion_note": "Runtime generation and publication succeeded, but this one card has a strict own-citation support gap. Do not claim the fully-supported card acceptance condition complete until the bounded fix is validated."
+}

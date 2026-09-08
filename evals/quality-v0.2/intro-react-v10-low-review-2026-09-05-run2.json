@@ -1,0 +1,330 @@
+{
+  "schema_version": 1,
+  "review_source": "independent_ai",
+  "reviewed_at": "2026-09-05T14:11:42.748211+00:00",
+  "run_name": "20260905T135943.156258Z-2f66f9be00084d9992c57ee84249bb30",
+  "run_path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/introduction-runs/20260905T135943.156258Z-2f66f9be00084d9992c57ee84249bb30",
+  "run_code_sha": "b619942d595f98b2a527a4962b28c54d258506c1",
+  "invocation_git": {
+    "branch": "codex/col-19-paper-introduction-demo",
+    "dirty": false,
+    "sha": "b619942d595f98b2a527a4962b28c54d258506c1",
+    "status_porcelain": []
+  },
+  "paper": "react",
+  "task_id": "caa4319e-30d4-49c0-a0df-848bf7378086",
+  "pipeline_version": "paper-introduction-v10",
+  "application_status": "answered",
+  "published_introduction_present": true,
+  "scored_material": "attempt_2_published_card_exact_match",
+  "candidate_units": 8,
+  "own_quote_complete": 8,
+  "own_quote_partial": 0,
+  "basis_appropriate": 8,
+  "own_quote_and_basis_both_complete": 8,
+  "independent_coverage_complete": 5,
+  "coverage_aspects": 5,
+  "basis_counts": {
+    "paper_statement": 8,
+    "author_interpretation": 0,
+    "teaching_example": 0,
+    "system_inference": 0
+  },
+  "unused_basis_branches_unexercised": true,
+  "full_semantic_acceptance": true,
+  "at_least_one_new_fully_supported_card_evidence": true,
+  "whole_goal_completion_not_assessed": true,
+  "human_review": {
+    "status": "pending",
+    "reviewer": null
+  },
+  "product_acceptance": "pending",
+  "learning_acceptance": "pending",
+  "blind_review": {
+    "sha256": "54030283ae737d43ada90212b9e6ae692d250ec58b26e3339e1c751d07c5daa8",
+    "frozen_at": "2026-09-05T14:06:59.595164+00:00",
+    "application_answered_status_known_from_parent": true,
+    "application_support_and_coverage_reasons_read_before_freeze": false,
+    "final_judgment_unchanged_after_application_comparison": true
+  },
+  "application_comparison": {
+    "initial_support_true": 4,
+    "initial_coverage_true": 5,
+    "final_support_true": 8,
+    "final_coverage_true": 5,
+    "final_disagreements": [],
+    "initial_review_scope": "首稿在最终稿盲评之后阅读，未另作全项独立评分；反馈差异作为因果诊断保留。",
+    "initial_diagnostic_differences": [
+      {
+        "field": "mechanism",
+        "application": "unsupported",
+        "independent": "scope_wording_debatable_not_used_to_disqualify_final_card",
+        "reason": "初稿“最终生成结束动作及答案或完成交互目标”可作为任务结果的概括，没有明确声称所有任务同一种结束动作。应用把完成交互目标视为必须附独立终止形式的断言，仍有与v9相近的过度外推问题。末稿已分开持续轨迹和知识任务finish，最终不再有此争点。"
+      },
+      {
+        "field": "contribution",
+        "application": "unsupported",
+        "independent": "agree_specific_example_support_incomplete",
+        "reason": "本项仅有Wikipedia和泛称external environments，网页/模拟环境枚举的完整具体身份未在自身引文明确；最终删去这些外围例子而保留双向原理。"
+      },
+      {
+        "field": "evidence_and_limits",
+        "application": "unsupported",
+        "independent": "agree_setup_source_incomplete",
+        "reason": "初稿将所有结果统一写在冻结/少样本设置中，却没有自己的冻结模型来源；修订收窄成自身已引用条件和结果可逐项对应的ALFWorld代表实验。"
+      }
+    ]
+  },
+  "content_findings": [
+    "原理和少样本术语正文保留冻结模型及人工轨迹；每项自己的来源支持其所写事实。",
+    "方法明确生成自由语言思考或领域动作、环境返回观察、持续轨迹输出及知识任务finish；密集推理与稀疏长程思考的差异保留。",
+    "少样本术语说示例含思考/动作/环境观察，供模型据此生成新轨迹；没有像v9将观察逐一作为模型模仿对象，不能机械把复合交互轨迹的概括等同于模型伪造每条观察。",
+    "结果选ALFWorld一个代表实验，给134未见游戏、人工轨迹、六组受控提示与删除thought的Act比较，并以本项第7/8页引文支持；大动作空间和上下文限制有本项第9页来源。",
+    "结果段不再断言四任务统一冻结设置；方法正文仍明确冻结和人工少样本，必要内容未删除。按原简洁导读规格不要求每字段重复同一条件。"
+  ],
+  "revision_facts": {
+    "initial_feedback_fields": [
+      "problem",
+      "contribution",
+      "mechanism",
+      "evidence_and_limits"
+    ],
+    "field_texts_changed": 8,
+    "already_app_supported_fields_rewritten": 4,
+    "changed_citation_fields": [
+      "evidence_and_limits"
+    ],
+    "detected_final_regression": false,
+    "note": "八项文本仍全部改写，不能声称实现了程序保留通过字段；本次对末稿全量独立核对没有发现因此新增的无据细节。"
+  },
+  "citation_checks": {
+    "attempts": [
+      {
+        "attempt": 1,
+        "citation_occurrences": 26,
+        "unique_chunks": 18,
+        "all_exact_identity_page_offset_checks_passed": true
+      },
+      {
+        "attempt": 2,
+        "citation_occurrences": 22,
+        "unique_chunks": 14,
+        "all_exact_identity_page_offset_checks_passed": true
+      }
+    ],
+    "published_occurrences_checked": 22,
+    "all_passed": true,
+    "selected_source_chunks_checked": 129,
+    "all_selected_offsets_match_saved_pages": true,
+    "published_identical_to_terminal_candidate": true,
+    "postgresql_introduction_identical_to_terminal": true,
+    "source_pages_sha256": "6e4c7b00dc4633b09f58d06f2dc5b6efe74696c7d956c4788f81a42698466809",
+    "paper_pdf_sha256": "f285b0971ae4a790e402fb93966bed3adde2cf0a04977d08b2b40d6ab0cace69",
+    "source_same_as_v9": true
+  },
+  "model_configuration": {
+    "model_name": "gpt-5.6-sol",
+    "profile": "openai",
+    "reasoning_effort": "low",
+    "max_output_tokens": 5000,
+    "output_token_parameter": "max_completion_tokens",
+    "temperature": null,
+    "thinking": "not_sent",
+    "timeout_seconds": 120.0,
+    "response_format": "json_object",
+    "endpoint_sha256": "11238294f94d9e116880f18da75e59773e7181ccbdad6976b18f166ccc457f05"
+  },
+  "prompt_and_limit_control": {
+    "comparison_source_sha": "a8398965132a495db48f26212e15c082f5fb5c98",
+    "prompts": {
+      "INTRODUCTION_PROMPT": {
+        "ast_identical": true,
+        "value_identical": true,
+        "sha256": "bc2c183c64efad3fef8652a6dbf0f98215dddb1ed9d4e85ecff427c711733905"
+      },
+      "INTRODUCTION_VERIFY_PROMPT": {
+        "ast_identical": true,
+        "value_identical": true,
+        "sha256": "a84f7a40c79e59b867eacc334b784abd0c167e54694309bf1606ebdfe8800b5f"
+      },
+      "REVISION_PROMPT": {
+        "ast_identical": true,
+        "value_identical": true,
+        "sha256": "103789e6117f6933bf89ec23600e97970c7dea9ead4d64f7ba1e55a69d57011c"
+      }
+    },
+    "limits": {
+      "INTRODUCTION_PIPELINE_TIMEOUT": 300.0,
+      "INTRODUCTION_CALL_TIMEOUT": 120.0,
+      "INTRODUCTION_MAX_OUTPUT_TOKENS": 5000,
+      "INTRODUCTION_MAX_CITATIONS": 8,
+      "MAX_SOURCE_CHARS": 120000,
+      "MAX_CONTEXT_CHARS": 150000
+    },
+    "all_named_limits_unchanged": true,
+    "max_content_revisions": 1,
+    "maximum_calls_per_full_pipeline": 4
+  },
+  "payload_evidence": {
+    "actual_payload_metadata_matched_persistent_ledger": true,
+    "all_4_calls_reasoning_effort_low": true,
+    "all_4_calls_max_completion_tokens_5000": true,
+    "all_4_calls_temperature_not_sent": true,
+    "raw_payload_not_saved": true,
+    "source_builds_trace_from_actual_payload": "src/papertrail/model.py:244-269 at b619942",
+    "generation_request_sha_same_as_failed_low_run": true,
+    "generation_response_sha_differs_from_failed_low_run": true
+  },
+  "persistent_ledger": {
+    "budget_scope": "c104b0323b7ddb128b881e00b8feaa9825a12b2c15b5ff593d43d52a562f1e3e",
+    "budget_mode": "provider_quota",
+    "calls_before_task": 390,
+    "calls_through_task": 394,
+    "task_calls_verified_against_postgresql": 4,
+    "calls": [
+      {
+        "id": "27ca3661-6988-44a5-8ba0-cb7560c0df7a",
+        "task_id": "caa4319e-30d4-49c0-a0df-848bf7378086",
+        "budget_scope": "c104b0323b7ddb128b881e00b8feaa9825a12b2c15b5ff593d43d52a562f1e3e",
+        "stage": "introduction_generate",
+        "created_at": "2026-09-05T21:59:44.476739+08:00",
+        "completed_at": "2026-09-05T22:00:14.281569+08:00",
+        "request_sha256": "b31068e1788ec23ee95d79afffc92371a8faf427f7b73d9712de8909b66fb6b1",
+        "reasoning_effort": "low",
+        "reasoning_tokens": 74,
+        "usage": {
+          "total_tokens": 46341,
+          "prompt_tokens": 44933,
+          "completion_tokens": 1408
+        }
+      },
+      {
+        "id": "ef2a48a5-fe0a-479f-bc74-e85a781c99ea",
+        "task_id": "caa4319e-30d4-49c0-a0df-848bf7378086",
+        "budget_scope": "c104b0323b7ddb128b881e00b8feaa9825a12b2c15b5ff593d43d52a562f1e3e",
+        "stage": "introduction_verify",
+        "created_at": "2026-09-05T22:00:14.298339+08:00",
+        "completed_at": "2026-09-05T22:02:04.369906+08:00",
+        "request_sha256": "aafbcaf38bbe65159d874310be2eb1291be51a412022244d4310a866c611bdb9",
+        "reasoning_effort": "low",
+        "reasoning_tokens": 848,
+        "usage": {
+          "total_tokens": 54800,
+          "prompt_tokens": 52013,
+          "completion_tokens": 2787
+        }
+      },
+      {
+        "id": "68d24969-c43c-4a45-9dc0-5e3970b214c5",
+        "task_id": "caa4319e-30d4-49c0-a0df-848bf7378086",
+        "budget_scope": "c104b0323b7ddb128b881e00b8feaa9825a12b2c15b5ff593d43d52a562f1e3e",
+        "stage": "introduction_revise",
+        "created_at": "2026-09-05T22:02:04.380030+08:00",
+        "completed_at": "2026-09-05T22:02:37.175492+08:00",
+        "request_sha256": "6f27a78cd32157c336a2cb7caf80a0e8c7d721a3893003bab51906ce7c074441",
+        "reasoning_effort": "low",
+        "reasoning_tokens": 339,
+        "usage": {
+          "total_tokens": 49361,
+          "prompt_tokens": 47841,
+          "completion_tokens": 1520
+        }
+      },
+      {
+        "id": "e68904ab-1f78-480b-8e82-d5ea4a2ce493",
+        "task_id": "caa4319e-30d4-49c0-a0df-848bf7378086",
+        "budget_scope": "c104b0323b7ddb128b881e00b8feaa9825a12b2c15b5ff593d43d52a562f1e3e",
+        "stage": "introduction_verify",
+        "created_at": "2026-09-05T22:02:37.189127+08:00",
+        "completed_at": "2026-09-05T22:03:17.557521+08:00",
+        "request_sha256": "c8ced26ef8a9a5274885f6017bf8ee0a9910a656c137bbe8466b8029cd2e7470",
+        "reasoning_effort": "low",
+        "reasoning_tokens": 461,
+        "usage": {
+          "total_tokens": 52744,
+          "prompt_tokens": 50660,
+          "completion_tokens": 2084
+        }
+      }
+    ]
+  },
+  "new_request_not_application_cache": {
+    "request": {
+      "paper_id": "acffff0b-0513-4b00-98d3-40567542eda9",
+      "previous_id": "282aee7c-f8fe-4bcb-a6c6-2feedf294467",
+      "refresh_if_outdated": true,
+      "request_id": "e9164a08-7d6d-4dbe-83a6-41cad4483aba",
+      "rubric": "docs/paper-introduction-demo.md",
+      "started_at": "2026-09-05T13:59:44.441362+00:00"
+    },
+    "runner_reused_existing_task": false,
+    "new_ledger_call_ids": [
+      "27ca3661-6988-44a5-8ba0-cb7560c0df7a",
+      "ef2a48a5-fe0a-479f-bc74-e85a781c99ea",
+      "68d24969-c43c-4a45-9dc0-5e3970b214c5",
+      "e68904ab-1f78-480b-8e82-d5ea4a2ce493"
+    ],
+    "previous_request_remains_separate": true,
+    "provider_internal_prompt_cache_status": "unknown_not_inferred"
+  },
+  "usage": {
+    "model_calls": 4,
+    "elapsed_seconds": 213.108,
+    "prompt_tokens": 195447,
+    "completion_tokens": 7799,
+    "total_tokens": 203246,
+    "usage_complete": true,
+    "reasoning_tokens_per_call": [
+      74,
+      848,
+      339,
+      461
+    ],
+    "reasoning_tokens_known_subtotal": 1722,
+    "reasoning_tokens_unknown_calls": 0,
+    "reasoning_tokens_total": 1722,
+    "reasoning_tokens_are_subset_of_completion_tokens": true,
+    "cost": null,
+    "unknown_cost_calls": 4
+  },
+  "comparison_boundaries": {
+    "v9_react_own_support_complete": 7,
+    "v9_react_coverage_complete": 4,
+    "v9_model_calls": 4,
+    "v9_elapsed_seconds": 165.386,
+    "v9_reasoning_effort": "none",
+    "v9_reasoning_tokens_total": null,
+    "v9_reasoning_tokens_note": "旧版本未记录该细分，不以none设置推断为0。",
+    "low_real_runs_including_interruption": 2,
+    "low_completed_content_runs": 1,
+    "low_fully_supported_new_cards": 1,
+    "low_end_to_end_success_denominator": 2,
+    "low_combined_actual_calls": 6,
+    "failed_run_not_removed_from_denominator": true,
+    "failed_run_review": "evals/quality-v0.2/intro-react-v10-low-review-2026-09-05.json",
+    "interpretation": "本轮同prompt/来源/限制，临时改low后取得一张完整支持新卡；只有一次完整内容链，另一次ID+网络失败，不能把它推广为low优于none的一般准确率或因果结论。"
+  },
+  "original_run_integrity": {
+    "manifest_entries_verified": 17,
+    "manifest_sha256": "5207fc3a4d593f42dd1f882166078b19dfea016ef2a692a4bed1c4fa047fc9eb",
+    "all_match": true,
+    "run_modified": false,
+    "terminal_sha256": "2343a86b397cde31711537368b51fdccfc779a3966bff93393fa2a6a53c1a90b"
+  },
+  "historical_scores_unchanged": true,
+  "no_provider_calls_tests_holdout_or_application_edits_by_review": true,
+  "artifacts": [
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T135943.156258Z-2f66f9be00084d9992c57ee84249bb30/react-blind-review.json",
+      "sha256": "54030283ae737d43ada90212b9e6ae692d250ec58b26e3339e1c751d07c5daa8"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T135943.156258Z-2f66f9be00084d9992c57ee84249bb30/intro-react-v10-low-independent-review.json",
+      "sha256": "ff2a5b0ec5b9fc526ce597d7f0f5cd9906111bd599b52cc2a6cea96f02cfd2bb"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T135943.156258Z-2f66f9be00084d9992c57ee84249bb30/intro-react-v10-low-review.sha256",
+      "sha256": "81082c741adeb99ceb8bd5047b8c1c52bf2fa2b4ce746dc37f67d96c4305ec23"
+    }
+  ]
+}

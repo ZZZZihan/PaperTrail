@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "review_source": "ai",
+  "reviewed_at": "2026-09-05T09:38:53.691080+00:00",
+  "run_name": "20260905T092951.023414Z-9f0e39ee1bd347e5b6ed7ba01fbfa8d3",
+  "run_code_sha": "9c6963954732cca9fe9741ffa2a1964c42e1b0e1",
+  "core_code_sha": "9c6963954732cca9fe9741ffa2a1964c42e1b0e1",
+  "pipeline_version": "paper-introduction-v7",
+  "application_status": "failed",
+  "application_error_code": "call_limit_exceeded",
+  "published_introduction_present": false,
+  "application_self_check_used_as_quality_evidence": false,
+  "independent_summary": {
+    "full_semantic_acceptance": false,
+    "scored_material": "attempt_1_unpublished_candidate",
+    "published_output_units": 0,
+    "reviewed_candidate_units": 8,
+    "own_citation_fully_supported_units": 6,
+    "partially_supported_units": 2,
+    "unsupported_units": 0,
+    "coverage_aspects_covered": 5,
+    "coverage_aspects_total": 5,
+    "coverage_is_content_presence_not_full_support": true,
+    "terms_supported": 2,
+    "terms_partially_supported": 1,
+    "terms_reviewed": 3,
+    "necessary_conditions_in_body": {
+      "frozen_model": true,
+      "human_demonstration_trajectories": true
+    },
+    "necessary_conditions_supported_in_mechanism_own_citations": true,
+    "results_field_own_setup_support_complete": false,
+    "basis_categories_present": {
+      "paper_statement": 8,
+      "author_interpretation": 0,
+      "teaching_example": 0,
+      "system_inference": 0
+    },
+    "basis_categories_appropriate": 8,
+    "absent_basis_categories_not_evaluated": true,
+    "body_characters": 446,
+    "citation_occurrences": 22,
+    "unique_citation_chunks": 17,
+    "all_citation_identity_checks_passed": true
+  },
+  "findings": [
+    {
+      "id": "results-own-setup-citation-gap",
+      "field": "evidence_and_limits",
+      "severity": "citation_support_gap",
+      "candidate_phrase": "在冻结模型和少量人工示例条件下，ReAct在问答、事实核验、文本游戏和网页购物中总体优于只行动方法",
+      "paper_fact_true_in_main_prompting_setup": true,
+      "own_citation_support_complete": false,
+      "reason": "本项5个引用支持四任务名称、相对Act的观察、ALFWorld/WebShop的少样本和IL/RL比较、大动作空间/上下文长度限制及潜在交互风险，但没有任何一条说明冻结参数或人工编排示例。少样本在本项仅明确覆盖ALFWorld/WebShop，未明确覆盖HotpotQA/FEVER。条件来源出现在mechanism或术语，不能自动转移给本项。",
+      "missing_sources": [
+        {
+          "chunk_id": "pti_ce485c53486dc81da4663589fef0e063",
+          "physical_page": 3,
+          "supports": "主要实验冻结PaLM-540B、few-shot上下文及人工思考/动作/观察轨迹"
+        },
+        {
+          "chunk_id": "pti_92d38402d160b5a8b4da2df41ce0b900",
+          "physical_page": 4,
+          "supports": "HotpotQA/FEVER分别6/3个手工编排few-shot轨迹"
+        }
+      ],
+      "minimum_fix": "将实验设置的准确来源附在该字段自身，并逐一配对结果、比较对象和所加条件；或选一个主要观察写清条件，避免不必要地合并四任务。不得仅删去必要限定。",
+      "blocks_fully_supported_card_acceptance": true
+    },
+    {
+      "id": "results-behavior-limit-own-citation-gap",
+      "field": "evidence_and_limits",
+      "severity": "citation_support_gap",
+      "candidate_phrase": "提示只能支持有限行为",
+      "paper_fact_true": true,
+      "own_citation_support_complete": false,
+      "reason": "本项第9页来源具体支持复杂大动作空间需要更多示例和上下文长度限制；论文第3页确有limited support of reasoning and acting behaviors，但对应pti_1cc13e…未附本项。为该额外概括补齐准确来源，或只保留已附来源明确支持的具体局限。该缺口与设置缺口位于同一个单位，不重复计为第三个部分单位。",
+      "missing_sources": [
+        {
+          "chunk_id": "pti_1cc13e0882bdd1adc245aec71fa938a0",
+          "physical_page": 3,
+          "supports": "prompting setup对reasoning/acting behaviors的limited support"
+        }
+      ],
+      "minimum_fix": "当前结果段5条引用，附入两条设置来源及本条局限来源后为8条，仍在上限内；另一选择是保留已支持的大动作空间/上下文局限并删除额外概括。",
+      "blocks_fully_supported_card_acceptance": true
+    },
+    {
+      "id": "term-movement-example-own-citation-gap",
+      "field": "terms[1]",
+      "severity": "citation_support_gap",
+      "candidate_phrase": "例如搜索、查找或移动",
+      "paper_fact_true": true,
+      "own_citation_support_complete": false,
+      "reason": "该术语的第4页两条引文支持search和lookup；第2页所附块的可读Figure 1图注支持Act/Thought由模型生成而Obs由环境生成，但前部图文抽取为乱码且该块没有可读移动操作示例。不能借同页其他未引用图文或全文中的ALFWorld动作补齐“移动”。定义其余部分有本项支持。",
+      "missing_sources": [
+        {
+          "chunk_id": "pti_5aab808075b2fa25f0f0e4d0ef2891ef",
+          "physical_page": 7,
+          "supports": "ALFWorld在模拟家庭中以文本动作导航，包含go to coffeetable 1示例"
+        }
+      ],
+      "minimum_fix": "删除非必要的“或移动”，或将第7页的准确导航动作来源附到该术语自身。",
+      "blocks_fully_supported_card_acceptance": true
+    }
+  ],
+  "run_path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/introduction-runs/20260905T092951.023414Z-9f0e39ee1bd347e5b6ed7ba01fbfa8d3",
+  "terminal_sha256": "6142d07bea49c7f8f1933161d1bdcb2237c63350254faf7982c42ebcf5a84e85",
+  "source_pages_sha256": "6e4c7b00dc4633b09f58d06f2dc5b6efe74696c7d956c4788f81a42698466809",
+  "original_run_integrity": {
+    "original_manifest_entries_verified": 17,
+    "all_match": true,
+    "original_run_modified": false
+  },
+  "resource_observation": {
+    "model_calls": 2,
+    "elapsed_seconds": 81.626,
+    "prompt_tokens": 94963,
+    "completion_tokens": 3972,
+    "total_tokens": 98935,
+    "cost": null,
+    "cost_status": "unknown",
+    "additional_provider_calls_by_this_review": 0,
+    "revision_draft_exists": false,
+    "revision_provider_call_record_exists": false
+  },
+  "human_review": {
+    "status": "pending",
+    "reviewer": null,
+    "reviewed_at": null
+  },
+  "product_acceptance": "pending",
+  "learning_acceptance": "pending",
+  "engineering_completion_note": "v7实际未发布，候选亦有严格自有引文缺口；本报告不能作为新版研读卡验收通过。v6已发布但7/8完整、1/8部分的独立结论保留，不因v7失败覆盖或美化。",
+  "artifacts": [
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T092951.023414Z-9f0e39ee1bd347e5b6ed7ba01fbfa8d3/intro-react-v7-independent-review.json",
+      "sha256": "5f0d3cb0f062e9244fee81a1ddb735e15f20f88a223d29b63676576b91822ce6"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T092951.023414Z-9f0e39ee1bd347e5b6ed7ba01fbfa8d3/intro-react-v7-review.sha256",
+      "sha256": "2f269a7f0805a24fd796de90bc428adb64cf759a9832909498a0b69b64fac9d9"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T092951.023414Z-9f0e39ee1bd347e5b6ed7ba01fbfa8d3/intro-react-v7-application-disagreement.json",
+      "sha256": "4451dfc7b8f81dc52b385bcc109ac3b26814b6d119ce8853b7ea90b3d6c2d25e"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T092951.023414Z-9f0e39ee1bd347e5b6ed7ba01fbfa8d3/intro-react-v7-disagreement.sha256",
+      "sha256": "8a156a1b6a110dad0bfb39e5edaccb8b69d7d7aafdbc443488b85b7ca57c983f"
+    }
+  ],
+  "application_disagreements": [
+    {
+      "field": "problem",
+      "application_verdict": {
+        "claim_index": 1,
+        "reason": "pti_bfb3660ee3bda94dc8176898ed27d841 支持纯思维链缺乏外部世界落地、可能产生事实幻觉和错误传播，也支持行动类方法缺少高层目标推理和工作记忆；pti_01a37204473fa87ec964fb1670e03f18 支持纯行动示例会因无法理解轨迹上下文而失败，并提到思考可分解目标。但本 claim 所附引文没有完整支持“仅生成动作时难以记录进度和根据反馈调整计划”这两个具体断言；相关表述只出现在未附于本 claim 的 pti_ce485c53486dc81da4663589fef0e063 等段落，因此按 claim-local 规则应判为不支持。",
+        "supported": false
+      },
+      "independent_verdict": "complete_as_contextual_paraphrase",
+      "independent_reason": "独立核对将“难以记录进度和根据反馈调整计划”视为本项所引工作记忆缺失、轨迹上下文推理困难及持续重复错误行动的概括；其用词为“难以”，未声称绝对不能。应用核验要求这两项功能在本项引文中更直接出现，因具体track progress/adjust action plans语句位于未附本项的下一段而判不支持。这里存在语义概括粒度的分歧；独立6/8只表示该审查口径下的未发布候选结果，不能覆盖应用判断或宣称全通过。",
+      "minimum_resolution": "若后续修订，将pti_ce485c53486dc81da4663589fef0e063也附在problem自身，可直接支持进度跟踪及异常后调整计划，消除该分歧。",
+      "counts_changed": false,
+      "application_review_read_after_independent_report_frozen": true
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "review_source": "independent_ai",
+  "reviewed_at": "2026-09-05T14:03:55.584582+00:00",
+  "run_name": "20260905T135649.076857Z-f66bd241dd0f4c9a8892d003b5b8a3be",
+  "run_path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/introduction-runs/20260905T135649.076857Z-f66bd241dd0f4c9a8892d003b5b8a3be",
+  "run_code_sha": "b619942d595f98b2a527a4962b28c54d258506c1",
+  "paper": "react",
+  "task_id": "282aee7c-f8fe-4bcb-a6c6-2feedf294467",
+  "pipeline_version": "paper-introduction-v10",
+  "application_status": "failed",
+  "error_code": "model_failure",
+  "published_introduction_present": false,
+  "scored_material": "only_saved_attempt_1_draft_not_validated_candidate",
+  "final_revised_draft_available": false,
+  "semantic_review_status": "not_scored_incomplete_run",
+  "own_quote_complete": null,
+  "basis_appropriate": null,
+  "coverage_complete": null,
+  "candidate_units_in_saved_initial_draft": 8,
+  "reason_for_no_quality_score": "初稿存在无效引用标识，唯一修订调用发生网络 model_failure，未生成修订稿或任何应用语义核验结果。按根节点有界任务调整，只冻结失败证据，不把可读初稿当作完成卡评分。",
+  "blindness_record": {
+    "initial_draft_and_own_source_ids_read_before_app_feedback": true,
+    "parent_reported_mechanical_error_after_draft_read": true,
+    "no_application_semantic_verdict_existed": true
+  },
+  "initial_draft_citations": {
+    "occurrences": 31,
+    "existing_ids": 30,
+    "invalid_ids": [
+      "pti_72fe8cfb7e5d47678d2f12f9d18e49f"
+    ],
+    "existing_ids_exact_page_offset_match": true,
+    "all_citation_identity_checks_passed": false,
+    "no_fuzzy_id_repair_applied": true
+  },
+  "causal_chain": [
+    "初稿 summary 引用 pti_72fe8cfb7e5d47678d2f12f9d18e49f 不在提供的来源标识中；程序检查失败并给出 invalid_citation。",
+    "未调用初稿语义 verify；进入唯一允许的内容修订。",
+    "修订调用 19.860 秒后 model_failure，没有返回 draft；因此也没有修订后的语义 verify。",
+    "终态 failed 且 introduction 为 null，本次失败保留为一次预选 ReAct low 实测，不从后续成功分母删去。"
+  ],
+  "application_checks": {
+    "attempt1_citation_validation": "failed",
+    "attempt1_feedback": [
+      {
+        "claim_index": 0,
+        "code": "invalid_citation",
+        "field": "summary",
+        "reason": "引用无法在当前论文证据中核对，已停止展示。",
+        "unknown_chunk_ids": [
+          "pti_72fe8cfb7e5d47678d2f12f9d18e49f"
+        ]
+      }
+    ],
+    "attempt1_semantic_verdict_count": 0,
+    "attempt2_draft_present": false,
+    "attempt2_citation_validation": "not_run",
+    "semantic_audit_calls": 0
+  },
+  "model_configuration": {
+    "model_name": "gpt-5.6-sol",
+    "profile": "openai",
+    "reasoning_effort": "low",
+    "max_output_tokens": 5000,
+    "output_token_parameter": "max_completion_tokens",
+    "temperature": null,
+    "thinking": "not_sent",
+    "timeout_seconds": 120.0,
+    "response_format": "json_object",
+    "endpoint_sha256": "11238294f94d9e116880f18da75e59773e7181ccbdad6976b18f166ccc457f05"
+  },
+  "prompt_and_limit_control": {
+    "comparison_source_sha": "a8398965132a495db48f26212e15c082f5fb5c98",
+    "prompts": {
+      "INTRODUCTION_PROMPT": {
+        "ast_identical": true,
+        "value_identical": true,
+        "sha256": "bc2c183c64efad3fef8652a6dbf0f98215dddb1ed9d4e85ecff427c711733905"
+      },
+      "INTRODUCTION_VERIFY_PROMPT": {
+        "ast_identical": true,
+        "value_identical": true,
+        "sha256": "a84f7a40c79e59b867eacc334b784abd0c167e54694309bf1606ebdfe8800b5f"
+      },
+      "REVISION_PROMPT": {
+        "ast_identical": true,
+        "value_identical": true,
+        "sha256": "103789e6117f6933bf89ec23600e97970c7dea9ead4d64f7ba1e55a69d57011c"
+      }
+    },
+    "limits": {
+      "INTRODUCTION_PIPELINE_TIMEOUT": 300.0,
+      "INTRODUCTION_CALL_TIMEOUT": 120.0,
+      "INTRODUCTION_MAX_OUTPUT_TOKENS": 5000,
+      "INTRODUCTION_MAX_CITATIONS": 8,
+      "MAX_SOURCE_CHARS": 120000,
+      "MAX_CONTEXT_CHARS": 150000
+    },
+    "all_named_limits_unchanged": true,
+    "max_content_revisions": 1,
+    "maximum_calls_per_full_pipeline": 4
+  },
+  "persistent_ledger": {
+    "budget_scope": "c104b0323b7ddb128b881e00b8feaa9825a12b2c15b5ff593d43d52a562f1e3e",
+    "budget_mode": "provider_quota",
+    "calls_before_task": 388,
+    "calls_through_task": 390,
+    "task_calls_verified_against_postgresql": 2,
+    "calls": [
+      {
+        "id": "8693bc7d-e144-4130-bda5-c186d810ccb2",
+        "task_id": "282aee7c-f8fe-4bcb-a6c6-2feedf294467",
+        "budget_scope": "c104b0323b7ddb128b881e00b8feaa9825a12b2c15b5ff593d43d52a562f1e3e",
+        "stage": "introduction_generate",
+        "created_at": "2026-09-05T21:56:50.392533+08:00",
+        "completed_at": "2026-09-05T21:57:20.639516+08:00",
+        "request_sha256": "b31068e1788ec23ee95d79afffc92371a8faf427f7b73d9712de8909b66fb6b1",
+        "reasoning_effort": "low",
+        "reasoning_tokens": 71,
+        "usage": {
+          "total_tokens": 46423,
+          "prompt_tokens": 44933,
+          "completion_tokens": 1490
+        }
+      },
+      {
+        "id": "186165b5-8620-40b4-85d9-d6bd5614410d",
+        "task_id": "282aee7c-f8fe-4bcb-a6c6-2feedf294467",
+        "budget_scope": "c104b0323b7ddb128b881e00b8feaa9825a12b2c15b5ff593d43d52a562f1e3e",
+        "stage": "introduction_revise",
+        "created_at": "2026-09-05T21:57:20.655218+08:00",
+        "completed_at": "2026-09-05T21:57:40.523773+08:00",
+        "request_sha256": "2c3e5f5fa3ec6e8927e4fa053ee39c1d4f035ddaf0fdf652ef7a867812f19a3e",
+        "reasoning_effort": "low",
+        "reasoning_tokens": null,
+        "usage": null
+      }
+    ]
+  },
+  "new_request_not_application_cache": {
+    "task_id": "282aee7c-f8fe-4bcb-a6c6-2feedf294467",
+    "request": {
+      "paper_id": "acffff0b-0513-4b00-98d3-40567542eda9",
+      "previous_id": "c01f8182-ae73-49f7-a0d2-ae3cff87e43a",
+      "refresh_if_outdated": true,
+      "request_id": "a393629f-182c-4085-a250-445b0ee3ebee",
+      "rubric": "docs/paper-introduction-demo.md",
+      "started_at": "2026-09-05T13:56:50.353965+00:00"
+    },
+    "runner_reused_existing_task": false,
+    "new_ledger_call_ids": [
+      "8693bc7d-e144-4130-bda5-c186d810ccb2",
+      "186165b5-8620-40b4-85d9-d6bd5614410d"
+    ],
+    "response_sha256_for_completed_generate": "61098d2c5405dae9e49cd4892513f5d84d99993da20a74e12dbbb39239402151",
+    "note": "证明应用新建真实调用；不声称排除了供应商内部 prompt cache。"
+  },
+  "usage": {
+    "model_calls": 2,
+    "elapsed_seconds": 50.159,
+    "known_prompt_tokens": 44933,
+    "known_completion_tokens": 1490,
+    "known_total_tokens": 46423,
+    "usage_complete": false,
+    "reasoning_tokens_known_subtotal": 71,
+    "reasoning_tokens_unknown_calls": 1,
+    "reasoning_tokens_total": null,
+    "reasoning_tokens_are_subset_of_completion_tokens": true,
+    "cost": null,
+    "unknown_cost_calls": 2
+  },
+  "original_run_integrity": {
+    "manifest_entries_verified": 17,
+    "all_match": true,
+    "manifest_sha256": "4a51ef27aae4833ef83741b72763449e80e9050c35f6f9f7037a4fe4d1ff2e6f",
+    "run_modified": false
+  },
+  "review_limits": [
+    "网络失败的本次未完成内容链不用于估计 low 相对 none 的语义收益。",
+    "初稿全部正文与自身可定位来源已读，但根节点随后限定为失败证据归档；无独立完整语义分数。",
+    "未访问 holdout，未调用 provider，未修改应用或原 RUN。"
+  ],
+  "human_review": "pending",
+  "product_acceptance": "pending",
+  "learning_acceptance": "pending",
+  "payload_evidence": {
+    "raw_payload_not_saved": true,
+    "evidence_boundary": "实际调用 trace 与持久账本记录 reasoning_effort=low、max_completion_tokens=5000、canonical request SHA。源代码 model.py 将这些字段直接取自实际 payload 后再发请求；未声称保存或抓取了原始 HTTP 请求。",
+    "request_building_source": "src/papertrail/model.py:244-269 at b619942",
+    "reasoning_token_extraction_source": "src/papertrail/model.py:302-308 at b619942"
+  },
+  "artifacts": [
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T135649.076857Z-f66bd241dd0f4c9a8892d003b5b8a3be/intro-react-v10-low-independent-review.json",
+      "sha256": "4c165c182285e47cda34ab7e1bd439b85b86fb295c2ecdeaf348d69d54156018"
+    },
+    {
+      "path": "/Users/xuzihan/Documents/ChatGPT/PaperTrail/data/diagnostics/reviews/20260905T135649.076857Z-f66bd241dd0f4c9a8892d003b5b8a3be/intro-react-v10-low-review.sha256",
+      "sha256": "eeed0478c564173b8f286bd3eb7d0c74206d19a98d59b000f4fa04760a9cd9d0"
+    }
+  ]
+}

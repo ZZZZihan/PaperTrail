@@ -6,7 +6,7 @@ import re
 from collections import Counter
 
 CHUNK_VERSION = "page-char-v1-1400-200"
-RETRIEVAL_VERSION = "bm25-v1-k1-1.5-b-0.75"
+RETRIEVAL_VERSION = "bm25-v2-query-term-coverage"
 _STOPWORDS = set(
     "a an the and or of to in on for with from by is are was were be been being "
     "as at that this these those it its we our their they what which how does do did "
@@ -93,3 +93,99 @@ def retrieve(
         if len(selected) >= top_k:
             break
     return selected
+
+
+def retrieve_for_queries(
+    chunks: list[dict],
+    question: str,
+    queries: list[str],
+    *,
+    top_k: int = 12,
+    max_chars: int = 20_000,
+) -> dict:
+    """Keep merged BM25 order and replace at most two tail items for lexical gaps.
+
+    Candidates must come from a generated query's own top 12 positive matches.
+    The final selection must retain every query term covered by the merged
+    baseline. This preserves words, not their semantic relationships or evidence
+    sufficiency; the answer's support and coverage checks still run separately.
+    """
+    merged = " ".join([question, *queries])
+    baseline = retrieve(chunks, merged, top_k=top_k, max_chars=max_chars)
+    words = {chunk["chunk_id"]: set(tokenize(chunk["text"])) for chunk in chunks}
+    corpus = set().union(*words.values())
+    query_terms = set(tokenize(merged))
+
+    def matched(selected: list[dict]) -> set[str]:
+        return query_terms & set().union(*(words[c["chunk_id"]] for c in selected))
+
+    original_terms = matched(baseline)
+    covered = original_terms
+    seen = {chunk["chunk_id"] for chunk in baseline}
+    supplements, decisions, rejected = [], [], []
+    for query_index, query in enumerate(queries):
+        if len(supplements) >= min(2, len(baseline)):
+            break
+        gap = (set(tokenize(query)) & corpus) - covered
+        if not gap:
+            continue
+        for rank, chunk in enumerate(retrieve(chunks, query, top_k=12, max_chars=max_chars), 1):
+            added = gap & words[chunk["chunk_id"]]
+            if chunk["chunk_id"] in seen or not added:
+                continue
+            trial = baseline[: len(baseline) - len(supplements) - 1] + [*supplements, chunk]
+            if sum(len(c["text"]) for c in trial) > max_chars:
+                rejected.append(
+                    {"query_index": query_index, "chunk_id": chunk["chunk_id"], "reason": "chars"}
+                )
+                continue
+            lost_terms = original_terms - matched(trial)
+            if lost_terms:
+                rejected.append(
+                    {
+                        "query_index": query_index,
+                        "chunk_id": chunk["chunk_id"],
+                        "reason": "would_drop_query_terms",
+                        "terms": sorted(lost_terms),
+                    }
+                )
+                continue
+            decisions.append(
+                {
+                    "query_index": query_index,
+                    "query": query,
+                    "query_rank": rank,
+                    "query_score": chunk["score"],
+                    "trigger_terms": sorted(added),
+                    "chunk_id": chunk["chunk_id"],
+                    "replaced_chunk_id": baseline[len(baseline) - len(supplements) - 1]["chunk_id"],
+                }
+            )
+            supplements.append(chunk)
+            seen.add(chunk["chunk_id"])
+            covered = matched(trial)
+            break
+    # Published scores stay on the merged-query BM25 scale; query scores are diagnostic.
+    merged_scores = {
+        c["chunk_id"]: c["score"]
+        for c in retrieve(
+            chunks, merged, top_k=len(chunks), max_chars=sum(len(c["text"]) for c in chunks)
+        )
+    }
+    selected = baseline[: len(baseline) - len(supplements)] + [
+        {**c, "score": merged_scores[c["chunk_id"]]} for c in supplements
+    ]
+    return {
+        "selected": selected,
+        "merged_selected": baseline,
+        "supplementation": {
+            "method": "query-term-coverage-v1",
+            "meaning": "Lexical query-term coverage only, not semantic evidence sufficiency.",
+            "candidate_top_k": 12,
+            "max_replacements": 2,
+            "decisions": decisions,
+            "rejected_candidates": rejected,
+            "baseline_matched_terms": sorted(original_terms),
+            "selected_matched_terms": sorted(matched(selected)),
+        },
+    }

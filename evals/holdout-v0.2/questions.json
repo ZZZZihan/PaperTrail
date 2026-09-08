@@ -1,0 +1,2257 @@
+{
+  "schema_version": 2,
+  "dataset_id": "papertrail-candidate-holdout-v0.2",
+  "provenance": "AI-prepared candidate holdout, source checked, human review pending. No model run or product score. Preparation agents have seen labels; implementation/tuning agents must not inspect questions or answer keys.",
+  "expected_status_values": [
+    "answered",
+    "insufficient_evidence"
+  ],
+  "questions": [
+    {
+      "id": "cot-01",
+      "paper_id": "cot",
+      "category": "fact",
+      "question": "本文把 chain-of-thought prompting 的一个 few-shot 示例组织成什么三元组？其中 chain of thought 指什么？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "示例由输入、思维链、输出构成。",
+        "思维链是通向最终输出的一系列中间自然语言推理步骤。"
+      ],
+      "required_conditions": [],
+      "evidence_ids": [
+        "cot-definition"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": null,
+      "answer_points": [
+        {
+          "id": "cot-01-a1",
+          "text": "示例由输入、思维链、输出构成。",
+          "evidence_ids": [
+            "cot-definition"
+          ]
+        },
+        {
+          "id": "cot-01-a2",
+          "text": "思维链是通向最终输出的一系列中间自然语言推理步骤。",
+          "evidence_ids": [
+            "cot-definition"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "cot-definition",
+          "page_index": 1,
+          "pdf_page_number": 2,
+          "quote": "triples",
+          "char_start": 2674,
+          "char_end": 2681,
+          "section": "1 Introduction"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen cot PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "cot-02",
+      "paper_id": "cot",
+      "category": "cross_section_conditions",
+      "question": "算术推理主实验如何构造和复用 few-shot 示例，AQuA 有什么例外，模型怎样解码？LaMDA 与其余模型的示例顺序重复设置是否相同？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "作者人工编写一组8个带思维链的few-shot示例。",
+        "除AQuA外，算术推理各基准复用这同一组8例。",
+        "AQuA是多项选择题，使用训练集中的4个示例和解答。",
+        "主实验采用greedy decoding。",
+        "LaMDA报告5个随机种子的平均结果，每个种子改变示例随机排列顺序。",
+        "其他模型报告单一示例顺序的结果。"
+      ],
+      "required_conditions": [
+        {
+          "id": "cot-02-c1",
+          "text": "8例是人工编写，并非无人工输入。",
+          "evidence_ids": [
+            "cot-manual",
+            "cot-exception",
+            "cot-decoding"
+          ]
+        },
+        {
+          "id": "cot-02-c2",
+          "text": "复用8例的范围排除AQuA；AQuA为选择题并取训练集4例及解答。",
+          "evidence_ids": [
+            "cot-manual",
+            "cot-exception",
+            "cot-decoding"
+          ]
+        },
+        {
+          "id": "cot-02-c3",
+          "text": "本题主实验解码为greedy，不得混入后续多数投票工作。",
+          "evidence_ids": [
+            "cot-manual",
+            "cot-exception",
+            "cot-decoding"
+          ]
+        },
+        {
+          "id": "cot-02-c4",
+          "text": "5次重复只用于LaMDA，变化的是示例顺序；其他模型是单一顺序。",
+          "evidence_ids": [
+            "cot-manual",
+            "cot-exception",
+            "cot-decoding"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "cot-manual",
+        "cot-exception",
+        "cot-decoding"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": null,
+      "answer_points": [
+        {
+          "id": "cot-02-a1",
+          "text": "作者人工编写一组8个带思维链的few-shot示例。",
+          "evidence_ids": [
+            "cot-manual",
+            "cot-exception",
+            "cot-decoding"
+          ]
+        },
+        {
+          "id": "cot-02-a2",
+          "text": "除AQuA外，算术推理各基准复用这同一组8例。",
+          "evidence_ids": [
+            "cot-manual",
+            "cot-exception",
+            "cot-decoding"
+          ]
+        },
+        {
+          "id": "cot-02-a3",
+          "text": "AQuA是多项选择题，使用训练集中的4个示例和解答。",
+          "evidence_ids": [
+            "cot-manual",
+            "cot-exception",
+            "cot-decoding"
+          ]
+        },
+        {
+          "id": "cot-02-a4",
+          "text": "主实验采用greedy decoding。",
+          "evidence_ids": [
+            "cot-manual",
+            "cot-exception",
+            "cot-decoding"
+          ]
+        },
+        {
+          "id": "cot-02-a5",
+          "text": "LaMDA报告5个随机种子的平均结果，每个种子改变示例随机排列顺序。",
+          "evidence_ids": [
+            "cot-manual",
+            "cot-exception",
+            "cot-decoding"
+          ]
+        },
+        {
+          "id": "cot-02-a6",
+          "text": "其他模型报告单一示例顺序的结果。",
+          "evidence_ids": [
+            "cot-manual",
+            "cot-exception",
+            "cot-decoding"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "cot-manual",
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "quote": "manually composed",
+          "char_start": 3744,
+          "char_end": 3761,
+          "section": "3.1 Experimental Setup"
+        },
+        {
+          "id": "cot-exception",
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "quote": "except AQuA",
+          "char_start": 2903,
+          "char_end": 2914,
+          "section": "3.1 Experimental Setup (continued)"
+        },
+        {
+          "id": "cot-decoding",
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "quote": "greedy decoding",
+          "char_start": 3690,
+          "char_end": 3705,
+          "section": "3.1 Experimental Setup"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen cot PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "cot-03",
+      "paper_id": "cot",
+      "category": "false_premise",
+      "question": "论文是否证明了只要加入思维链示例，小规模语言模型也一定优于标准提示？请用本文观察检验这个说法。",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "否，论文未支持对小模型必然有效的概括。",
+        "作者在该实验中观察到较小模型会产生流畅但不合逻辑的思维链，表现可能低于标准提示。"
+      ],
+      "required_conditions": [
+        {
+          "id": "cot-03-c1",
+          "text": "结论限定本文所测模型与任务，不能变成对所有模型的普遍定理。",
+          "evidence_ids": [
+            "cot-scale"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "cot-scale"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": null,
+      "answer_points": [
+        {
+          "id": "cot-03-a1",
+          "text": "否，论文未支持对小模型必然有效的概括。",
+          "evidence_ids": [
+            "cot-scale"
+          ]
+        },
+        {
+          "id": "cot-03-a2",
+          "text": "作者在该实验中观察到较小模型会产生流畅但不合逻辑的思维链，表现可能低于标准提示。",
+          "evidence_ids": [
+            "cot-scale"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "cot-scale",
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "quote": "illogical",
+          "char_start": 4746,
+          "char_end": 4755,
+          "section": "3.2 Results"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen cot PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "cot-04",
+      "paper_id": "cot",
+      "category": "insufficient_evidence",
+      "question": "请仅根据本文给出全部实验实际消耗的总 TPU 芯片小时数。",
+      "expected_status": "insufficient_evidence",
+      "expected_answer_points": [],
+      "required_conditions": [],
+      "evidence_ids": [
+        "cot-unestimated",
+        "cot-resources"
+      ],
+      "insufficient_reason": "已核对的检查表3(d)明确说未估计总计算量；E.2只给出部分模型的TPU配置和API使用方式。当前证据无法得到全部实验的总TPU芯片小时，不能把芯片数当时长或自行估算。",
+      "insufficiency_audit": {
+        "reviewed_page_indices": [
+          14,
+          29
+        ],
+        "reviewed_sections": [
+          "Checklist 3(d)",
+          "Appendix E.2 Computational Resources"
+        ],
+        "search_page_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "search_patterns": [
+          "\\bTPU\\b",
+          "\\bhours?\\b",
+          "total amount of compute",
+          "\\bseconds?\\b"
+        ],
+        "boundary": "不足判断限定冻结PDF内已核对资源段落和所列全文关键词命中；不宣称全部未公开记录中也不存在。",
+        "missing_information": [
+          "覆盖所有实验的设备使用时长及合计口径"
+        ],
+        "search_normalization": "Case-insensitive regular expression on unmodified pypdf text; exact pattern list and hit pages frozen",
+        "keyword_page_indices": {
+          "\\bTPU\\b": [
+            29
+          ],
+          "\\bhours?\\b": [
+            16,
+            26,
+            32,
+            38
+          ],
+          "total amount of compute": [
+            14
+          ],
+          "\\bseconds?\\b": [
+            1,
+            2,
+            3,
+            4,
+            8,
+            15,
+            18,
+            26,
+            29
+          ]
+        }
+      },
+      "table_probe": null,
+      "answer_points": [],
+      "expected_evidence": [
+        {
+          "id": "cot-unestimated",
+          "page_index": 14,
+          "pdf_page_number": 15,
+          "quote": "total amount of compute",
+          "char_start": 1828,
+          "char_end": 1851,
+          "section": "Checklist 3(d)"
+        },
+        {
+          "id": "cot-resources",
+          "page_index": 29,
+          "pdf_page_number": 30,
+          "quote": "TPU v3",
+          "char_start": 1426,
+          "char_end": 1432,
+          "section": "E.2 Computational Resources"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen cot PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "cot-05",
+      "paper_id": "cot",
+      "category": "table_footnote_probe",
+      "question": "附录表6中，GSM8K 上标准提示与思维链提示的结果各是多少？请结合表注说明模型、± 后数值的含义，以及重复试验改变的因素。",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "GSM8K标准提示为6.5±0.4，思维链提示为14.3±0.4。",
+        "该表报告LaMDA 137B。",
+        "±后的数值是标准差，来自5个随机种子下不同的few-shot示例顺序。"
+      ],
+      "required_conditions": [
+        {
+          "id": "cot-05-c1",
+          "text": "数字来自表6的GSM8K列与Standard prompting/Chain of thought prompting两行。",
+          "evidence_ids": [
+            "cot-table6"
+          ]
+        },
+        {
+          "id": "cot-05-c2",
+          "text": "重复变化是示例顺序，不能写成独立训练5个模型或置信区间。",
+          "evidence_ids": [
+            "cot-table6"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "cot-table6"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": {
+        "label": "Table 6",
+        "visual_review_page_indices": [
+          22
+        ],
+        "row_labels": [
+          "Standard prompting",
+          "Chain of thought prompting"
+        ],
+        "column_labels": [
+          "GSM8K"
+        ],
+        "note_evidence_ids": [
+          "cot-table6"
+        ]
+      },
+      "answer_points": [
+        {
+          "id": "cot-05-a1",
+          "text": "GSM8K标准提示为6.5±0.4，思维链提示为14.3±0.4。",
+          "evidence_ids": [
+            "cot-table6"
+          ]
+        },
+        {
+          "id": "cot-05-a2",
+          "text": "该表报告LaMDA 137B。",
+          "evidence_ids": [
+            "cot-table6"
+          ]
+        },
+        {
+          "id": "cot-05-a3",
+          "text": "±后的数值是标准差，来自5个随机种子下不同的few-shot示例顺序。",
+          "evidence_ids": [
+            "cot-table6"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "cot-table6",
+          "page_index": 22,
+          "pdf_page_number": 23,
+          "quote": "Standard deviation",
+          "char_start": 531,
+          "char_end": 549,
+          "section": "Appendix Table 6 (caption, headers and first two rows)"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen cot PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "sc-01",
+      "paper_id": "sc",
+      "category": "fact",
+      "question": "Self-Consistency 如何从一个问题得到最终答案？与 CoT 的贪心解码相比，主要改变在哪里？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "先用CoT示例提示语言模型。",
+        "以采样产生多条不同推理路径，替代仅选择贪心解码路径。",
+        "对推理路径进行边缘化并聚合最终答案，选择最一致的答案。"
+      ],
+      "required_conditions": [],
+      "evidence_ids": [
+        "sc-method"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": null,
+      "answer_points": [
+        {
+          "id": "sc-01-a1",
+          "text": "先用CoT示例提示语言模型。",
+          "evidence_ids": [
+            "sc-method"
+          ]
+        },
+        {
+          "id": "sc-01-a2",
+          "text": "以采样产生多条不同推理路径，替代仅选择贪心解码路径。",
+          "evidence_ids": [
+            "sc-method"
+          ]
+        },
+        {
+          "id": "sc-01-a3",
+          "text": "对推理路径进行边缘化并聚合最终答案，选择最一致的答案。",
+          "evidence_ids": [
+            "sc-method"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "sc-method",
+          "page_index": 1,
+          "pdf_page_number": 2,
+          "quote": "three steps",
+          "char_start": 1223,
+          "char_end": 1234,
+          "section": "Figure 1 caption"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen sc PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "sc-02",
+      "paper_id": "sc",
+      "category": "cross_section_conditions",
+      "question": "Self-Consistency 的算术推理主结果采用什么提示与训练条件？每轮采样多少输出、结果如何重复汇总，比较基线怎样解码？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "采用few-shot提示，不训练或微调语言模型。",
+        "算术推理任务复用同一组8个人工编写示例。",
+        "每轮从解码器独立采样40个输出。",
+        "报告10轮运行的平均结果。",
+        "比较基线是采用greedy decoding的CoT提示。"
+      ],
+      "required_conditions": [
+        {
+          "id": "sc-02-c1",
+          "text": "无训练/微调不意味着无人工示例；仍使用8个人工示例。",
+          "evidence_ids": [
+            "sc-setup",
+            "sc-results"
+          ]
+        },
+        {
+          "id": "sc-02-c2",
+          "text": "40是每轮独立采样输出数，10是汇总运行轮数。",
+          "evidence_ids": [
+            "sc-setup",
+            "sc-results"
+          ]
+        },
+        {
+          "id": "sc-02-c3",
+          "text": "基线的解码方式为greedy。",
+          "evidence_ids": [
+            "sc-setup",
+            "sc-results"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "sc-setup",
+        "sc-results"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": null,
+      "answer_points": [
+        {
+          "id": "sc-02-a1",
+          "text": "采用few-shot提示，不训练或微调语言模型。",
+          "evidence_ids": [
+            "sc-setup",
+            "sc-results"
+          ]
+        },
+        {
+          "id": "sc-02-a2",
+          "text": "算术推理任务复用同一组8个人工编写示例。",
+          "evidence_ids": [
+            "sc-setup",
+            "sc-results"
+          ]
+        },
+        {
+          "id": "sc-02-a3",
+          "text": "每轮从解码器独立采样40个输出。",
+          "evidence_ids": [
+            "sc-setup",
+            "sc-results"
+          ]
+        },
+        {
+          "id": "sc-02-a4",
+          "text": "报告10轮运行的平均结果。",
+          "evidence_ids": [
+            "sc-setup",
+            "sc-results"
+          ]
+        },
+        {
+          "id": "sc-02-a5",
+          "text": "比较基线是采用greedy decoding的CoT提示。",
+          "evidence_ids": [
+            "sc-setup",
+            "sc-results"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "sc-setup",
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "quote": "without training",
+          "char_start": 2936,
+          "char_end": 2952,
+          "section": "3.1 Experiment Setup"
+        },
+        {
+          "id": "sc-results",
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "quote": "40 outputs",
+          "char_start": 145,
+          "char_end": 155,
+          "section": "3.2 Main Results"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen sc PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "sc-03",
+      "paper_id": "sc",
+      "category": "false_premise",
+      "question": "Self-Consistency 必须先额外训练一个验证器，并训练多个独立模型再投票，这个描述符合本文吗？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "不符合；文中说无需额外训练、辅助模型或微调。",
+        "它在单一预训练语言模型之上进行自集成，而非训练多个模型后聚合。"
+      ],
+      "required_conditions": [
+        {
+          "id": "sc-03-c1",
+          "text": "这里只否定Self-Consistency方法需要的新增训练或辅助模型，不否认基础语言模型已有预训练。",
+          "evidence_ids": [
+            "sc-noextras"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "sc-noextras"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": null,
+      "answer_points": [
+        {
+          "id": "sc-03-a1",
+          "text": "不符合；文中说无需额外训练、辅助模型或微调。",
+          "evidence_ids": [
+            "sc-noextras"
+          ]
+        },
+        {
+          "id": "sc-03-a2",
+          "text": "它在单一预训练语言模型之上进行自集成，而非训练多个模型后聚合。",
+          "evidence_ids": [
+            "sc-noextras"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "sc-noextras",
+          "page_index": 1,
+          "pdf_page_number": 2,
+          "quote": "single language model",
+          "char_start": 2211,
+          "char_end": 2232,
+          "section": "1 Introduction (continued)"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen sc PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "sc-04",
+      "paper_id": "sc",
+      "category": "insufficient_evidence",
+      "question": "根据本文的实测记录，用 PaLM-540B 采样40条路径回答一道 GSM8K 题，平均额外耗电多少 Wh？",
+      "expected_status": "insufficient_evidence",
+      "expected_answer_points": [],
+      "required_conditions": [],
+      "evidence_ids": [
+        "sc-cost"
+      ],
+      "insufficient_reason": "已核对主实验设置、结果与计算代价局限；当前证据只说明更多路径增加计算代价，未给所问的逐题电能实测和基准对照。路径数和准确率不能换算为Wh。",
+      "insufficiency_audit": {
+        "reviewed_page_indices": [
+          3,
+          4,
+          8
+        ],
+        "reviewed_sections": [
+          "3.1 Experiment Setup",
+          "3.2 Main Results",
+          "5 Conclusion and Discussion"
+        ],
+        "search_page_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ],
+        "search_patterns": [
+          "\\benergy\\b",
+          "\\bwatts?\\b",
+          "\\bkwh\\b",
+          "\\bjoules?\\b",
+          "\\bWh\\b",
+          "\\bcost\\b"
+        ],
+        "boundary": "不足限定当前冻结PDF的已检查设置/代价段落及所列全文词命中；不把未找到写成所有外部测量不存在。",
+        "missing_information": [
+          "逐题设备功耗与执行时间或直接电能测量",
+          "额外耗电所采用的比较基准"
+        ],
+        "search_normalization": "Case-insensitive regular expression on unmodified pypdf text; exact pattern list and hit pages frozen",
+        "keyword_page_indices": {
+          "\\benergy\\b": [
+            18
+          ],
+          "\\bwatts?\\b": [],
+          "\\bkwh\\b": [],
+          "\\bjoules?\\b": [],
+          "\\bWh\\b": [],
+          "\\bcost\\b": [
+            8
+          ]
+        }
+      },
+      "table_probe": null,
+      "answer_points": [],
+      "expected_evidence": [
+        {
+          "id": "sc-cost",
+          "page_index": 8,
+          "pdf_page_number": 9,
+          "quote": "computation cost",
+          "char_start": 4282,
+          "char_end": 4298,
+          "section": "5 Conclusion and Discussion"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen sc PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "sc-05",
+      "paper_id": "sc",
+      "category": "table_footnote_probe",
+      "question": "表3中 PaLM-540B 在 CSQA 上的 CoT 与 Self-Consistency 准确率分别是多少，增加了多少个百分点？结合实验设置脚注说明 CSQA 使用哪个数据划分。",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "PaLM-540B的CSQA CoT准确率为79.0%。",
+        "Self-Consistency准确率为80.7%，绝对增加1.7个百分点。",
+        "CommonsenseQA使用dev划分，而非默认test划分。"
+      ],
+      "required_conditions": [
+        {
+          "id": "sc-05-c1",
+          "text": "比较限定表3的PaLM-540B与CSQA，不得读成其他模型或其他任务。",
+          "evidence_ids": [
+            "sc-table3",
+            "sc-split"
+          ]
+        },
+        {
+          "id": "sc-05-c2",
+          "text": "+1.7是绝对百分点增量，不是相对百分比。",
+          "evidence_ids": [
+            "sc-table3",
+            "sc-split"
+          ]
+        },
+        {
+          "id": "sc-05-c3",
+          "text": "CSQA使用脚注3的dev例外。",
+          "evidence_ids": [
+            "sc-table3",
+            "sc-split"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "sc-table3",
+        "sc-split"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": {
+        "label": "Table 3 and footnote 3",
+        "visual_review_page_indices": [
+          3,
+          4
+        ],
+        "row_labels": [
+          "PaLM-540B CoT-prompting",
+          "PaLM-540B Self-consistency"
+        ],
+        "column_labels": [
+          "CSQA"
+        ],
+        "note_evidence_ids": [
+          "sc-split"
+        ]
+      },
+      "answer_points": [
+        {
+          "id": "sc-05-a1",
+          "text": "PaLM-540B的CSQA CoT准确率为79.0%。",
+          "evidence_ids": [
+            "sc-table3",
+            "sc-split"
+          ]
+        },
+        {
+          "id": "sc-05-a2",
+          "text": "Self-Consistency准确率为80.7%，绝对增加1.7个百分点。",
+          "evidence_ids": [
+            "sc-table3",
+            "sc-split"
+          ]
+        },
+        {
+          "id": "sc-05-a3",
+          "text": "CommonsenseQA使用dev划分，而非默认test划分。",
+          "evidence_ids": [
+            "sc-table3",
+            "sc-split"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "sc-table3",
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "quote": "Method CSQA",
+          "char_start": 2719,
+          "char_end": 2730,
+          "section": "Table 3"
+        },
+        {
+          "id": "sc-split",
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "quote": "dev split",
+          "char_start": 4040,
+          "char_end": 4049,
+          "section": "Footnote 3"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen sc PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "rag-01",
+      "paper_id": "rag",
+      "category": "fact",
+      "question": "RAG-Sequence 和 RAG-Token 在一次回答中如何使用检索到的文档？它们对文档进行边缘化的粒度有什么区别？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "RAG-Sequence 将单个检索文档作为整个输出序列共用的潜变量。",
+        "RAG-Sequence 为各个检索文档计算完整输出序列的概率，再对文档边缘化。",
+        "RAG-Token 允许不同输出 token 使用不同的潜在文档。",
+        "RAG-Token 先在每个生成步骤对检索文档边缘化得到下一 token 的分布，再继续生成。"
+      ],
+      "required_conditions": [
+        {
+          "id": "rag-01-c1",
+          "text": "两种模型都以检索到的 top-K 文档近似边缘化；不能把 RAG-Token 说成每生成一个 token 就重新检索一批文档。",
+          "evidence_ids": [
+            "rag-01-e1"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "rag-01-e1"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": null,
+      "forbidden_inferences": [
+        "RAG-Token necessarily runs a new retrieval query after every token."
+      ],
+      "answer_points": [
+        {
+          "id": "rag-01-a1",
+          "text": "RAG-Sequence 将单个检索文档作为整个输出序列共用的潜变量。",
+          "evidence_ids": [
+            "rag-01-e1"
+          ]
+        },
+        {
+          "id": "rag-01-a2",
+          "text": "RAG-Sequence 为各个检索文档计算完整输出序列的概率，再对文档边缘化。",
+          "evidence_ids": [
+            "rag-01-e1"
+          ]
+        },
+        {
+          "id": "rag-01-a3",
+          "text": "RAG-Token 允许不同输出 token 使用不同的潜在文档。",
+          "evidence_ids": [
+            "rag-01-e1"
+          ]
+        },
+        {
+          "id": "rag-01-a4",
+          "text": "RAG-Token 先在每个生成步骤对检索文档边缘化得到下一 token 的分布，再继续生成。",
+          "evidence_ids": [
+            "rag-01-e1"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "rag-01-e1",
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "quote": "RAG-Sequence",
+          "char_start": 708,
+          "char_end": 720,
+          "section": "rag-01 supporting context"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen rag PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "rag-02",
+      "paper_id": "rag",
+      "category": "cross_section_conditions",
+      "question": "本文实验中，RAG 微调时实际更新哪些模块、固定哪些模块？Wikipedia 索引的时间版本和切块方式是什么，训练与测试的检索文档数如何确定？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "微调更新查询编码器 BERTq 与 BART 生成器。",
+        "文档编码器 BERTd 与文档索引保持固定。",
+        "所有实验的非参数知识源使用 2018 年 12 月的 Wikipedia dump。",
+        "每篇 Wikipedia 文章切成互不重叠的 100 词块，合计约 2100 万文档。",
+        "训练考虑每次检索 k=5 或 k=10 个文档。",
+        "测试时的 k 使用开发数据确定。"
+      ],
+      "required_conditions": [
+        {
+          "id": "rag-02-c1",
+          "text": "固定文档编码器指本论文的 RAG 微调阶段；不能推断该编码器从未训练过。",
+          "evidence_ids": [
+            "rag-02-e1",
+            "rag-02-e3"
+          ]
+        },
+        {
+          "id": "rag-02-c2",
+          "text": "区分训练候选 k 与测试所选 k，不能把训练的 5 或 10 当成所有测试任务统一固定的文档数。",
+          "evidence_ids": [
+            "rag-02-e4"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "rag-02-e1",
+        "rag-02-e2",
+        "rag-02-e3",
+        "rag-02-e4"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": null,
+      "answer_points": [
+        {
+          "id": "rag-02-a1",
+          "text": "微调更新查询编码器 BERTq 与 BART 生成器。",
+          "evidence_ids": [
+            "rag-02-e3"
+          ]
+        },
+        {
+          "id": "rag-02-a2",
+          "text": "文档编码器 BERTd 与文档索引保持固定。",
+          "evidence_ids": [
+            "rag-02-e3"
+          ]
+        },
+        {
+          "id": "rag-02-a3",
+          "text": "所有实验的非参数知识源使用 2018 年 12 月的 Wikipedia dump。",
+          "evidence_ids": [
+            "rag-02-e4"
+          ]
+        },
+        {
+          "id": "rag-02-a4",
+          "text": "每篇 Wikipedia 文章切成互不重叠的 100 词块，合计约 2100 万文档。",
+          "evidence_ids": [
+            "rag-02-e4"
+          ]
+        },
+        {
+          "id": "rag-02-a5",
+          "text": "训练考虑每次检索 k=5 或 k=10 个文档。",
+          "evidence_ids": [
+            "rag-02-e4"
+          ]
+        },
+        {
+          "id": "rag-02-a6",
+          "text": "测试时的 k 使用开发数据确定。",
+          "evidence_ids": [
+            "rag-02-e4"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "rag-02-e1",
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "quote": "Retriever",
+          "char_start": 2011,
+          "char_end": 2020,
+          "section": "rag-02 supporting context"
+        },
+        {
+          "id": "rag-02-e2",
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "quote": "Training",
+          "char_start": 3452,
+          "char_end": 3460,
+          "section": "rag-02 supporting context"
+        },
+        {
+          "id": "rag-02-e3",
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "quote": "minimize",
+          "char_start": 0,
+          "char_end": 8,
+          "section": "rag-02 supporting context"
+        },
+        {
+          "id": "rag-02-e4",
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "quote": "Experiments",
+          "char_start": 1870,
+          "char_end": 1881,
+          "section": "rag-02 supporting context"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen rag PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "rag-03",
+      "paper_id": "rag",
+      "category": "false_premise",
+      "question": "这篇论文说 RAG 不需要直接的检索监督，所以从检索器初始化到 RAG 微调的整个过程中都没有用过带检索监督的数据，对吗？请按训练阶段说明。",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "这个说法不正确：不能把 RAG 微调无需直接文档监督推广到初始化检索器的训练历史。",
+        "检索器以预训练的 DPR 双编码器初始化；它被训练去检索包含 Natural Questions 和 TriviaQA 答案的文档。",
+        "论文明确指出，初始化使用的 DPR 检索器在 Natural Questions 和 TriviaQA 上使用过检索监督。",
+        "在本论文 RAG 联合微调阶段，训练输入是输入/输出对，不直接监督应检索哪个文档。"
+      ],
+      "required_conditions": [
+        {
+          "id": "rag-03-c1",
+          "text": "明确区分 DPR 初始化训练和 RAG 下游微调两个阶段。",
+          "evidence_ids": [
+            "rag-03-e1",
+            "rag-03-e2",
+            "rag-03-e3"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "rag-03-e1",
+        "rag-03-e2",
+        "rag-03-e3"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": null,
+      "answer_points": [
+        {
+          "id": "rag-03-a1",
+          "text": "这个说法不正确：不能把 RAG 微调无需直接文档监督推广到初始化检索器的训练历史。",
+          "evidence_ids": [
+            "rag-03-e1",
+            "rag-03-e2",
+            "rag-03-e3"
+          ]
+        },
+        {
+          "id": "rag-03-a2",
+          "text": "检索器以预训练的 DPR 双编码器初始化；它被训练去检索包含 Natural Questions 和 TriviaQA 答案的文档。",
+          "evidence_ids": [
+            "rag-03-e1"
+          ]
+        },
+        {
+          "id": "rag-03-a3",
+          "text": "论文明确指出，初始化使用的 DPR 检索器在 Natural Questions 和 TriviaQA 上使用过检索监督。",
+          "evidence_ids": [
+            "rag-03-e3"
+          ]
+        },
+        {
+          "id": "rag-03-a4",
+          "text": "在本论文 RAG 联合微调阶段，训练输入是输入/输出对，不直接监督应检索哪个文档。",
+          "evidence_ids": [
+            "rag-03-e2"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "rag-03-e1",
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "quote": "We",
+          "char_start": 2559,
+          "char_end": 2561,
+          "section": "rag-03 supporting context"
+        },
+        {
+          "id": "rag-03-e2",
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "quote": "Training",
+          "char_start": 3452,
+          "char_end": 3460,
+          "section": "rag-03 supporting context"
+        },
+        {
+          "id": "rag-03-e3",
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "quote": "It",
+          "char_start": 3854,
+          "char_end": 3856,
+          "section": "rag-03 supporting context"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen rag PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "rag-04",
+      "paper_id": "rag",
+      "category": "insufficient_evidence",
+      "question": "请给出论文报告的 RAG-Sequence 在 Natural Questions 上 44.5 EM 的 95% 置信区间和跨随机种子标准差。只使用论文实际报告的数据，不自行估算。",
+      "expected_status": "insufficient_evidence",
+      "expected_answer_points": [],
+      "required_conditions": [],
+      "evidence_ids": [
+        "rag-04-e1",
+        "rag-04-e2",
+        "rag-04-e3"
+      ],
+      "insufficient_reason": "当前已核对的实验结果和实现细节中，只找到 44.5 EM 等点估计，未找到该结果的 95% 置信区间或跨种子标准差。 不能提供所请求的两个统计量，也不能将自行估算或未见的重复运行当作论文报告。",
+      "insufficiency_audit": {
+        "reviewed_page_indices": [
+          3,
+          4,
+          5,
+          16,
+          17,
+          18
+        ],
+        "reviewed_sections": [
+          "Section 3.1 Open-domain QA",
+          "Section 4.1 and Table 1",
+          "Appendix A Implementation Details",
+          "Appendix C Training setup Details",
+          "Appendix D Further Details on Open-Domain QA",
+          "Appendix G Parameters",
+          "Appendix I and Table 7"
+        ],
+        "search_page_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ],
+        "search_patterns": [
+          "confidence",
+          "standard\\ deviation",
+          "standard\\ error",
+          "random\\ seed",
+          "seed",
+          "variance",
+          "p\\-value",
+          "significance"
+        ],
+        "boundary": "不足结论限于当前论文中已核对的相关表格、正文和附录范围，不宣称所有外部代码或其他版本均不存在这些数据。",
+        "missing_information": [
+          "NQ RAG-Sequence 44.5 EM 95% confidence interval",
+          "cross-seed standard deviation"
+        ],
+        "near_miss_rule": "Table 1 gives point estimates; hardware, retrieval counts and dataset sizes do not supply the requested repeated-run variability.",
+        "search_normalization": "Case-insensitive regular expression on unmodified pypdf text; exact pattern list and hit pages frozen",
+        "keyword_page_indices": {
+          "confidence": [],
+          "standard\\ deviation": [],
+          "standard\\ error": [],
+          "random\\ seed": [],
+          "seed": [],
+          "variance": [],
+          "p\\-value": [],
+          "significance": []
+        }
+      },
+      "table_probe": null,
+      "answer_points": [],
+      "expected_evidence": [
+        {
+          "id": "rag-04-e1",
+          "page_index": 5,
+          "pdf_page_number": 6,
+          "quote": "Table",
+          "char_start": 0,
+          "char_end": 5,
+          "section": "rag-04 supporting context"
+        },
+        {
+          "id": "rag-04-e2",
+          "page_index": 16,
+          "pdf_page_number": 17,
+          "quote": "A",
+          "char_start": 80,
+          "char_end": 81,
+          "section": "rag-04 supporting context"
+        },
+        {
+          "id": "rag-04-e3",
+          "page_index": 16,
+          "pdf_page_number": 17,
+          "quote": "C",
+          "char_start": 1482,
+          "char_end": 1483,
+          "section": "rag-04 supporting context"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen rag PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "rag-05",
+      "paper_id": "rag",
+      "category": "table_footnote_probe",
+      "question": "请读表 2：RAG-Sequence 在 MSMARCO 的 Rouge-L 和 BLEU-1 各是多少，相比 BART 各高多少？表中的星号是什么意思，这些结果能否当作与 SotA 使用相同 gold 输入条件的比较？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "RAG-Sequence 的 MSMARCO Rouge-L 为 40.8，BLEU-1 为 44.2。",
+        "BART 的相应分数为 38.2 和 41.6，因此 RAG-Sequence 在两个指标上均高 2.6 点。",
+        "星号表示使用了 gold context/evidence；MSMARCO SotA 的 49.8 和 49.9 都带星号。",
+        "不能视为相同 gold 输入条件：本文 RAG/BART 的 open-domain 设定不使用 MSMARCO 提供的 gold passages，而该 SotA 使用 gold context。"
+      ],
+      "required_conditions": [
+        {
+          "id": "rag-05-c1",
+          "text": "数据来自 Table 2 的 MSMARCO 分组、R-L 与 B-1 两列，不能读取旁边 Jeopardy 的 B-1/QB-1。",
+          "evidence_ids": [
+            "rag-05-e1"
+          ]
+        },
+        {
+          "id": "rag-05-c2",
+          "text": "比较必须带出 gold context 条件；分数差是指标点数差而非相对百分比。",
+          "evidence_ids": [
+            "rag-05-e1",
+            "rag-05-e4"
+          ]
+        },
+        {
+          "id": "rag-05-c3",
+          "text": "本文使用问题和答案、从 Wikipedia 检索；不能把表注的“无 gold access 最佳”读成所有输入条件一致时全表最优。",
+          "evidence_ids": [
+            "rag-05-e1",
+            "rag-05-e2",
+            "rag-05-e3"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "rag-05-e1",
+        "rag-05-e2",
+        "rag-05-e3",
+        "rag-05-e4"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": {
+        "label": "Table 2",
+        "row_labels": [
+          "BART",
+          "RAG-Seq.",
+          "SotA"
+        ],
+        "column_labels": [
+          "MSMARCO R-L",
+          "MSMARCO B-1"
+        ],
+        "note_evidence_ids": [
+          "rag-05-e1"
+        ],
+        "visual_review_page_indices": [
+          5
+        ]
+      },
+      "answer_points": [
+        {
+          "id": "rag-05-a1",
+          "text": "RAG-Sequence 的 MSMARCO Rouge-L 为 40.8，BLEU-1 为 44.2。",
+          "evidence_ids": [
+            "rag-05-e1"
+          ]
+        },
+        {
+          "id": "rag-05-a2",
+          "text": "BART 的相应分数为 38.2 和 41.6，因此 RAG-Sequence 在两个指标上均高 2.6 点。",
+          "evidence_ids": [
+            "rag-05-e1",
+            "rag-05-e4"
+          ]
+        },
+        {
+          "id": "rag-05-a3",
+          "text": "星号表示使用了 gold context/evidence；MSMARCO SotA 的 49.8 和 49.9 都带星号。",
+          "evidence_ids": [
+            "rag-05-e1"
+          ]
+        },
+        {
+          "id": "rag-05-a4",
+          "text": "不能视为相同 gold 输入条件：本文 RAG/BART 的 open-domain 设定不使用 MSMARCO 提供的 gold passages，而该 SotA 使用 gold context。",
+          "evidence_ids": [
+            "rag-05-e2",
+            "rag-05-e3",
+            "rag-05-e4"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "rag-05-e1",
+          "page_index": 5,
+          "pdf_page_number": 6,
+          "quote": "Table",
+          "char_start": 424,
+          "char_end": 429,
+          "section": "Table 2"
+        },
+        {
+          "id": "rag-05-e2",
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "quote": "Abstractive",
+          "char_start": 3695,
+          "char_end": 3706,
+          "section": "rag-05 supporting context"
+        },
+        {
+          "id": "rag-05-e3",
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "quote": "MSMARCO",
+          "char_start": 0,
+          "char_end": 7,
+          "section": "rag-05 supporting context"
+        },
+        {
+          "id": "rag-05-e4",
+          "page_index": 5,
+          "pdf_page_number": 6,
+          "quote": "Abstractive",
+          "char_start": 1054,
+          "char_end": 1065,
+          "section": "rag-05 supporting context"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen rag PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "dpr-01",
+      "paper_id": "dpr",
+      "category": "fact",
+      "question": "DPR 如何分别把问题和段落编码成向量，又用什么相似度给段落排序？请包括编码器关系、输出 token 和向量维数。",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "问题和段落分别使用两个独立的 BERT base uncased 编码器。",
+        "每个编码器取 [CLS] token 的表示作为输出。",
+        "输出维数 d=768。",
+        "问题与段落向量的点积（inner/dot product）是检索相似度。"
+      ],
+      "required_conditions": [
+        {
+          "id": "dpr-01-c1",
+          "text": "“两个独立编码器”不能写成同一套共享权重或跨注意力联合编码问题与段落。",
+          "evidence_ids": [
+            "dpr-01-e1",
+            "dpr-01-e2"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "dpr-01-e1",
+        "dpr-01-e2"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": null,
+      "answer_points": [
+        {
+          "id": "dpr-01-a1",
+          "text": "问题和段落分别使用两个独立的 BERT base uncased 编码器。",
+          "evidence_ids": [
+            "dpr-01-e2"
+          ]
+        },
+        {
+          "id": "dpr-01-a2",
+          "text": "每个编码器取 [CLS] token 的表示作为输出。",
+          "evidence_ids": [
+            "dpr-01-e2"
+          ]
+        },
+        {
+          "id": "dpr-01-a3",
+          "text": "输出维数 d=768。",
+          "evidence_ids": [
+            "dpr-01-e2"
+          ]
+        },
+        {
+          "id": "dpr-01-a4",
+          "text": "问题与段落向量的点积（inner/dot product）是检索相似度。",
+          "evidence_ids": [
+            "dpr-01-e1"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "dpr-01-e1",
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "quote": "At",
+          "char_start": 5,
+          "char_end": 7,
+          "section": "dpr-01 supporting context"
+        },
+        {
+          "id": "dpr-01-e2",
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "quote": "Encoders",
+          "char_start": 1265,
+          "char_end": 1273,
+          "section": "dpr-01 supporting context"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen dpr PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "dpr-02",
+      "paper_id": "dpr",
+      "category": "cross_section_conditions",
+      "question": "在 WebQuestions 和 CuratedTREC 的 Multi 实验中，DPR 检索器的训练数据由哪些数据集合并而成，reader 从哪里初始化、之后怎样适配？这和只在单个数据集上训练有什么关键区别？",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "Multi 检索器合并 NQ、TriviaQA、WebQuestions 和 CuratedTREC 的训练数据。",
+        "SQuAD 排除在 Multi 检索器的合并训练数据之外。",
+        "对 WQ/TREC 这类小数据集的 Multi 实验，reader 从已在 Natural Questions 上训练的 reader 开始。",
+        "该 reader 随后在目标小数据集上微调；不能解释为直接零样本应用 NQ reader。",
+        "Single 使用单个目标数据集的训练数据；Multi 允许使用其他数据集的训练数据。"
+      ],
+      "required_conditions": [
+        {
+          "id": "dpr-02-c1",
+          "text": "“Multi”不能解读为五个数据集全部合并。",
+          "evidence_ids": [
+            "dpr-02-e1",
+            "dpr-02-e2",
+            "dpr-02-e4"
+          ]
+        },
+        {
+          "id": "dpr-02-c2",
+          "text": "检索器的数据合并与 reader 的 NQ 预训练后目标任务微调是不同步骤，必须分别说明。",
+          "evidence_ids": [
+            "dpr-02-e2",
+            "dpr-02-e3",
+            "dpr-02-e4"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "dpr-02-e1",
+        "dpr-02-e2",
+        "dpr-02-e3",
+        "dpr-02-e4"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": null,
+      "answer_points": [
+        {
+          "id": "dpr-02-a1",
+          "text": "Multi 检索器合并 NQ、TriviaQA、WebQuestions 和 CuratedTREC 的训练数据。",
+          "evidence_ids": [
+            "dpr-02-e1",
+            "dpr-02-e2"
+          ]
+        },
+        {
+          "id": "dpr-02-a2",
+          "text": "SQuAD 排除在 Multi 检索器的合并训练数据之外。",
+          "evidence_ids": [
+            "dpr-02-e2",
+            "dpr-02-e4"
+          ]
+        },
+        {
+          "id": "dpr-02-a3",
+          "text": "对 WQ/TREC 这类小数据集的 Multi 实验，reader 从已在 Natural Questions 上训练的 reader 开始。",
+          "evidence_ids": [
+            "dpr-02-e3",
+            "dpr-02-e4"
+          ]
+        },
+        {
+          "id": "dpr-02-a4",
+          "text": "该 reader 随后在目标小数据集上微调；不能解释为直接零样本应用 NQ reader。",
+          "evidence_ids": [
+            "dpr-02-e3",
+            "dpr-02-e4"
+          ]
+        },
+        {
+          "id": "dpr-02-a5",
+          "text": "Single 使用单个目标数据集的训练数据；Multi 允许使用其他数据集的训练数据。",
+          "evidence_ids": [
+            "dpr-02-e2",
+            "dpr-02-e4"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "dpr-02-e1",
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "quote": "Question",
+          "char_start": 1208,
+          "char_end": 1216,
+          "section": "dpr-02 supporting context"
+        },
+        {
+          "id": "dpr-02-e2",
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "quote": "While",
+          "char_start": 1255,
+          "char_end": 1260,
+          "section": "dpr-02 supporting context"
+        },
+        {
+          "id": "dpr-02-e3",
+          "page_index": 6,
+          "pdf_page_number": 7,
+          "quote": "We",
+          "char_start": 3964,
+          "char_end": 3966,
+          "section": "dpr-02 supporting context"
+        },
+        {
+          "id": "dpr-02-e4",
+          "page_index": 7,
+          "pdf_page_number": 8,
+          "quote": "Table",
+          "char_start": 612,
+          "char_end": 617,
+          "section": "dpr-02 supporting context"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen dpr PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "dpr-03",
+      "paper_id": "dpr",
+      "category": "false_premise",
+      "question": "DPR 在本文五个数据集上的检索准确率都超过 BM25，所以本文证明了稠密检索可以无条件替代 BM25，对吗？如果不对，请给出明确反例并区分实验事实与作者的解释。",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "不对，论文明确把 SQuAD 作为例外，不能得出所有数据集都胜出或无条件替代的结论。",
+        "Table 2 的 SQuAD Top-20 中，BM25 为 68.8，Single DPR 为 63.2，Multi DPR 为 51.6，均低于 BM25。",
+        "作者猜测 SQuAD 的问题在看到段落后编写，词项重叠高，因此有利于 BM25。",
+        "作者还猜测仅来自 500 多篇 Wikipedia 文章导致训练分布偏置。"
+      ],
+      "required_conditions": [
+        {
+          "id": "dpr-03-c1",
+          "text": "反例必须说明 SQuAD、Top-20 检索准确率与 Single/Multi 设置，不与端到端 QA EM 混用。",
+          "evidence_ids": [
+            "dpr-03-e1",
+            "dpr-03-e2"
+          ]
+        },
+        {
+          "id": "dpr-03-c2",
+          "text": "词项重叠和训练偏置是作者提出的解释/猜测，不能写成已用受控因果实验确认的原因。",
+          "evidence_ids": [
+            "dpr-03-e3"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "dpr-03-e1",
+        "dpr-03-e2",
+        "dpr-03-e3"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": null,
+      "answer_points": [
+        {
+          "id": "dpr-03-a1",
+          "text": "不对，论文明确把 SQuAD 作为例外，不能得出所有数据集都胜出或无条件替代的结论。",
+          "evidence_ids": [
+            "dpr-03-e1",
+            "dpr-03-e2"
+          ]
+        },
+        {
+          "id": "dpr-03-a2",
+          "text": "Table 2 的 SQuAD Top-20 中，BM25 为 68.8，Single DPR 为 63.2，Multi DPR 为 51.6，均低于 BM25。",
+          "evidence_ids": [
+            "dpr-03-e1"
+          ]
+        },
+        {
+          "id": "dpr-03-a3",
+          "text": "作者猜测 SQuAD 的问题在看到段落后编写，词项重叠高，因此有利于 BM25。",
+          "evidence_ids": [
+            "dpr-03-e3"
+          ]
+        },
+        {
+          "id": "dpr-03-a4",
+          "text": "作者还猜测仅来自 500 多篇 Wikipedia 文章导致训练分布偏置。",
+          "evidence_ids": [
+            "dpr-03-e3"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "dpr-03-e1",
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "quote": "Training",
+          "char_start": 5,
+          "char_end": 13,
+          "section": "Table 2"
+        },
+        {
+          "id": "dpr-03-e2",
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "quote": "Main",
+          "char_start": 1971,
+          "char_end": 1975,
+          "section": "dpr-03 supporting context"
+        },
+        {
+          "id": "dpr-03-e3",
+          "page_index": 4,
+          "pdf_page_number": 5,
+          "quote": "We",
+          "char_start": 3347,
+          "char_end": 3349,
+          "section": "dpr-03 supporting context"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen dpr PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "dpr-04",
+      "paper_id": "dpr",
+      "category": "insufficient_evidence",
+      "question": "论文有没有给出 DPR 与 ORQA 在同一硬件、相同推理批大小下的完整端到端问答吞吐量（QPS）比值？如果有请报出；只允许使用本文报告，不能拿检索 QPS 或单个 reader 延迟替代。",
+      "expected_status": "insufficient_evidence",
+      "expected_answer_points": [],
+      "required_conditions": [],
+      "evidence_ids": [
+        "dpr-04-e1",
+        "dpr-04-e2",
+        "dpr-04-e3"
+      ],
+      "insufficient_reason": "当前核对的运行效率与问答结果部分没有提供所要求的同条件端到端 QPS 比值，因此不能报出该比值。 995.0 questions/s 是 DPR passage retrieval 的测量，不能当作完整端到端 QA 的 QPS。 约 20 ms 是该段讨论的 reader 延迟，作者明确说吞吐量的确切影响更难测量；ORQA 与 DPR 段落长度等条件也不同。",
+      "insufficiency_audit": {
+        "reviewed_page_indices": [
+          6,
+          7,
+          11,
+          12
+        ],
+        "reviewed_sections": [
+          "Section 5.4 Run-time Efficiency",
+          "Section 6.1 End-to-end QA System",
+          "Section 6.2 Results and reader/ORQA discussion",
+          "Appendix D Joint Training of Retriever and Reader"
+        ],
+        "search_page_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "search_patterns": [
+          "throughput",
+          "questions\\ per\\ second",
+          "QPS",
+          "latency",
+          "ORQA",
+          "batch\\ size",
+          "hardware"
+        ],
+        "boundary": "不足结论限定当前核对的 Section 5.4、Section 6.1/6.2 和 Appendix D，不能断言外部代码/实验永远不存在此测量。",
+        "missing_information": [
+          "matched-hardware matched-inference-batch end-to-end DPR QPS",
+          "matched-hardware matched-inference-batch end-to-end ORQA QPS",
+          "directly reported ratio"
+        ],
+        "near_miss_rule": "Retrieval-only 995.0 questions/s, BM25 per-thread 23.7 questions/s and reader roughly 20ms have different scope and cannot answer a complete end-to-end DPR-versus-ORQA matched-condition throughput ratio.",
+        "search_normalization": "Case-insensitive regular expression on unmodified pypdf text; exact pattern list and hit pages frozen",
+        "keyword_page_indices": {
+          "throughput": [
+            7
+          ],
+          "questions\\ per\\ second": [
+            6
+          ],
+          "QPS": [],
+          "latency": [
+            7,
+            11
+          ],
+          "ORQA": [
+            0,
+            1,
+            7,
+            11
+          ],
+          "batch\\ size": [
+            4,
+            5,
+            6,
+            11
+          ],
+          "hardware": []
+        }
+      },
+      "table_probe": null,
+      "answer_points": [],
+      "expected_evidence": [
+        {
+          "id": "dpr-04-e1",
+          "page_index": 6,
+          "pdf_page_number": 7,
+          "quote": "Run-time",
+          "char_start": 360,
+          "char_end": 368,
+          "section": "dpr-04 supporting context"
+        },
+        {
+          "id": "dpr-04-e2",
+          "page_index": 7,
+          "pdf_page_number": 8,
+          "quote": "One",
+          "char_start": 2876,
+          "char_end": 2879,
+          "section": "dpr-04 supporting context"
+        },
+        {
+          "id": "dpr-04-e3",
+          "page_index": 11,
+          "pdf_page_number": 12,
+          "quote": "D",
+          "char_start": 3099,
+          "char_end": 3100,
+          "section": "dpr-04 supporting context"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen dpr PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    },
+    {
+      "id": "dpr-05",
+      "paper_id": "dpr",
+      "category": "table_footnote_probe",
+      "question": "表 3 中 G.+BM25(1)、#N=127+128 这一行的 Top-5、Top-20、Top-100 各是多少？请解释 IB、127+128 和表注的“1 个额外 BM25 negative”，并说明这些分数在哪个数据划分上测得。",
+      "expected_status": "answered",
+      "expected_answer_points": [
+        "该行 Top-5=65.8，Top-20=78.0，Top-100=84.9。",
+        "IB 指 in-batch training，该行启用了 batch 内负例训练。",
+        "127 表示同一批内其他问题的 127 个 gold positive passages 作为当前问题的负例，即 batch size 为 128。",
+        "每个问题额外选 1 个 BM25 negative，整批共有 128 个，这些额外段落对批内所有问题作为负例，所以 #N 写作 127+128。",
+        "这些是 Natural Questions 开发集上的 top-k 检索准确率。"
+      ],
+      "required_conditions": [
+        {
+          "id": "dpr-05-c1",
+          "text": "不能把这一行的“1 个 BM25 negative”解释为每个问题最终只比较 1 个 hard negative；表注明确批内共享。",
+          "evidence_ids": [
+            "dpr-05-e1",
+            "dpr-05-e2",
+            "dpr-05-e3",
+            "dpr-05-e4"
+          ]
+        },
+        {
+          "id": "dpr-05-c2",
+          "text": "不能把该行标成测试集成绩或最终问答 EM。",
+          "evidence_ids": [
+            "dpr-05-e1"
+          ]
+        },
+        {
+          "id": "dpr-05-c3",
+          "text": "必须按 #N=127+128 的最后一行取数，不能误取同名 G.+BM25(1) 的 31+32 行。",
+          "evidence_ids": [
+            "dpr-05-e1"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "dpr-05-e1",
+        "dpr-05-e2",
+        "dpr-05-e3",
+        "dpr-05-e4"
+      ],
+      "insufficient_reason": null,
+      "insufficiency_audit": null,
+      "table_probe": {
+        "label": "Table 3",
+        "row_labels": [
+          "G.+BM25(1) #N=127+128"
+        ],
+        "column_labels": [
+          "IB",
+          "Top-5",
+          "Top-20",
+          "Top-100"
+        ],
+        "note_evidence_ids": [
+          "dpr-05-e1"
+        ],
+        "visual_review_page_indices": [
+          5
+        ]
+      },
+      "answer_points": [
+        {
+          "id": "dpr-05-a1",
+          "text": "该行 Top-5=65.8，Top-20=78.0，Top-100=84.9。",
+          "evidence_ids": [
+            "dpr-05-e1"
+          ]
+        },
+        {
+          "id": "dpr-05-a2",
+          "text": "IB 指 in-batch training，该行启用了 batch 内负例训练。",
+          "evidence_ids": [
+            "dpr-05-e1"
+          ]
+        },
+        {
+          "id": "dpr-05-a3",
+          "text": "127 表示同一批内其他问题的 127 个 gold positive passages 作为当前问题的负例，即 batch size 为 128。",
+          "evidence_ids": [
+            "dpr-05-e1",
+            "dpr-05-e2",
+            "dpr-05-e3"
+          ]
+        },
+        {
+          "id": "dpr-05-a4",
+          "text": "每个问题额外选 1 个 BM25 negative，整批共有 128 个，这些额外段落对批内所有问题作为负例，所以 #N 写作 127+128。",
+          "evidence_ids": [
+            "dpr-05-e1",
+            "dpr-05-e4"
+          ]
+        },
+        {
+          "id": "dpr-05-a5",
+          "text": "这些是 Natural Questions 开发集上的 top-k 检索准确率。",
+          "evidence_ids": [
+            "dpr-05-e1"
+          ]
+        }
+      ],
+      "expected_evidence": [
+        {
+          "id": "dpr-05-e1",
+          "page_index": 5,
+          "pdf_page_number": 6,
+          "quote": "Type",
+          "char_start": 2398,
+          "char_end": 2402,
+          "section": "Table 3"
+        },
+        {
+          "id": "dpr-05-e2",
+          "page_index": 2,
+          "pdf_page_number": 3,
+          "quote": "In-batch",
+          "char_start": 3980,
+          "char_end": 3988,
+          "section": "dpr-05 supporting context"
+        },
+        {
+          "id": "dpr-05-e3",
+          "page_index": 3,
+          "pdf_page_number": 4,
+          "quote": "negative",
+          "char_start": 5,
+          "char_end": 13,
+          "section": "dpr-05 supporting context"
+        },
+        {
+          "id": "dpr-05-e4",
+          "page_index": 5,
+          "pdf_page_number": 6,
+          "quote": "Finally",
+          "char_start": 1842,
+          "char_end": 1849,
+          "section": "dpr-05 supporting context"
+        }
+      ],
+      "allowed_source_scope": "Only the frozen dpr PDF, including its appendices; no external paper, web search or model prior may supply factual evidence.",
+      "ai_review": {
+        "status": "prepared_and_source_checked",
+        "reviewer": "Codex AI",
+        "method": "Direct source reading, pypdf exact offsets/hash checks and visual table-note review; no model response run",
+        "note": "AI-prepared candidate labels. Source-byte validation is separate from semantic acceptance."
+      },
+      "human_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "decision": null,
+        "notes": null
+      }
+    }
+  ]
+}

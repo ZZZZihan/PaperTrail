@@ -37,8 +37,9 @@ class Budget:
             scope = os.getenv("PAPERTRAIL_MODEL_BUDGET_SCOPE", "v01-development")
             scope_hash = hashlib.sha256(scope.encode()).hexdigest()
             if mode == "provider_quota":
-                max_calls = int(os.environ["PAPERTRAIL_MODEL_MAX_CALLS"])
-                if not 1 <= max_calls <= 1000:
+                configured_calls = os.environ["PAPERTRAIL_MODEL_MAX_CALLS"].strip()
+                max_calls = None if configured_calls == "unlimited" else int(configured_calls)
+                if max_calls is not None and not 1 <= max_calls <= 1000:
                     return None
                 return cls(
                     Decimal(0), Decimal(0), Decimal(0), currency, scope_hash, mode, max_calls
@@ -78,7 +79,7 @@ class CallLedger:
         if self.budget is None:
             raise ModelError(
                 "budget_not_configured",
-                "请配置获准预算及单价，或明确选择供应商额度模式并设置调用次数上限，然后重启。",
+                "请配置获准预算及单价，或明确选择供应商额度模式并设置获准的调用次数配置，然后重启。",
             )
         budget = self.budget
         quota = budget.mode == "provider_quota"
@@ -90,6 +91,7 @@ class CallLedger:
         reservation = {
             **metadata,
             "budget_mode": budget.mode,
+            "max_calls": budget.max_calls,
             "reserved_cost_purpose": "call_slot_only_not_monetary"
             if quota
             else "conservative_token_cost",
@@ -114,7 +116,11 @@ class CallLedger:
                 raise ModelError(
                     "budget_currency_changed", "本轮预算币种与既有记录不同，请恢复配置。"
                 )
-            if quota and sum(row["call_count"] for row in rows) >= budget.max_calls:
+            if (
+                quota
+                and budget.max_calls is not None
+                and sum(row["call_count"] for row in rows) >= budget.max_calls
+            ):
                 raise ModelError(
                     "call_limit_exceeded", "本轮调用次数已达上限，请核对供应商额度和账本后再试。"
                 )
@@ -163,6 +169,7 @@ class CallLedger:
         augmented = {
             **details,
             "budget_mode": self.budget.mode,
+            "max_calls": self.budget.max_calls,
             "reserved_cost_purpose": "call_slot_only_not_monetary"
             if self.budget.mode == "provider_quota"
             else "conservative_token_cost",
@@ -216,6 +223,7 @@ class CallLedger:
                 for row in rows
             ],
             "budget_mode": self.budget.mode if self.budget else None,
+            "max_calls": self.budget.max_calls if self.budget else None,
             "estimated_cost": str(known_subtotal) if known_costs or not rows else None,
             "estimated_cost_scope": "known_calls_only",
             "known_cost_subtotal": str(known_subtotal),

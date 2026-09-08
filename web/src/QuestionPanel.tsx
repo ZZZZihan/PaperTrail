@@ -11,14 +11,24 @@ type Question = {
   id: string;
   paper_id: string;
   question: string;
-  status: "pending" | "running" | "answered" | "insufficient_evidence" | "failed";
+  status: "pending" | "running" | "answered" | "partial_answer" | "insufficient_evidence" | "failed";
   stage: string;
-  claims: { text: string; citations: Citation[] }[];
+  claims: { text: string; citations: Citation[]; role?: "answer" | "background" | null }[];
   message: string;
   error_code: string | null;
   created_at: string;
   completed_at: string | null;
   support_status?: string;
+  coverage?: {
+    status: "complete" | "partial" | "unanswered";
+    review_source: "ai" | "not_checked";
+    items: {
+      requirement: string;
+      covered: boolean;
+      claim_indices: number[];
+      kind?: "requested" | "qualification" | "background";
+    }[];
+  } | null;
   trace?: Record<string, unknown>;
 };
 
@@ -54,6 +64,7 @@ const statusLabels: Record<Question["status"], string> = {
   pending: "等待处理",
   running: "正在查找与核对证据",
   answered: "回答已保存",
+  partial_answer: "部分回答 · 仍有要点待核对",
   insufficient_evidence: "当前已检索证据不足",
   failed: "本次问答未完成",
 };
@@ -83,6 +94,36 @@ const suggestions = [
   { label: "方法局限", question: "作者讨论了哪些局限？请区分作者原文和你的推断。" },
 ];
 
+function CitedClaims({ claims, paperId, onCitation }: {
+  claims: Question["claims"];
+  paperId: string;
+  onCitation: (citation: Citation) => void;
+}) {
+  return claims.map((claim, index) => (
+    <div className="answer-claim" key={index}>
+      <p>{claim.text}</p>
+      <div className="claim-citations">
+        {claim.citations.map((citation, citationIndex) => (
+          <button
+            type="button"
+            className="citation-link"
+            key={`${citation.chunk_id}-${citationIndex}`}
+            disabled={citation.paper_id !== paperId}
+            onClick={() => onCitation(citation)}
+            aria-label={`查看引用：PDF 第 ${citation.page_index + 1} 页，${citation.quote.slice(0, 60)}`}
+          >
+            <span className="citation-label">
+              <span>PDF 第 {citation.page_index + 1} 页</span>
+              <span aria-hidden="true">查看原文 ↗</span>
+            </span>
+            <q>{citation.quote}</q>
+          </button>
+        ))}
+      </div>
+    </div>
+  ));
+}
+
 function QuestionCard({
   question,
   initiallyOpen,
@@ -100,6 +141,12 @@ function QuestionCard({
 }) {
   const [open, setOpen] = useState(initiallyOpen || inProgress(question));
   const active = inProgress(question);
+  const insufficient = question.status === "insufficient_evidence";
+  const answerClaims = question.claims.filter((claim) => claim.role !== "background");
+  const backgroundClaims = insufficient ? question.claims : question.claims.filter((claim) => claim.role === "background");
+  // Missing fields belong to historical results; their original status and scores stay intact.
+  const answerItems = question.coverage?.items.filter((item) => item.kind !== "background") || [];
+  const backgroundItems = question.coverage?.items.filter((item) => item.kind === "background") || [];
   return (
     <details
       className={`question-card question-${question.status}`}
@@ -129,44 +176,54 @@ function QuestionCard({
             </div>
           </div>
         )}
-        {question.status === "answered" && (
+        {question.coverage && answerItems.length > 0 && (
+          <div className="answer-coverage" aria-label="回答要点核对">
+            <strong>{insufficient ? "当前请求仍缺少证据" : question.coverage.status === "complete" ? "回答要点已由 AI 核对" : "已回答与待核对的要点"}</strong>
+            <ul>
+              {answerItems.map((item, index) => (
+                <li key={index}>
+                  <span>{item.kind === "requested" && !item.covered
+                    ? item.claim_indices.length > 0 ? "部分已回答 · 尚未完整" : "当前证据无法提供"
+                    : item.kind === "qualification"
+                      ? item.covered ? "条件已核对" : "条件待核对"
+                      : item.covered ? "已回答" : "待核对"}</span>：{item.requirement}
+                </li>
+              ))}
+            </ul>
+            <small>核对范围是本次问题与已检索内容。AI 仍可能遗漏条件，请结合原文判断。</small>
+          </div>
+        )}
+        {(question.status === "answered" || question.status === "partial_answer") && (
           <>
             <div className="evidence-verification">
               来源已校验 · AI 已检查支持关系 · 待你核对
             </div>
-            {question.claims.map((claim, index) => (
-              <div className="answer-claim" key={index}>
-                <p>{claim.text}</p>
-                <div className="claim-citations">
-                  {claim.citations.map((citation, citationIndex) => (
-                    <button
-                      type="button"
-                      className="citation-link"
-                      key={`${citation.chunk_id}-${citationIndex}`}
-                      disabled={citation.paper_id !== paperId}
-                      onClick={() => onCitation(citation)}
-                      aria-label={`查看引用：PDF 第 ${citation.page_index + 1} 页，${citation.quote.slice(0, 60)}`}
-                    >
-                      <span className="citation-label">
-                        <span>PDF 第 {citation.page_index + 1} 页</span>
-                        <span aria-hidden="true">查看原文 ↗</span>
-                      </span>
-                      <q>{citation.quote}</q>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
+            {!question.coverage && <p className="review-note">这条历史回答尚未检查要点与必要条件是否完整。</p>}
+            <CitedClaims claims={answerClaims} paperId={paperId} onCitation={onCitation} />
             {question.message && <p className="answer-note">{question.message}</p>}
             <p className="review-note">
               AI 检查不代替你的核对。页码按 PDF 文件顺序计算，可能与论文印刷页码不同。
             </p>
           </>
         )}
-        {question.status === "insufficient_evidence" && (
+        {(backgroundClaims.length > 0 || backgroundItems.length > 0) && (
+          <section className="answer-background" aria-label="补充背景">
+            <h3>补充背景</h3>
+            <p className="background-note">以下引文仅补充论文背景，不计作对本次请求的回答。来源已校验，AI 支持检查仍待你核对。</p>
+            <CitedClaims claims={backgroundClaims} paperId={paperId} onCitation={onCitation} />
+            {backgroundItems.length > 0 && <ul className="background-coverage">
+              {backgroundItems.map((item, index) => (
+                <li key={index}>
+                  <span>{item.covered ? "背景已核对" : "背景待核对"}</span>：{item.requirement}
+                </li>
+              ))}
+            </ul>}
+          </section>
+        )}
+        {insufficient && (
           <div className="answer-insufficient">
-            <p>{question.message || "在当前已检索证据中未找到足以支持回答的内容。"}</p>
             <small>这不表示整篇论文一定没有相关内容。可缩小问题，补充方法名、实验名或原文关键词后再问。</small>
+            <p className="answer-insufficient-conclusion">{question.message || "在当前已检索证据中未找到足以支持回答的内容。证据不足。"}</p>
           </div>
         )}
         {question.status === "failed" && (
@@ -175,7 +232,7 @@ function QuestionCard({
             {question.error_code && <small>错误标识：{question.error_code}</small>}
           </div>
         )}
-        {(question.status === "failed" || question.status === "insufficient_evidence") && (
+        {(question.status === "failed" || question.status === "insufficient_evidence" || question.status === "partial_answer") && (
           <button
             type="button"
             className="text-button retry-question"
@@ -193,9 +250,13 @@ function QuestionCard({
 export function QuestionPanel({
   paperId,
   onCitation,
+  embedded = false,
+  focusRequest = 0,
 }: {
   paperId: string;
   onCitation: (citation: Citation) => void;
+  embedded?: boolean;
+  focusRequest?: number;
 }) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [draft, setDraft] = useState("");
@@ -215,6 +276,13 @@ export function QuestionPanel({
   const textarea = useRef<HTMLTextAreaElement>(null);
   const form = useRef<HTMLFormElement>(null);
   const active = questions.some(inProgress);
+
+  useEffect(() => {
+    if (!focusRequest) return;
+    // The parent has committed the tab change, so the composer is no longer hidden.
+    textarea.current?.focus({ preventScroll: true });
+    textarea.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [focusRequest]);
 
   useEffect(() => {
     mounted.current = true;
@@ -318,10 +386,10 @@ export function QuestionPanel({
 
   return (
     <section className="reader-panel question-panel" aria-label="论文证据问答">
-      <div className="panel-heading">
-        <span>证据问答 <span className="version-badge">v0.1</span></span>
+      {!embedded && <div className="panel-heading">
+        <span>证据问答 <span className="version-badge">v0.2</span></span>
         <small>仅基于当前论文</small>
-      </div>
+      </div>}
       <div className="question-panel-content">
         <form className="question-composer" ref={form} onSubmit={(event) => void submit(event)}>
           <label htmlFor="paper-question">从你想理解的问题开始</label>
